@@ -1,9 +1,9 @@
 import { Flex, FormLabel, Spacer, Stack } from '@chakra-ui/react'
-import { WhatsAppOptionsListOptions, Variable } from 'models'
-import React, { useEffect, useState } from 'react'
+import { WhatsAppOptionsListOptions, Variable, OctaWabaStepType } from 'models'
+import React, { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
-import { Node } from 'slate'
+import { inputPlaceholders } from 'components/shared/Graph/Nodes/helpers/helpers'
 
 type WhatsAppOptionsListSettingsBodyProps = {
   options: WhatsAppOptionsListOptions
@@ -104,6 +104,12 @@ export const WhatsAppOptionsListSettingsBody = ({
           </FormLabel>
         </Flex>
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} header`
+              ],
+          }}
           onClose={handleHeaderText}
           initialValue={
             options.header?.content ? options.header.content.richText : []
@@ -123,6 +129,12 @@ export const WhatsAppOptionsListSettingsBody = ({
           </FormLabel>
         </Flex>
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} body`
+              ],
+          }}
           required={{
             errorMsg: 'O campo "Texto do corpo da mensagem" é obrigatório',
           }}
@@ -145,6 +157,12 @@ export const WhatsAppOptionsListSettingsBody = ({
           </FormLabel>
         </Flex>
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} footer`
+              ],
+          }}
           onClose={handleFooterText}
           initialValue={
             options.footer?.content ? options.footer.content.richText : []
@@ -164,6 +182,12 @@ export const WhatsAppOptionsListSettingsBody = ({
           </FormLabel>
         </Flex>
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} title`
+              ],
+          }}
           required={{ errorMsg: 'O campo "Título da lista" é obrigatório' }}
           onClose={handleListTitle}
           initialValue={

@@ -1,3 +1,4 @@
+import { InputPlaceholders } from 'components/shared/interfaces/placeholders'
 import {
   BubbleStepType,
   InputStepType,
@@ -127,4 +128,28 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
       },
     ]
   }
+}
+
+export const inputPlaceholders: InputPlaceholders = {
+  [InputStepType.ASK_NAME]: 'Ex: Pode me dizer o seu nome?',
+  [InputStepType.EMAIL]: 'Ex: Pode me informar o seu email?',
+  [`${InputStepType.EMAIL} fallback`]:
+    'Ex: Esse email não parece ser válido. Digite novamente',
+  [InputStepType.CPF]: 'Ex: Pode me informar o seu CPF?',
+  [InputStepType.CHOICE]: 'Digite o texto da pergunta',
+  [InputStepType.PHONE]: 'Ex: Pode me informar o seu celular?',
+  [`${InputStepType.PHONE} fallback`]:
+    'Ex: Isso não se parece com um telefone válido. Digite novamente',
+  [`${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} header`]: 'Digite o cabeçalho',
+  [`${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} body`]:
+    'Digite o corpo da mensagem',
+  [`${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} footer`]: 'Digite o rodapé',
+  [`${OctaWabaStepType.WHATSAPP_OPTIONS_LIST} title`]: 'Digite o título',
+  [`${OctaWabaStepType.WHATSAPP_BUTTONS_LIST} header`]: 'Digite o cabeçalho',
+  [`${OctaWabaStepType.WHATSAPP_BUTTONS_LIST} body`]:
+    'Digite o corpo da mensagem',
+  [`${OctaWabaStepType.WHATSAPP_BUTTONS_LIST} footer`]: 'Digite o rodapé',
+  [OctaWabaStepType.COMMERCE]:
+    'Ex: Este é o catálogo que selecionamos para você:',
+  [BubbleStepType.MEDIA]: 'Ex: Confira nossas opções:',
 }

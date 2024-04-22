@@ -1,8 +1,9 @@
 import { Flex, FormLabel, Spacer, Stack } from '@chakra-ui/react'
-import { Variable, WhatsAppButtonsListOptions } from 'models'
+import { OctaWabaStepType, Variable, WhatsAppButtonsListOptions } from 'models'
 import React, { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
+import { inputPlaceholders } from 'components/shared/Graph/Nodes/helpers/helpers'
 
 type WhatsAppButtonsListSettingsBodyProps = {
   options: WhatsAppButtonsListOptions
@@ -89,6 +90,12 @@ export const WhatsAppButtonsListSettingsBody = ({
         </Flex>
 
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_BUTTONS_LIST} header`
+              ],
+          }}
           onClose={handleHeaderText}
           initialValue={
             options.header?.content ? options.header.content.richText : []
@@ -108,6 +115,12 @@ export const WhatsAppButtonsListSettingsBody = ({
           </FormLabel>
         </Flex>
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_BUTTONS_LIST} body`
+              ],
+          }}
           required
           onClose={handleBodyText}
           initialValue={
@@ -128,6 +141,12 @@ export const WhatsAppButtonsListSettingsBody = ({
           </FormLabel>
         </Flex>
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[
+                `${OctaWabaStepType.WHATSAPP_BUTTONS_LIST} footer`
+              ],
+          }}
           onClose={handleFooterText}
           initialValue={
             options.footer?.content ? options.footer.content.richText : []

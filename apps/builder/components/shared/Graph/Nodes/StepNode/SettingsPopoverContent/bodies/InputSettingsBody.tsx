@@ -4,6 +4,8 @@ import { InputOptions, TextBubbleContent, Variable } from 'models'
 import React from 'react'
 import { TextBubbleEditor } from '../../TextBubbleEditor'
 import { useTypebot } from 'contexts/TypebotContext'
+import { inputPlaceholders } from '../../../helpers/helpers'
+import { InputPlaceholders } from 'components/shared/interfaces/placeholders'
 
 type InputSettingBodyProps = {
   step: {
@@ -86,6 +88,11 @@ export const InputSettingBody = ({
         (
         <TextBubbleEditor
           required={{ errorMsg: 'O campo "Texto da pergunta" é obrigatório' }}
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[step.type as keyof InputPlaceholders] ||
+              'Digite o texto da pergunta...',
+          }}
           onClose={handleCloseEditorBotMessage}
           initialValue={
             step.options.message ? step.options.message.richText : []
@@ -109,6 +116,12 @@ export const InputSettingBody = ({
                 Mensagem para resposta inválida - Tentativa {index + 1}
               </FormLabel>
               <TextBubbleEditor
+                myEditableProps={{
+                  placeholder:
+                    inputPlaceholders[
+                      `${step.type} fallback` as keyof InputPlaceholders
+                    ] || 'Digite o texto da pergunta...',
+                }}
                 required={{
                   errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${
                     index + 1

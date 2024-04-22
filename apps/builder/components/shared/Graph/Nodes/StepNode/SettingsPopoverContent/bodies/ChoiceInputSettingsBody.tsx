@@ -4,9 +4,12 @@ import { ChoiceInputOptions, TextBubbleContent, Variable } from 'models'
 import React from 'react'
 import { TextBubbleEditor } from '../../TextBubbleEditor'
 import { FooterMessage } from 'components/shared/buttons/UploadButton.style'
+import { inputPlaceholders } from '../../../helpers/helpers'
+import { InputPlaceholders } from 'components/shared/interfaces/placeholders'
 
 type ChoiceInputSettingsBodyProps = {
   options?: ChoiceInputOptions
+  stepType: keyof InputPlaceholders
   onOptionsChange: (options: ChoiceInputOptions) => void
 }
 
@@ -14,6 +17,7 @@ const MAX_LENGHT_TEXT = 500
 
 export const ChoiceInputSettingsBody = ({
   options,
+  stepType,
   onOptionsChange,
 }: ChoiceInputSettingsBodyProps) => {
   const handleCloseEditorBotMessage = (content: TextBubbleContent) => {
@@ -42,6 +46,10 @@ export const ChoiceInputSettingsBody = ({
         </Flex>
         (
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[stepType] || 'Digite o texto da pergunta...',
+          }}
           required={{ errorMsg: 'O campo "Texto da pergunta" é obrigatório' }}
           onClose={handleCloseEditorBotMessage}
           initialValue={options?.message ? options.message.richText : []}

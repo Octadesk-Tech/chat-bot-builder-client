@@ -450,7 +450,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
       (
       <Stack>
         <HStack justify="space-between">
-          <Text>O que você quer fazer ?</Text>
+          <Text>O que você quer fazer?</Text>
           <DropdownList<HttpMethodsWebhook>
             currentItem={step.options.method}
             onItemSelect={handleMethodChange}

@@ -5,6 +5,7 @@ import {
   PlateEditor,
   selectEditor,
   serializeHtml,
+  TEditableProps,
   TEditor,
   TElement,
   Value,
@@ -32,6 +33,18 @@ type TextBubbleEditorProps = {
   increment?: number
   maxLength?: number
   required?: boolean | { errorMsg?: string }
+  myEditableProps?:
+    | TEditableProps<
+        | TElement[]
+        | {
+            type: string
+            children: {
+              text: string
+            }[]
+          }[]
+      >
+    | null
+    | undefined
 }
 
 export const TextBubbleEditor = ({
@@ -41,8 +54,10 @@ export const TextBubbleEditor = ({
   increment,
   maxLength,
   required,
+  myEditableProps,
 }: TextBubbleEditorProps) => {
   const [value, setValue] = useState(initialValue)
+  const [focus, setFocus] = useState(false)
 
   const [isVariableDropdownOpen, setIsVariableDropdownOpen] = useState(false)
   const varDropdownRef = useRef<HTMLDivElement | null>(null)
@@ -182,18 +197,33 @@ export const TextBubbleEditor = ({
       })
     )
   }
+
+  const chooseBorderColor = () => {
+    if (checkRequiredField()) {
+      return 'red.400'
+    }
+    if (focus) return 'blue.400'
+
+    return 'grey.400'
+  }
   return (
     <>
       <Stack
         flex="1"
         ref={textEditorRef}
         borderWidth="2px"
-        borderColor={checkRequiredField() ? 'red.400' : 'blue.400'}
+        borderColor={chooseBorderColor()}
         rounded="md"
         onMouseDown={handleMouseDown}
         pos="relative"
         spacing={0}
         cursor="text"
+        onFocus={() => {
+          setFocus(true)
+        }}
+        onBlur={() => {
+          setFocus(false)
+        }}
       >
         <ToolBar
           editor={editor}
@@ -219,6 +249,7 @@ export const TextBubbleEditor = ({
             },
             onKeyDown: handleKeyDown,
             onKeyUp: () => keyUpEditor(),
+            ...myEditableProps,
           }}
           initialValue={
             initialValue.length === 0

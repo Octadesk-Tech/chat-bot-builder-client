@@ -462,18 +462,18 @@ export const defaultCommerceOptions: CommerceOptions = {
   name: '',
   subject: '',
   message: {
-    html: `<div style="margin-left: 8px;">Este é o catálogo que selecionamos para você:</div>`,
+    html: ``,
     richText: [
       {
         children: [
           {
-            text: 'Este é o catálogo que selecionamos para você:',
+            text: '',
           },
         ],
         type: 'p',
       },
     ],
-    plainText: 'Este é o catálogo que selecionamos para você:',
+    plainText: '',
   },
 }
 
@@ -484,18 +484,18 @@ export const defaultWhatsAppOptionsListOptions: WhatsAppOptionsListOptions = {
   subType: 'interactive-list',
   body: {
     content: {
-      html: `<div style="margin-left: 8px;">Pergunta com lista de opções</div>`,
+      html: ``,
       richText: [
         {
           children: [
             {
-              text: 'Pergunta com lista de opções',
+              text: '',
             },
           ],
           type: 'p',
         },
       ],
-      plainText: 'Pergunta com lista de opções',
+      plainText: '',
     },
   },
   buttons: [''],
@@ -513,18 +513,18 @@ export const defaultWhatsAppOptionsListOptions: WhatsAppOptionsListOptions = {
   listItems: [],
   listTitle: {
     content: {
-      html: `<div style="margin-left: 8px;">Lista de opções</div>`,
+      html: ``,
       richText: [
         {
           children: [
             {
-              text: 'Lista de opções',
+              text: '',
             },
           ],
           type: 'h4',
         },
       ],
-      plainText: 'Lista de opções',
+      plainText: '',
     },
   },
   property: {

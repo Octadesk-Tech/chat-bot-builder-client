@@ -3,10 +3,12 @@ import { MediaBubbleContent, TextBubbleContent } from 'models'
 import React from 'react'
 import { TextBubbleEditor } from '../../TextBubbleEditor'
 import { ImageUploadContent } from 'components/shared/ImageUploadContent'
+import { inputPlaceholders } from '../../../helpers/helpers'
+import { InputPlaceholders } from 'components/shared/interfaces/placeholders'
 
 type InputMediaSettingBodyProps = {
   step: {
-    type: string,
+    type: string
     content: MediaBubbleContent
   }
   onContentChange: (content: MediaBubbleContent) => void
@@ -19,11 +21,16 @@ export const InputMediaSettingBody = ({
   const handleCloseEditorBotMessage = (content: TextBubbleContent) => {
     onContentChange({
       ...step.content,
-      message: content
+      message: content,
     })
   }
 
-  const handleImageUrlChange = (url: string, type: string, name: string, size: number) => onContentChange({ ...step.content, url, type, name, size })
+  const handleImageUrlChange = (
+    url: string,
+    type: string,
+    name: string,
+    size: number
+  ) => onContentChange({ ...step.content, url, type, name, size })
 
   return (
     <Stack spacing={4}>
@@ -33,18 +40,26 @@ export const InputMediaSettingBody = ({
         </FormLabel>
         (
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder:
+              inputPlaceholders[step.type as keyof InputPlaceholders] ||
+              'Digite o texto da mensagem...',
+          }}
           onClose={handleCloseEditorBotMessage}
           initialValue={
-            step.content.message
-              ? step.content.message.richText
-              : []
+            step.content.message ? step.content.message.richText : []
           }
           onKeyUp={handleCloseEditorBotMessage}
         />
         )
       </Stack>
       <Stack>
-        <ImageUploadContent url={step.content?.url} name={step.content?.name} size={step.content?.size} onSubmit={handleImageUrlChange} />
+        <ImageUploadContent
+          url={step.content?.url}
+          name={step.content?.name}
+          size={step.content?.size}
+          onSubmit={handleImageUrlChange}
+        />
       </Stack>
     </Stack>
   )

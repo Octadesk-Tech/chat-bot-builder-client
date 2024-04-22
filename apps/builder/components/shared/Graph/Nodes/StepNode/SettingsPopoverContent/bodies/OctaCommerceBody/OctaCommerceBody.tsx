@@ -1,5 +1,10 @@
 import OctaLoading from 'components/octaComponents/OctaLoading/OctaLoading'
-import { CommerceOptions, TextBubbleContent, Variable } from 'models'
+import {
+  CommerceOptions,
+  OctaWabaStepType,
+  TextBubbleContent,
+  Variable,
+} from 'models'
 import React, { useEffect, useState } from 'react'
 import { CommerceService } from 'services/octadesk/commerce/commerce'
 import {
@@ -11,6 +16,7 @@ import SelectProducts from './SelectProducts/SelectProducts'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
 import { Flex, FormLabel, Spacer, Stack } from '@chakra-ui/react'
 import { TextBubbleEditor } from '../../../TextBubbleEditor'
+import { inputPlaceholders } from 'components/shared/Graph/Nodes/helpers/helpers'
 
 type Props = {
   options: CommerceOptions
@@ -106,6 +112,9 @@ export const OctaCommerceBody = ({ options, onOptionsChange }: Props) => {
         </Flex>
         (
         <TextBubbleEditor
+          myEditableProps={{
+            placeholder: inputPlaceholders[OctaWabaStepType.COMMERCE],
+          }}
           maxLength={500}
           required
           increment={1}

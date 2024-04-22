@@ -153,7 +153,6 @@ export const StepSettings = ({
       items: [{ ...(step as any).items[0], ...updates }],
     } as Partial<Step>)
   }
-  console.log(step.type)
   switch (step.type) {
     case InputStepType.URL: {
       return (
@@ -167,6 +166,7 @@ export const StepSettings = ({
     case InputStepType.CHOICE: {
       return (
         <ChoiceInputSettingsBody
+          stepType={step.type}
           options={step.options}
           onOptionsChange={handleOptionsChange}
         />

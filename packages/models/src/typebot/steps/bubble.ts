@@ -100,29 +100,32 @@ export const defaultTextBubbleContent: TextBubbleContent = {
 export const defaultImageBubbleContent: ImageBubbleContent = {
   name: '',
   size: 1,
-  type: ''
+  type: '',
 }
 
-const mediaDefaultText = 'Confira nossas opções:'
 export const defaultMediaBubbleContent: MediaBubbleContent = {
   name: '',
   size: 1,
   type: 'media',
   message: {
-    html: `<div style="margin-left: 8px;">${mediaDefaultText}</div>`,
-    richText: [{
-      children: [{
-        text: mediaDefaultText,
-      }],
-      type: "p"
-    }],
-    plainText: mediaDefaultText
+    html: ``,
+    richText: [
+      {
+        children: [
+          {
+            text: '',
+          },
+        ],
+        type: 'p',
+      },
+    ],
+    plainText: '',
   },
   useFallback: false,
   fallbackMessages: undefined,
   initialVariableToken: '',
   property: undefined,
-  variableId: undefined
+  variableId: undefined,
 }
 
 export const defaultVideoBubbleContent: VideoBubbleContent = {}
