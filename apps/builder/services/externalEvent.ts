@@ -4,7 +4,8 @@ import { services } from '@octadesk-tech/services'
 
 const getNucleusUrl = async () => {
   const authStorage = Storage.getItem('auth') as any
-  const url = await services.createClient('base')
+  const url = await services.createClient('nucleus')
+  console.log(url)
 
   const { data } = await url.get('/nucleus-auth/apiKeysManagement/apikeys-baseurl', {
     headers: {
