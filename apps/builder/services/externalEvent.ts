@@ -7,16 +7,20 @@ const getNucleusUrl = async () => {
 
   const nucleusUrl = (window as any).NUCLEUS_API_URL
 
-  const { data } = await services.nucleus
-    .getClient({ baseURL: nucleusUrl })
-    .get('/apiKeysManagement/apikeys-baseurl', {
-      headers: {
-        'Content-Type': 'application/json',
-        authorization: `Bearer ${authStorage?.access_token}`,
-      },
-    })
+  try {
+    const { data } = await services.nucleus
+      .getClient({ baseURL: nucleusUrl })
+      .get('/apiKeysManagement/apikeys-baseurl', {
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: `Bearer ${authStorage?.access_token}`,
+        },
+      })
 
-  return data;
+    return data;
+  } catch (error) {
+    console.error('Error in url External Event', error)
+  }
 }
 
 export const mountUrl = async ({ blockId, botId }: IMountUrl) => {
