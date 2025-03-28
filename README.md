@@ -21,6 +21,10 @@ This fork is being used solely for bot flow construction. We do not use the bot 
 
 Typebot is an open-source alternative to Landbot. It allows you to create conversational apps/forms (Lead qualification, Product launch, User onboarding, Customer support), embed them anywhere on your web/mobile apps, and collect results in real-time.
 
+# New architecture
+
+We are migrating our project structure. From now on, when creating new requests, follow the established pattern inside apps/builder/hooks.
+
 ## Local setup
 
 1. Clone the repo

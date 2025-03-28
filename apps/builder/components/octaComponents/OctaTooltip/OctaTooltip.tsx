@@ -6,7 +6,9 @@ import {
   Popover,
   PopoverArrow,
   PopoverBody,
+  PopoverBodyProps,
   PopoverContent,
+  PopoverProps,
   PopoverTrigger,
   Text,
   useDisclosure,
@@ -14,7 +16,7 @@ import {
 import { isDefined } from '@udecode/plate-core'
 import { ReactElement } from 'react'
 
-interface OctaTooltipProps {
+interface OctaTooltipProps extends PopoverProps {
   contentText: string
   duration?: number
   hrefUrl?: string
@@ -23,6 +25,8 @@ interface OctaTooltipProps {
   textColor?: string
   tooltipPlacement?: PlacementWithLogical
   element?: ReactElement
+  contentWithElements?: ReactElement
+  popoverBody?: PopoverBodyProps
 }
 
 const OctaTooltip = ({
@@ -33,14 +37,16 @@ const OctaTooltip = ({
   popoverColor = '#ffffff',
   textColor = '#000000',
   tooltipPlacement = 'bottom',
-  element
+  element,
+  contentWithElements,
+  popoverBody,
+  ...props
 }: OctaTooltipProps) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const handleMouseEnter = () => {
     onOpen()
-    if (duration)
-      setTimeout(() => onClose(), duration)
+    if (duration) setTimeout(() => onClose(), duration)
   }
 
   const handleMouseLeave = () => {
@@ -52,27 +58,43 @@ const OctaTooltip = ({
       isOpen={isOpen}
       onOpen={onOpen}
       onClose={onClose}
-      placement={tooltipPlacement}>
-      {isDefined(element) &&
-        <PopoverTrigger><span onMouseEnter={() => handleMouseEnter()}>{element}</span></PopoverTrigger>
-      }
-      {!isDefined(element) &&
+      placement={tooltipPlacement}
+      {...props}
+    >
+      {isDefined(element) && (
+        <PopoverTrigger>
+          <span onMouseEnter={() => handleMouseEnter()}>{element}</span>
+        </PopoverTrigger>
+      )}
+      {!isDefined(element) && (
         <PopoverTrigger>
           <InfoIcon
             color={'gray.300'}
             onMouseEnter={() => handleMouseEnter()}
           />
         </PopoverTrigger>
-      }
+      )}
       <PopoverContent color={textColor} bg={popoverColor} width="100%">
         <PopoverArrow bg={popoverColor} />
-        <PopoverBody onMouseLeave={() => handleMouseLeave()} onMouseEnter={onOpen}>
-          <HStack>
-            <Text>{contentText}</Text>
-            <Link href={hrefUrl} isExternal style={{ textDecoration: "underline" }}>
-              {contentLink}
-            </Link>
-          </HStack>
+        <PopoverBody
+          onMouseLeave={() => handleMouseLeave()}
+          onMouseEnter={onOpen}
+          {...popoverBody}
+        >
+          {contentWithElements ? (
+            contentWithElements
+          ) : (
+            <HStack>
+              <Text>{contentText}</Text>
+              <Link
+                href={hrefUrl}
+                isExternal
+                style={{ textDecoration: 'underline' }}
+              >
+                {contentLink}
+              </Link>
+            </HStack>
+          )}
         </PopoverBody>
       </PopoverContent>
     </Popover>
