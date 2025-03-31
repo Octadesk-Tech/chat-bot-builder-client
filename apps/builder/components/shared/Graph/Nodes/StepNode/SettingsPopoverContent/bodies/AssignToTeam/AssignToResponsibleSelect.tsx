@@ -39,7 +39,6 @@ export const AssignToResponsibleSelect = ({
   hasResponsibleContact,
 }: Props) => {
   const { octaAgents } = useTypebot()
-  console.log('options', options)
   const [itemsToResponsibleAssign, setItemsToResponsibleAssign] = useState<
     Array<OptionType>
   >([])
