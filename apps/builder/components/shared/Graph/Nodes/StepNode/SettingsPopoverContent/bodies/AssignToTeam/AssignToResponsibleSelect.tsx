@@ -20,9 +20,9 @@ interface IParsedAgents {
 }
 
 interface IOptions {
-  assignTo: string
-  assignType: '@NO-ONE' | '@AGENT'
-  subType: 'RESPONSIBLE_CONTACT'
+  assignTo?: string
+  assignType?: '@NO-ONE' | '@AGENT' | '@GROUP'
+  subType?: 'RESPONSIBLE_CONTACT'
 }
 
 type Combination =
@@ -91,6 +91,10 @@ export const AssignToResponsibleSelect = ({
     'interactive-list@AGENT': (agent: IParsedAgents, options: IOptions) =>
       generateAgentValue(agent),
     'interactive-buttons@AGENT': (agent: IParsedAgents, options: IOptions) =>
+      generateAgentValue(agent),
+    'interactive-list@GROUP': (agent: IParsedAgents, options: IOptions) =>
+      generateAgentValue(agent),
+    'interactive-buttons@GROUP': (agent: IParsedAgents, options: IOptions) =>
       generateAgentValue(agent),
   }
 
