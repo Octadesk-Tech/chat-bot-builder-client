@@ -60,7 +60,6 @@ const schema = z.object({
     .max(30, 'O texto de dica do campo deve ter no máximo 30 caracteres.'),
   hint: z
     .string()
-    .min(1, { message: 'Campo obrigatório' })
     .max(240, 'O texto de ajuda do campo deve ter no máximo 240 caracteres.'),
 })
 
@@ -104,13 +103,14 @@ export const CreateChatFieldModal = ({
       if (resData) {
         const variable: Variable = {
           id: resData.id,
-          name: resData.title,
+          title: resData.title,
+          name: `customField.${resData.fieldId}`,
           domain: 'CHAT',
-          token: '#' + resData.fieldId,
+          token: '#' + resData.fieldId.replaceAll('_', '-'),
           variableId: resData.id,
           example: '',
           fieldId: resData.fieldId,
-          type: resData.type || 'string',
+          type: resData.type ?? 'string',
           fixed: true,
         }
 
@@ -231,7 +231,7 @@ export const CreateChatFieldModal = ({
                 </FormErrorMessage>
               )}
             </FormControl>
-            <FormControl isRequired isInvalid={!!errors.hint}>
+            <FormControl isInvalid={!!errors.hint}>
               <Box
                 display="flex"
                 flexDirection="row"
