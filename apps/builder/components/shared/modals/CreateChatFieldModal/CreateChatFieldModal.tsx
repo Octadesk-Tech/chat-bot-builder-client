@@ -52,8 +52,11 @@ const schema = z.object({
     .max(30, 'O código do campo deve ter no máximo 30 caracteres.')
     .regex(
       /^\w+$/,
-      'O código do campo deve conter apenas letras, números e underscores.'
-    ),
+      'O código do campo deve conter apenas letras minúsculas, números e underscores.'
+    )
+    .refine((val) => val === val.toLowerCase(), {
+      message: 'O texto de ajuda não deve conter letras maiúsculas.',
+    }),
   placeHolder: z
     .string()
     .min(1, { message: 'Campo obrigatório' })
@@ -132,9 +135,13 @@ export const CreateChatFieldModal = ({
     }
   }
 
-  const replaceSpacesByUnderscore = useCallback((value: string) => {
-    return value.replace(/\s+/g, '_')
-  }, [])
+  const replaceAllNonAlphanumericWithUnderscore = (value: string) => {
+    return value
+      .split(/[^a-zA-Z0-9]+/)
+      .filter(Boolean)
+      .join('_')
+      .toLowerCase()
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
@@ -171,7 +178,10 @@ export const CreateChatFieldModal = ({
                   onChange: (e) => {
                     const { value } = e.target
                     setValue('title', value)
-                    setValue('fieldId', replaceSpacesByUnderscore(value))
+                    setValue(
+                      'fieldId',
+                      replaceAllNonAlphanumericWithUnderscore(value)
+                    )
                   },
                 })}
                 placeholder="Insira o título do campo..."
@@ -196,7 +206,7 @@ export const CreateChatFieldModal = ({
                   onChange: (e) =>
                     setValue(
                       'fieldId',
-                      replaceSpacesByUnderscore(e.target.value)
+                      replaceAllNonAlphanumericWithUnderscore(e.target.value)
                     ),
                 })}
                 placeholder="Código do campo..."
