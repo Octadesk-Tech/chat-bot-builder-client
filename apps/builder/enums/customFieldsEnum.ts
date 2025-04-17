@@ -28,7 +28,7 @@ export enum CustomFieldTypes {
   RequesterEmail = 19,
   Description = 20,
   Forwarding = 21,
-  // UserPorductService = 22,
+  UserPorductService = 22,
   Cc = 23,
   Cco = 24,
   SearchableList = 25,
