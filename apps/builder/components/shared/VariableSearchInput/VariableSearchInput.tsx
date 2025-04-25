@@ -37,6 +37,7 @@ type Props = {
     variable: Pick<
       Variable,
       | 'id'
+      | 'title'
       | 'name'
       | 'domain'
       | 'type'
