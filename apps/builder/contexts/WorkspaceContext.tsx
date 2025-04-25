@@ -416,6 +416,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     const customProperties = properties.map(
       (h: {
         id: string
+        title: string
         fieldType: number
         type: number
         fieldId: string
@@ -433,6 +434,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
         return {
           type: fieldType,
           id: h.id,
+          title: h.title,
           variableId: h.id,
           token: tokenValue,
           domain: domainType,
@@ -487,6 +489,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
         type: property.type,
         id: variableId,
         variableId,
+        title: property.name,
         token: property.token,
         domain: 'CHAT',
         name: 'customField.' + property.name,
@@ -596,7 +599,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
 
       if (isResponsibleContactEnabled) {
         if (!mergedItems.some((mi) => mi.token === '#responsavel-contato')) {
-          const variableId = uuid();
+          const variableId = uuid()
           mergedItems.push({
             token: '#responsavel-contato',
             example: 'Agente responsável',
