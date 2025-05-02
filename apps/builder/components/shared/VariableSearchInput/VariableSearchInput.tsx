@@ -32,6 +32,7 @@ type Props = {
   isApi?: boolean
   menuPosition?: 'absolute' | 'fixed'
   variablesSelectorIsOpen?: boolean
+  onCreateModalOpenChange?: (isOpen: boolean) => void
   handleOutsideClick?: () => void
   onSelectVariable: (
     variable: Pick<
@@ -63,6 +64,7 @@ export const VariableSearchInput = ({
   isApi = false,
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
+  onCreateModalOpenChange = () => {},
   ...inputProps
 }: Props) => {
   const { onOpen, onClose } = useDisclosure()
@@ -136,8 +138,8 @@ export const VariableSearchInput = ({
     isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? debounceTimeout : 0
   )
 
-  const dropdownRef = useRef(null)
-  const boxRef = useRef(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const boxRef = useRef<HTMLDivElement>(null)
 
   const [screen, setScreen] = useState<'VIEWER' | 'CREATE' | 'REMOVE'>('VIEWER')
 
@@ -148,13 +150,21 @@ export const VariableSearchInput = ({
 
   useOutsideClick({
     ref: boxRef,
-    handler: () => {
-      if (screen !== 'CREATE' && handleOutsideClick) handleOutsideClick()
+    handler: (event) => {
+      const target = event.target as HTMLElement
+
+      if (dropdownRef.current?.contains(target)) return
+      if (target.closest('[data-create-variable-modal]')) return
+      if (screen === 'CREATE') return
+      handleOutsideClick && handleOutsideClick()
     },
   })
 
   useEffect(() => {
-    if (isDefaultOpen) onOpen()
+    if (isDefaultOpen) {
+      onOpen()
+      onCreateModalOpenChange?.(true)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -197,8 +207,10 @@ export const VariableSearchInput = ({
   const handleToggleScreen = (): void => {
     setScreen((e) => {
       if (e === 'VIEWER') {
+        onCreateModalOpenChange?.(true)
         return 'CREATE'
       } else {
+        onCreateModalOpenChange?.(false)
         return 'VIEWER'
       }
     })
@@ -207,11 +219,17 @@ export const VariableSearchInput = ({
   const onCreateVariable = (variable: Variable): void => {
     onSelectVariable(variable)
     setScreen('VIEWER')
+    onCreateModalOpenChange?.(false)
     onClose()
   }
 
   const handleContentWheel: WheelEventHandler = (event) => {
     event.stopPropagation()
+  }
+
+  const handleCreateChatFieldModalClose = () => {
+    setScreen('VIEWER')
+    onCreateModalOpenChange?.(false)
   }
 
   return (
@@ -224,7 +242,7 @@ export const VariableSearchInput = ({
       borderRadius={'6px'}
     >
       {screen === 'VIEWER' && (
-        <Container data-screen={screen}>
+        <Container data-screen={screen} ref={dropdownRef}>
           {labelDefault || 'Selecione uma variável para salvar a resposta:'}
           <div onWheelCapture={handleContentWheel}>
             <Select
@@ -246,9 +264,7 @@ export const VariableSearchInput = ({
       )}
       <CreateChatFieldModal
         isOpen={screen === 'CREATE'}
-        onClose={() => {
-          setScreen('VIEWER')
-        }}
+        onClose={handleCreateChatFieldModalClose}
         onCreateVariable={onCreateVariable}
       />
     </Flex>

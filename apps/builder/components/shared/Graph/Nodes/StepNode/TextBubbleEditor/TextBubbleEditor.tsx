@@ -131,7 +131,12 @@ export const TextBubbleEditor = ({
 
   useOutsideClick({
     ref: textEditorRef,
-    handler: closeEditor,
+    handler: (event) => {
+      const target = event.target as HTMLElement
+      if (varDropdownRef.current?.contains(target)) return
+      if (target.closest('[data-create-variable-modal]')) return
+      closeEditor()
+    },
   })
 
   const convertValueToStepContent = (v: TElement[]): TextBubbleContent => {
