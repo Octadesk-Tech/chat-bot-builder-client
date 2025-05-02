@@ -146,7 +146,12 @@ export const CreateChatFieldModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
-      <ModalContent as="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <ModalContent
+        as="form"
+        onSubmit={handleSubmit(onSubmit)}
+        noValidate
+        data-create-variable-modal
+      >
         <ModalHeader>Novo campo de conversas</ModalHeader>
         <ModalCloseButton />
         <ModalBody as={Stack}>
