@@ -1,5 +1,5 @@
 import { StepIndices, WOZAssignStep } from 'models'
-import React from 'react'
+import React, { Fragment } from 'react'
 import { Stack, Text } from '@chakra-ui/react'
 import { ItemNodesList } from 'components/shared/Graph/Nodes/ItemNode'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
@@ -31,14 +31,15 @@ const WOZAssignContent = ({ step, indices }: Props) => {
 
       <OctaDivider />
 
-      <Text noOfLines={0}>
-        Tentativas de resposta antes de direcionar:{' '}
-        {step?.options?.limitAnswerNoContent
-          ? step?.options?.limitAnswerNoContent
-          : '3'}
-      </Text>
-
-      <OctaDivider />
+      {step?.options?.limitAnswerNoContent && (
+        <Fragment>
+          <Text noOfLines={0}>
+            Tentativas de resposta antes de direcionar:{' '}
+            {step?.options?.limitAnswerNoContent}
+          </Text>
+          <OctaDivider />
+        </Fragment>
+      )}
 
       <Text noOfLines={0}>
         Redirecionamento baseado no assunto da conversa:
