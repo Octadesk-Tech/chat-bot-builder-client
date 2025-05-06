@@ -1,7 +1,6 @@
 import React, {
   useState,
   useRef,
-  ChangeEvent,
   useEffect,
   WheelEventHandler,
   useContext,
@@ -13,24 +12,14 @@ import {
   InputProps,
 } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
-import cuid from 'cuid'
 import Select from 'react-select'
 import { Variable } from 'models'
 import { useDebouncedCallback } from 'use-debounce'
 import { isEmpty } from 'utils'
-import {
-  ButtonOption,
-  CancelButton,
-  Container,
-  FormField,
-  FormFieldCol,
-  FormFieldRowMin,
-  LabelField,
-} from './VariableSearchInput.style'
-import OctaButton from 'components/octaComponents/OctaButton/OctaButton'
-import OctaInput from 'components/octaComponents/OctaInput/OctaInput'
+import { Container } from './VariableSearchInput.style'
 import { CustomFieldTitle } from 'enums/customFieldsTitlesEnum'
 import { StepNodeContext } from '../Graph/Nodes/StepNode/StepNode/StepNode'
+import { CreateChatFieldModal } from '../modals/CreateChatFieldModal/CreateChatFieldModal'
 
 type Props = {
   initialVariableId?: string
@@ -42,12 +31,14 @@ type Props = {
   isSaveContext?: boolean
   isApi?: boolean
   menuPosition?: 'absolute' | 'fixed'
-  variablesSelectorIsOpen?: boolean | undefined
+  variablesSelectorIsOpen?: boolean
+  onCreateModalOpenChange?: (isOpen: boolean) => void
   handleOutsideClick?: () => void
   onSelectVariable: (
     variable: Pick<
       Variable,
       | 'id'
+      | 'title'
       | 'name'
       | 'domain'
       | 'type'
@@ -73,10 +64,11 @@ export const VariableSearchInput = ({
   isApi = false,
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
+  onCreateModalOpenChange = () => {},
   ...inputProps
 }: Props) => {
   const { onOpen, onClose } = useDisclosure()
-  const { typebot, createVariable } = useTypebot()
+  const { typebot } = useTypebot()
 
   const variables = typebot?.variables ?? []
   const makeTitle = (propertiesType: string): string => {
@@ -146,11 +138,10 @@ export const VariableSearchInput = ({
     isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? debounceTimeout : 0
   )
 
-  const dropdownRef = useRef(null)
-  const boxRef = useRef(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
+  const boxRef = useRef<HTMLDivElement>(null)
 
   const [screen, setScreen] = useState<'VIEWER' | 'CREATE' | 'REMOVE'>('VIEWER')
-  const [customVariable, setCustomVariable] = useState<Variable>()
 
   useOutsideClick({
     ref: dropdownRef,
@@ -159,11 +150,21 @@ export const VariableSearchInput = ({
 
   useOutsideClick({
     ref: boxRef,
-    handler: handleOutsideClick,
+    handler: (event) => {
+      const target = event.target as HTMLElement
+
+      if (dropdownRef.current?.contains(target)) return
+      if (target.closest('[data-create-variable-modal]')) return
+      if (screen === 'CREATE') return
+      handleOutsideClick && handleOutsideClick()
+    },
   })
 
   useEffect(() => {
-    if (isDefaultOpen) onOpen()
+    if (isDefaultOpen) {
+      onOpen()
+      onCreateModalOpenChange?.(true)
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -206,66 +207,29 @@ export const VariableSearchInput = ({
   const handleToggleScreen = (): void => {
     setScreen((e) => {
       if (e === 'VIEWER') {
+        onCreateModalOpenChange?.(true)
         return 'CREATE'
       } else {
+        onCreateModalOpenChange?.(false)
         return 'VIEWER'
       }
     })
   }
 
-  const handleCreateVariableChange = (
-    e: ChangeEvent<HTMLInputElement>
-  ): void => {
-    const { value } = e.target
-    setCustomVariable(
-      (state): Variable =>
-        ({
-          ...state,
-          token: value,
-          fieldId: value.replace('#', ''),
-          name: value.replace('#', ''),
-          domain: 'CHAT',
-        } as Variable)
-    )
-  }
-
-  const handleSelectTypeVariable = (type: string) => {
-    setCustomVariable(
-      (state): Variable =>
-        ({
-          ...state,
-          type,
-        } as Variable)
-    )
-  }
-
-  const formatChars = {
-    '*': '[a-zA-Z0-9-]',
-  }
-
-  const handleCreateVariable = (): void => {
-    const id = 'v' + cuid()
-    if (customVariable) {
-      const customVariableDraft: Variable = {
-        id,
-        name: customVariable.name,
-        domain: customVariable.domain,
-        token: customVariable.token,
-        variableId: id,
-        example: '',
-        fieldId: customVariable.fieldId,
-        type: customVariable.type || 'string',
-        fixed: true,
-      }
-      createVariable(customVariableDraft)
-      onSelectVariable(customVariableDraft)
-      setScreen('VIEWER')
-      onClose()
-    }
+  const onCreateVariable = (variable: Variable): void => {
+    onSelectVariable(variable)
+    setScreen('VIEWER')
+    onCreateModalOpenChange?.(false)
+    onClose()
   }
 
   const handleContentWheel: WheelEventHandler = (event) => {
     event.stopPropagation()
+  }
+
+  const handleCreateChatFieldModalClose = () => {
+    setScreen('VIEWER')
+    onCreateModalOpenChange?.(false)
   }
 
   return (
@@ -278,7 +242,7 @@ export const VariableSearchInput = ({
       borderRadius={'6px'}
     >
       {screen === 'VIEWER' && (
-        <Container data-screen={screen}>
+        <Container data-screen={screen} ref={dropdownRef}>
           {labelDefault || 'Selecione uma variável para salvar a resposta:'}
           <div onWheelCapture={handleContentWheel}>
             <Select
@@ -290,7 +254,7 @@ export const VariableSearchInput = ({
               placeholder={inputProps.placeholder ?? 'Selecione a variável'}
               getOptionLabel={(option: Variable) => option.token}
               getOptionValue={(option: Variable) =>
-                option.variableId || option.id
+                option.variableId ?? option.id
               }
               menuPlacement="auto"
               menuPosition={menuPosition}
@@ -298,59 +262,11 @@ export const VariableSearchInput = ({
           </div>
         </Container>
       )}
-      {screen === 'CREATE' && (
-        <Container data-screen={screen}>
-          <FormField>
-            <OctaInput
-              placeholder="#nome-do-campo"
-              label="Nome do campo"
-              mask="#****************************************"
-              maskChar={null}
-              formatChars={formatChars}
-              onChange={handleCreateVariableChange}
-            />
-          </FormField>
-          <FormField style={{ height: '150px' }}>
-            <LabelField>Selecione o formato deste campo:</LabelField>
-            <FormFieldRowMin>
-              <ButtonOption
-                className={
-                  ['', 'string'].includes(customVariable?.type || '')
-                    ? 'active'
-                    : ''
-                }
-                onClick={() => handleSelectTypeVariable('string')}
-              >
-                Texto
-              </ButtonOption>
-              <ButtonOption
-                className={customVariable?.type === 'date' ? 'active' : ''}
-                onClick={() => handleSelectTypeVariable('date')}
-              >
-                dd/mm/aaaa
-              </ButtonOption>
-              <ButtonOption
-                className={customVariable?.type === 'float' ? 'active' : ''}
-                onClick={() => handleSelectTypeVariable('float')}
-              >
-                123
-              </ButtonOption>
-              <ButtonOption
-                className={customVariable?.type === 'order' ? 'active' : ''}
-                onClick={() => handleSelectTypeVariable('order')}
-              >
-                Pedido
-              </ButtonOption>
-            </FormFieldRowMin>
-            <FormFieldCol>
-              <OctaButton onClick={handleCreateVariable}>
-                Criar variável
-              </OctaButton>
-              <CancelButton onClick={handleToggleScreen}>Cancelar</CancelButton>
-            </FormFieldCol>
-          </FormField>
-        </Container>
-      )}
+      <CreateChatFieldModal
+        isOpen={screen === 'CREATE'}
+        onClose={handleCreateChatFieldModalClose}
+        onCreateVariable={onCreateVariable}
+      />
     </Flex>
   )
 }
