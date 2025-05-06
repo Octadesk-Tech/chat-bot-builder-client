@@ -59,7 +59,6 @@ const schema = z.object({
     }),
   placeHolder: z
     .string()
-    .min(1, { message: 'Campo obrigatório' })
     .max(30, 'O texto de dica do campo deve ter no máximo 30 caracteres.'),
   hint: z
     .string()
@@ -221,7 +220,7 @@ export const CreateChatFieldModal = ({
                 <FormErrorMessage>{errors.fieldId.message}</FormErrorMessage>
               )}
             </FormControl>
-            <FormControl isRequired isInvalid={!!errors.placeHolder}>
+            <FormControl isInvalid={!!errors.placeHolder}>
               <Box
                 display="flex"
                 flexDirection="row"
