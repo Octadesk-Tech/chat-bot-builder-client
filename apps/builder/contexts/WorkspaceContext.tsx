@@ -29,7 +29,7 @@ import CustomFields from 'services/octadesk/customFields/customFields'
 
 import { BotsService } from 'services/octadesk/bots/bots'
 
-import { DomainType } from 'enums/customFieldsEnum'
+import { CustomFieldTypes, DomainType } from 'enums/customFieldsEnum'
 
 import {
   fixedChatProperties,
@@ -648,10 +648,17 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   }, [octaPersonFields])
 
   useEffect(() => {
-    if (octaChatFields) {
+    const typesToExcludeFromChatFields = [
+      CustomFieldTypes.List,
+      CustomFieldTypes.Select,
+    ]
+    const octaChatFieldsFiltered = octaChatFields.filter(
+      (field) => !typesToExcludeFromChatFields.includes(field.type)
+    )
+    if (octaChatFieldsFiltered) {
       const octaChatProperties = mountPropertiesOptions(
         'CHAT',
-        mountProperties(octaChatFields, 'CHAT')
+        mountProperties(octaChatFieldsFiltered, 'CHAT')
       )
 
       if (octaChatProperties) {
