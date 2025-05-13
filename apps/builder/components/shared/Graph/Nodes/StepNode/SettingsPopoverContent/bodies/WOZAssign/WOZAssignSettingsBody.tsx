@@ -1,7 +1,7 @@
-import { Checkbox, Divider, HStack, Stack, Text } from '@chakra-ui/react'
+import { Divider, HStack, Stack, Text } from '@chakra-ui/react'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
 import { WOZAssignOptions } from 'models'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { WozAssignSelect } from './WozAssignSelect'
 import WozQtdAttemptsSelect from './WozQtdAttemptsSelect'
 
@@ -13,19 +13,8 @@ type Props = {
 export const WOZAssignSettingBody = ({ options, onOptionsChange }: Props) => {
   const [viewMoreInfo, setViewMoreInfo] = useState('')
 
-  const handleConfirmContextChange = (a: any) => {
-    onOptionsChange({
-      ...options,
-      confirmContext: a.target.checked,
-    })
-  }
-
   const changeViewMoreInfo = (infoToShow: string) => {
     setViewMoreInfo(infoToShow === viewMoreInfo ? '' : infoToShow)
-  }
-
-  const isConfirmContext = () => {
-    return viewMoreInfo === 'confirmContext'
   }
 
   const isRedirectionInfo = () => {
@@ -59,45 +48,6 @@ export const WOZAssignSettingBody = ({ options, onOptionsChange }: Props) => {
         onChange={handleChangeAttempts}
       />
       <Stack>
-        <OctaDivider width="100%" />
-        <HStack justify="space-between">
-          <Checkbox
-            isChecked={options.confirmContext}
-            onChange={handleConfirmContextChange}
-          >
-            Confirmar contexto antes de seguir árvore?
-          </Checkbox>
-          <Text
-            cursor={'pointer'}
-            onClick={() => changeViewMoreInfo('confirmContext')}
-            fontSize={'13px'}
-            align={'center'}
-            color={'purple.400'}
-          >
-            <span>Ver {isConfirmContext() ? 'menos' : 'mais'}</span>
-          </Text>
-        </HStack>
-        {isConfirmContext() && (
-          <Stack justify="space-between">
-            <Text color="gray.400" fontSize="sm" fontWeight="bold">
-              Experiência mais inteligente e personalizada
-            </Text>
-            <Text color="gray.400" fontSize="sm">
-              O WOZ confirmará antes de seguir para a próxima etapa, garantindo
-              que o contato esteja no caminho certo e tenha clareza sobre as
-              opções disponíveis.
-            </Text>
-            <OctaDivider width="100%" />
-            <Text color="gray.400" fontSize="sm" fontWeight="bold">
-              Menos erros, mais assertividade
-            </Text>
-            <Text color="gray.400" fontSize="sm">
-              Essa confirmação evita que o contato siga para um fluxo incorreto
-              sem querer, tornando a interação mais precisa e reduzindo
-              retrabalho.
-            </Text>
-          </Stack>
-        )}
         <OctaDivider width="100%" />
         <HStack justify="space-between">
           <Text>Redirecionamento baseado no assunto da conversa</Text>

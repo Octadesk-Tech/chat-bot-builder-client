@@ -1,11 +1,4 @@
-import {
-  StepBase,
-  StepWithItems,
-  ItemBase,
-  Step,
-  ItemType,
-  OctaProperty,
-} from '.'
+import { ItemBase, ItemType, OctaProperty, StepBase } from '.'
 import { TextBubbleContent, WOZStepType } from './bubble'
 
 // Regular steps
@@ -273,7 +266,6 @@ export type WOZSuggestionOptions = BaseOctaOptions & {
 
 export type WOZAssignOptions = BaseOctaOptions & {
   virtualAgentId?: string
-  confirmContext: boolean
   limitAnswerNoContent: number
 }
 
@@ -443,7 +435,6 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
   name: '',
   subject: '',
   virtualAgentId: undefined,
-  confirmContext: false,
   limitAnswerNoContent: 3,
 }
 
