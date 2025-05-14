@@ -98,6 +98,7 @@ export const Graph = memo(
     useEffect(() => {
       if (JSON.stringify(globalGraphPosition) === JSON.stringify(graphPosition))
         return
+
       setGraphPosition({ ...globalGraphPosition })
     }, [globalGraphPosition])
 
@@ -147,6 +148,7 @@ export const Graph = memo(
 
     const handleMouseUp = (e: MouseEvent) => {
       if (!typebot) return
+      setHideEdges(false)
 
       if (draggedItem) setDraggedItem(undefined)
 
@@ -175,8 +177,10 @@ export const Graph = memo(
 
     const handleCaptureMouseDown = (e: MouseEvent) => {
       const isRightClick = e.button === 2
-
       if (isRightClick) e.stopPropagation()
+      if (!isRightClick) {
+        setHideEdges(true)
+      }
     }
 
     const handleClick = () => {
@@ -306,7 +310,7 @@ export const Graph = memo(
             </Tooltip>
           </Stack>
 
-          <Stack
+          {/* <Stack
             pos="fixed"
             top={`calc(${headerHeight}px + 230px)`}
             right="40px"
@@ -338,7 +342,7 @@ export const Graph = memo(
                 }}
               />
             </Tooltip>
-          </Stack>
+          </Stack> */}
           <Flex
             flex="1"
             w="full"
