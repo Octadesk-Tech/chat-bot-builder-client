@@ -249,9 +249,14 @@ export const Graph = memo(
 
     useEventListener('wheel', handleMouseWheel, graphContainerRef.current)
 
-    useEventListener('mousedown', handleCaptureMouseDown, undefined, {
-      capture: true,
-    })
+    useEventListener(
+      'mousedown',
+      handleCaptureMouseDown,
+      graphContainerRef.current,
+      {
+        capture: true,
+      }
+    )
 
     useEventListener('mouseup', handleMouseUp, graphContainerRef.current)
 
