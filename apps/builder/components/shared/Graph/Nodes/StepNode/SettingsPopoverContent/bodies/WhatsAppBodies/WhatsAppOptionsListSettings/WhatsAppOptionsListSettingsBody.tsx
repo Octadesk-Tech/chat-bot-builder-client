@@ -165,7 +165,7 @@ export const WhatsAppOptionsListSettingsBody = ({
           }
           onKeyUp={handleHeaderText}
           maxLength={MAX_LENGHT_HEADER_AND_FOOTER}
-          wabaHeader={true}
+          wabaHeader
         />
       </Stack>
       <Stack>
