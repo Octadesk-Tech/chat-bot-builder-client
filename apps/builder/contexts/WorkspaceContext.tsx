@@ -29,7 +29,7 @@ import CustomFields from 'services/octadesk/customFields/customFields'
 
 import { BotsService } from 'services/octadesk/bots/bots'
 
-import { DomainType } from 'enums/customFieldsEnum'
+import { CustomFieldTypes, DomainType } from 'enums/customFieldsEnum'
 
 import {
   fixedChatProperties,
@@ -416,6 +416,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     const customProperties = properties.map(
       (h: {
         id: string
+        title: string
         fieldType: number
         type: number
         fieldId: string
@@ -433,6 +434,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
         return {
           type: fieldType,
           id: h.id,
+          title: h.title,
           variableId: h.id,
           token: tokenValue,
           domain: domainType,
@@ -487,6 +489,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
         type: property.type,
         id: variableId,
         variableId,
+        title: property.name,
         token: property.token,
         domain: 'CHAT',
         name: 'customField.' + property.name,
@@ -596,7 +599,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
 
       if (isResponsibleContactEnabled) {
         if (!mergedItems.some((mi) => mi.token === '#responsavel-contato')) {
-          const variableId = uuid();
+          const variableId = uuid()
           mergedItems.push({
             token: '#responsavel-contato',
             example: 'Agente responsável',
@@ -645,10 +648,17 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   }, [octaPersonFields])
 
   useEffect(() => {
-    if (octaChatFields) {
+    const typesToExcludeFromChatFields = [
+      CustomFieldTypes.List,
+      CustomFieldTypes.Select,
+    ]
+    const octaChatFieldsFiltered = octaChatFields.filter(
+      (field) => !typesToExcludeFromChatFields.includes(field.type)
+    )
+    if (octaChatFieldsFiltered) {
       const octaChatProperties = mountPropertiesOptions(
         'CHAT',
-        mountProperties(octaChatFields, 'CHAT')
+        mountProperties(octaChatFieldsFiltered, 'CHAT')
       )
 
       if (octaChatProperties) {
