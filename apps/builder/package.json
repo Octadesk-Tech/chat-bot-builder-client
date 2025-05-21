@@ -7,6 +7,7 @@
     "dev": "ENVIRONMENT=local next dev -p 8081",
     "dev:windows": "set ENVIRONMENT=local&&next dev -p 8081",
     "build": "next build",
+    "analyze": "ANALYZE=true yarn build",
     "start": "next start",
     "lint": "next lint",
     "test": "yarn playwright test",
@@ -102,6 +103,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^12.1.6",
     "@playwright/test": "^1.22.0",
     "@types/canvas-confetti": "^1.4.2",
     "@types/emoji-mart": "^3.0.9",

@@ -1,3 +1,6 @@
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+})
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { withSentryConfig } = require('@sentry/nextjs')
 const { i18n } = require('./next-i18next.config')
@@ -57,6 +60,9 @@ const sentryWebpackPluginOptions = {
   // https://github.com/getsentry/sentry-webpack-plugin#options.
 }
 
-module.exports = process.env.SENTRY_AUTH_TOKEN
+// Export the config with both Sentry and Bundle Analyzer
+const config = process.env.SENTRY_AUTH_TOKEN
   ? withSentryConfig(moduleExports, sentryWebpackPluginOptions)
   : moduleExports
+
+module.exports = withBundleAnalyzer(config)
