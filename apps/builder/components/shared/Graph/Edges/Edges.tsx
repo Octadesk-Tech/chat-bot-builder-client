@@ -1,11 +1,19 @@
 import { chakra } from '@chakra-ui/system'
 import { colors } from 'libs/theme'
 import { Block, Edge as EdgeProps } from 'models'
-import React, { memo } from 'react'
+import React, { memo, useMemo } from 'react'
 import { AnswersCount } from 'services/analytics'
 import { DrawingEdge } from './DrawingEdge'
 import { DropOffEdge } from './DropOffEdge'
 import { Edge } from './Edge'
+
+const getBlockMap = (blocks: Block[]) => {
+  const map = new Map<string, Block>()
+  for (const block of blocks) {
+    map.set(block.id, block)
+  }
+  return map
+}
 
 type Props = {
   visibleItems: Block[]
@@ -14,6 +22,7 @@ type Props = {
   answersCounts?: AnswersCount[]
   onUnlockProPlanClick?: () => void
 }
+
 export const Edges = memo(
   ({
     edges,
@@ -22,6 +31,8 @@ export const Edges = memo(
     onUnlockProPlanClick,
     visibleItems,
   }: Props) => {
+    const blockMap = useMemo(() => getBlockMap(blocks), [blocks])
+
     return (
       <chakra.svg
         width="full"
@@ -35,11 +46,20 @@ export const Edges = memo(
       >
         <DrawingEdge />
         {edges.map((edge) => {
-          const b = blocks.find((b) => b.id === edge.from.blockId)
+          const block = blockMap.get(edge.from.blockId)
+          const isFromVisible = visibleItems.some(
+            (item) => item.id === edge.from.blockId
+          )
+          const isToVisible = visibleItems.some(
+            (item) => item.id === edge.to.blockId
+          )
+
+          if (!isFromVisible && !isToVisible) return null
+
           return (
             <Edge
               visibleItems={visibleItems ?? []}
-              block={b || ({} as Block)}
+              block={block || ({} as Block)}
               key={edge.id}
               edge={edge}
             />
