@@ -45,6 +45,7 @@ import { PaymentSettings } from './bodies/PaymentSettings'
 import { RedirectSettings } from './bodies/RedirectSettings'
 import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
+import { ReturnOfServiceBody } from './bodies/ReturnOfServiceBody'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
@@ -77,6 +78,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
         width = 500
         break
       case LogicStepType.CONDITION:
+      case LogicStepType.RETURN_OF_SERVICE:
       case OctaStepType.ASSIGN_TO_TEAM:
       case OctaStepType.CALL_OTHER_BOT:
       case OctaStepType.CONVERSATION_TAG:
@@ -187,6 +189,11 @@ export const StepSettings = ({
     case LogicStepType.CONDITION: {
       return (
         <ConditionSettingsBody step={step} onItemChange={handleItemChange} />
+      )
+    }
+    case LogicStepType.RETURN_OF_SERVICE: {
+      return (
+        <ReturnOfServiceBody step={step} onOptionsChange={handleOptionsChange} />
       )
     }
     case LogicStepType.REDIRECT: {

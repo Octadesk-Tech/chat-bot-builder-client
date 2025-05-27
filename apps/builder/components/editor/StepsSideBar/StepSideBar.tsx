@@ -136,6 +136,10 @@ export const StepsSideBar = () => {
       return verifyFeatureToggle('external-event-in-bot')
     }
 
+    if (type === LogicStepType.RETURN_OF_SERVICE) {
+      return verifyFeatureToggle('customer-recontact')
+    }
+
     return true
   }
 

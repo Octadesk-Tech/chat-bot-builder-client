@@ -26,9 +26,11 @@ import {
   DraggableStep,
   ExternalEventStep,
   IntegrationStepType,
+  LogicStepType,
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
+  ReturnOfServiceStep,
   Step,
   TextBubbleContent,
   WOZAssignStep,
@@ -207,7 +209,8 @@ export const StepNode = ({
       !isCallOtherBotStep(step) &&
       !isWhatsAppOptionsListStep(step) &&
       !isWhatsAppButtonsListStep(step) &&
-      !isWozAssignStep(step)
+      !isWozAssignStep(step) &&
+      !isReturnOfService(step)
     )
   }
 
@@ -449,4 +452,8 @@ const hasStepRedirectCheckAvailability = (
   }
 
   return true
+}
+
+const isReturnOfService = (step: Step): step is ReturnOfServiceStep => {
+  return step.type === LogicStepType.RETURN_OF_SERVICE
 }

@@ -1,4 +1,5 @@
 import { ItemType, StepBase } from '.'
+import { ReturnType, TimeTypeValue } from '../../returnOfService'
 import { ItemBase } from './item'
 
 export type LogicStep =
@@ -7,12 +8,14 @@ export type LogicStep =
   | RedirectStep
   | CodeStep
   | TypebotLinkStep
+  | ReturnOfServiceStep
 
 export type LogicStepOptions =
   // | SetVariableOptions
   | RedirectOptions
   | CodeOptions
   | TypebotLinkOptions
+  | ReturnOfServiceOptions
 
 export enum LogicStepType {
   SET_VARIABLE = 'Set variable',
@@ -20,6 +23,7 @@ export enum LogicStepType {
   REDIRECT = 'Redirect',
   CODE = 'Code',
   TYPEBOT_LINK = 'Typebot link',
+  RETURN_OF_SERVICE = 'Return of service',
 }
 
 export type SetVariableStep = StepBase & {
@@ -51,6 +55,21 @@ export type TypebotLinkStep = StepBase & {
   type: LogicStepType.TYPEBOT_LINK
   options: TypebotLinkOptions
 }
+
+export type ReturnOfServiceStep = StepBase & {
+  type: LogicStepType.RETURN_OF_SERVICE
+  options: ReturnOfServiceOptions
+  items: Array<ReturnOfServiceItem>;
+}
+
+export declare type ReturnOfServiceItem = ItemBase & {
+  type: ItemType.RETURN_OF_SERVICE;
+  content: ReturnOfServiceContent;
+};
+
+export declare type ReturnOfServiceContent = {
+  returnType: ReturnType;
+};
 
 export enum LogicalOperator {
   OR = 'OU',
@@ -110,6 +129,12 @@ export type TypebotLinkOptions = {
   blockId?: string
 }
 
+export type ReturnOfServiceOptions = {
+  time: number
+  timeTypeValue: TimeTypeValue
+  validationError: boolean
+}
+
 export const defaultSetVariablesOptions: SetVariableOptions = {}
 
 export const defaultConditionContent: ConditionContent = {
@@ -122,3 +147,9 @@ export const defaultRedirectOptions: RedirectOptions = { isNewTab: false }
 export const defaultCodeOptions: CodeOptions = { name: 'Code snippet' }
 
 export const defaultTypebotLinkOptions: TypebotLinkOptions = {}
+
+export const defaultReturnOfServiceOptions: ReturnOfServiceOptions = {
+  time: 5,
+  timeTypeValue: TimeTypeValue.MINUTE,
+  validationError: false
+}
