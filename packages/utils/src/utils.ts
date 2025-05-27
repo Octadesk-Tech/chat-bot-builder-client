@@ -17,6 +17,7 @@ import {
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
+  ReturnOfServiceStep,
   Step,
   StepType,
   StepWithOptionsType,
@@ -161,12 +162,12 @@ export const stepTypeHasWebhook = (
 
 export const stepTypeHasItems = (
   type: StepType
-): type is LogicStepType.CONDITION | InputStepType.CHOICE | OctaStepType.OFFICE_HOURS | IntegrationStepType.WEBHOOK | IntegrationStepType.EXTERNAL_EVENT | OctaWabaStepType.WHATSAPP_OPTIONS_LIST | OctaWabaStepType.WHATSAPP_BUTTONS_LIST | OctaWabaStepType.COMMERCE | WOZStepType.ASSIGN =>
-  [LogicStepType.CONDITION, InputStepType.CHOICE, OctaStepType.OFFICE_HOURS, IntegrationStepType.WEBHOOK, IntegrationStepType.EXTERNAL_EVENT, OctaWabaStepType.WHATSAPP_OPTIONS_LIST, OctaWabaStepType.WHATSAPP_BUTTONS_LIST, OctaWabaStepType.COMMERCE, WOZStepType.ASSIGN].includes(type)
+): type is LogicStepType.CONDITION | LogicStepType.RETURN_OF_SERVICE |InputStepType.CHOICE | OctaStepType.OFFICE_HOURS | IntegrationStepType.WEBHOOK | IntegrationStepType.EXTERNAL_EVENT | OctaWabaStepType.WHATSAPP_OPTIONS_LIST | OctaWabaStepType.WHATSAPP_BUTTONS_LIST | OctaWabaStepType.COMMERCE | WOZStepType.ASSIGN =>
+  [LogicStepType.CONDITION, LogicStepType.RETURN_OF_SERVICE, InputStepType.CHOICE, OctaStepType.OFFICE_HOURS, IntegrationStepType.WEBHOOK, IntegrationStepType.EXTERNAL_EVENT, OctaWabaStepType.WHATSAPP_OPTIONS_LIST, OctaWabaStepType.WHATSAPP_BUTTONS_LIST, OctaWabaStepType.COMMERCE, WOZStepType.ASSIGN].includes(type)
 
 export const stepHasItems = (
   step: Step
-): step is ConditionStep | ChoiceInputStep | OfficeHourStep | WebhookStep | ExternalEventStep | WhatsAppOptionsListStep | WhatsAppButtonsListStep | WOZAssignStep =>
+): step is ConditionStep | ChoiceInputStep | OfficeHourStep | WebhookStep | ExternalEventStep | WhatsAppOptionsListStep | WhatsAppButtonsListStep | WOZAssignStep | ReturnOfServiceStep => 
   'items' in step && isDefined(step.items)
 
 export const byId = (id?: string) => (obj: { id: string }) => obj.id === id

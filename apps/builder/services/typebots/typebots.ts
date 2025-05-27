@@ -63,6 +63,8 @@ import {
   defaultWhatsAppButtonsListOptions,
   defaultWhatsAppOptionsListContent,
   defaultWhatsAppOptionsListOptions,
+  ReturnType,
+  defaultReturnOfServiceOptions
 } from 'models'
 import { stringify } from 'qs'
 import { duplicateWebhook } from 'services/webhook'
@@ -346,6 +348,7 @@ export const parseNewStep = (
 const parseDefaultItems = (
   type:
     | LogicStepType.CONDITION
+    | LogicStepType.RETURN_OF_SERVICE
     | InputStepType.CHOICE
     | OctaStepType.OFFICE_HOURS
     | IntegrationStepType.WEBHOOK
@@ -403,6 +406,25 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.CONDITION,
           content: defaultConditionContent,
+        },
+      ]
+    case LogicStepType.RETURN_OF_SERVICE:
+      return [
+        {
+          id: cuid(),
+          stepId,
+          type: ItemType.RETURN_OF_SERVICE,
+          content: {
+            returnType: ReturnType.IS_RETURN
+          },
+        },
+        {
+          id: cuid(),
+          stepId,
+          type: ItemType.RETURN_OF_SERVICE,
+          content: {
+            returnType: ReturnType.IS_NOT_RETURN
+          },
         },
       ]
     case OctaStepType.OFFICE_HOURS:
@@ -577,6 +599,8 @@ const parseDefaultStepOptions = (
       return defaultExternalEventOptions
     // case IntegrationStepType.EMAIL:
     //   return defaultSendEmailOptions
+    case LogicStepType.RETURN_OF_SERVICE:
+      return defaultReturnOfServiceOptions
     default:
       return null
   }

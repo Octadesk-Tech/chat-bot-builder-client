@@ -6,6 +6,7 @@ import { OfficeHoursNodeContent } from './contents/OfficeHoursNodeContent'
 import { WebhookNodeContent } from './contents/WebhooksNodeContent'
 import { WhatsAppButtonsNodeContent } from './contents/WhatsAppButtonsContent'
 import { WhatsAppOptionsNodeContent } from './contents/WhatsAppOptionsContent'
+import { ReturnOfServiceContent } from './contents/ReturnOfServiceContent'
 
 type Props = {
   step?: Step
@@ -49,6 +50,8 @@ export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => 
           indices={indices}
         />
       )
+      case ItemType.RETURN_OF_SERVICE:
+        return <ReturnOfServiceContent item={item} />
     default:
       return <></>
   }
