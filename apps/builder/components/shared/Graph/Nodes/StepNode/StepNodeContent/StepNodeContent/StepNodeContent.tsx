@@ -96,6 +96,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     case LogicStepType.CONDITION: {
       return <ItemNodesList step={step} indices={indices} isReadOnly />
     }
+    case LogicStepType.RETURN_OF_SERVICE: {
+      return <ItemNodesList step={step} indices={indices} isReadOnly />
+    }
     // case LogicStepType.REDIRECT: {
     //   return (
     //     <ConfigureContent

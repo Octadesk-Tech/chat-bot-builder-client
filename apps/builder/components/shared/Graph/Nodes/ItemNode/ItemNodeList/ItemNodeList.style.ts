@@ -9,6 +9,14 @@ export const Container = styled.div`
   font-size: .9rem;
 `;
 
+export const ReturnOfServiceContainer = styled(Container)`
+  padding: 8px 0px 18px;
+  margin-bottom: 14px;
+  border: none;
+  border-bottom: 1px solid #DADBDF;
+  color: #5A6377;
+`;
+
 export const HandleSelectCalendar = styled.div`
   font-family: 'Noto Sans', sans-serif;
   font-size: 16px;
