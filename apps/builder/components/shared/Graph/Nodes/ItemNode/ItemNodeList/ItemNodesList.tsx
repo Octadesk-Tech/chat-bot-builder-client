@@ -36,7 +36,7 @@ import { ItemNode } from '../ItemNode'
 import { ItemNodeOverlay } from '../ItemNodeOverlay'
 import {
   Container,
-  ReturnOfServiceContainer,
+  ChatReturnContainer,
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
@@ -149,7 +149,7 @@ export const ItemNodesList = ({
     path: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.path,
   }
 
-  const returnOfService = {
+  const chatReturn = {
     time: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.time,
     timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue 
       === TimeTypeValue.HOUR ? 'horas' : 'minutos',
@@ -245,18 +245,18 @@ export const ItemNodesList = ({
           <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{step?.options?.url || "Clique para editar..."}</Text>
         </Container>
       )}
-      {step.type === LogicStepType.RETURN_OF_SERVICE && (
-        <ReturnOfServiceContainer>
-          {returnOfService?.time && returnOfService?.timeType && !returnOfService?.validationError ? 
+      {step.type === LogicStepType.CHAT_RETURN && (
+        <ChatReturnContainer>
+          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ? 
           (
-            <Text noOfLines={0}>{`Tempo máximo: ${returnOfService.time} ${returnOfService.timeType}`}</Text>
+            <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
           )
           :
           (
             <Text noOfLines={0}>{'Configurar...'}</Text>
           )
           }
-        </ReturnOfServiceContainer>
+        </ChatReturnContainer>
       )}
       {step &&
         step.items &&
@@ -296,7 +296,7 @@ export const ItemNodesList = ({
         step.type !== OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
         step.type !== OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
         step.type !== WOZStepType.ASSIGN &&
-        step.type !== LogicStepType.RETURN_OF_SERVICE && (
+        step.type !== LogicStepType.CHAT_RETURN && (
           <Flex
             px="4"
             py="2"

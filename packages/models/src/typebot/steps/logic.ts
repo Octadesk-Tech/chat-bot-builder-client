@@ -1,5 +1,5 @@
 import { ItemType, StepBase } from '.'
-import { ReturnType, TimeTypeValue } from '../../returnOfService'
+import { ReturnType, TimeTypeValue } from '../../chatReturn'
 import { ItemBase } from './item'
 
 export type LogicStep =
@@ -8,14 +8,14 @@ export type LogicStep =
   | RedirectStep
   | CodeStep
   | TypebotLinkStep
-  | ReturnOfServiceStep
+  | ChatReturnStep
 
 export type LogicStepOptions =
   // | SetVariableOptions
   | RedirectOptions
   | CodeOptions
   | TypebotLinkOptions
-  | ReturnOfServiceOptions
+  | ChatReturnOptions
 
 export enum LogicStepType {
   SET_VARIABLE = 'Set variable',
@@ -23,7 +23,7 @@ export enum LogicStepType {
   REDIRECT = 'Redirect',
   CODE = 'Code',
   TYPEBOT_LINK = 'Typebot link',
-  RETURN_OF_SERVICE = 'Return of service',
+  CHAT_RETURN = 'chat-return',
 }
 
 export type SetVariableStep = StepBase & {
@@ -56,18 +56,18 @@ export type TypebotLinkStep = StepBase & {
   options: TypebotLinkOptions
 }
 
-export type ReturnOfServiceStep = StepBase & {
-  type: LogicStepType.RETURN_OF_SERVICE
-  options: ReturnOfServiceOptions
-  items: Array<ReturnOfServiceItem>;
+export type ChatReturnStep = StepBase & {
+  type: LogicStepType.CHAT_RETURN
+  options: ChatReturnOptions
+  items: Array<ChatReturnItem>;
 }
 
-export declare type ReturnOfServiceItem = ItemBase & {
-  type: ItemType.RETURN_OF_SERVICE;
-  content: ReturnOfServiceContent;
+export declare type ChatReturnItem = ItemBase & {
+  type: ItemType.CHAT_RETURN;
+  content: ChatReturnContent;
 };
 
-export declare type ReturnOfServiceContent = {
+export declare type ChatReturnContent = {
   returnType: ReturnType;
 };
 
@@ -129,7 +129,7 @@ export type TypebotLinkOptions = {
   blockId?: string
 }
 
-export type ReturnOfServiceOptions = {
+export type ChatReturnOptions = {
   time: number
   timeTypeValue: TimeTypeValue
   validationError: boolean
@@ -148,7 +148,7 @@ export const defaultCodeOptions: CodeOptions = { name: 'Code snippet' }
 
 export const defaultTypebotLinkOptions: TypebotLinkOptions = {}
 
-export const defaultReturnOfServiceOptions: ReturnOfServiceOptions = {
+export const defaultChatReturnOptions: ChatReturnOptions = {
   time: 5,
   timeTypeValue: TimeTypeValue.MINUTE,
   validationError: false

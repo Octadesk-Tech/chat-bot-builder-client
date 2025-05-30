@@ -83,7 +83,7 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
       return <ExternalLinkIcon color="purple.500" {...props} />
     case LogicStepType.CODE:
       return <CodeIcon color="purple.500" {...props} />
-    case LogicStepType.RETURN_OF_SERVICE:
+    case LogicStepType.CHAT_RETURN:
       return <ReturnArrow color="#D1155D" {...props} />
     case IntegrationStepType.WEBHOOK:
       return <WebhookIcon {...props} />
