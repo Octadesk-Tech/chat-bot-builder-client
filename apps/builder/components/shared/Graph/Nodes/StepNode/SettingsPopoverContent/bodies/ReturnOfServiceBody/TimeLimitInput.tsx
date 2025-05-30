@@ -22,6 +22,7 @@ export const TimeLimitInput = ({time, setTime, timeType, setTimeType, typeOption
     [TimeTypeValue.MINUTE]: 10080,
     [TimeTypeValue.HOUR]: 168,
   }
+  const maxLength = 5
 
   const invalidTimeMessage = {
     [TimeTypeValue.MINUTE]: `Para minutos, o valor inserido deve ser entre ${minTimeAllowed} e ${maxTimeAllowed[TimeTypeValue.MINUTE]}`,
@@ -66,7 +67,8 @@ export const TimeLimitInput = ({time, setTime, timeType, setTimeType, typeOption
 
   const isValidInput = (value: string) => {
     if (value.length <= 0) return true
-    return /\d$/.test(value)
+    if (value.length > maxLength) return false
+    return /^\d+$/.test(value)
   }
 
   const handleTimeChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +95,7 @@ export const TimeLimitInput = ({time, setTime, timeType, setTimeType, typeOption
         Tempo máximo para ser considerado retorno
       </FormLabel>
       <HStack>
-        <Input placeholder="Insira o tempo máximo..." value={time} onChange={handleTimeChange} borderRadius="lg" w="70%"/>
+        <Input placeholder="Insira o tempo máximo..." value={time} onChange={handleTimeChange} borderRadius="lg" w="70%" maxLength={maxLength}/>
         <Box w="30%">
         <TimeTypeInput onChange={handleTimeTypeChange} defaultValue={typeOptions[0]} options={typeOptions} value={timeType} />
         </Box>
