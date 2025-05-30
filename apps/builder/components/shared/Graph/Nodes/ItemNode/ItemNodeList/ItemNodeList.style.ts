@@ -9,7 +9,7 @@ export const Container = styled.div`
   font-size: .9rem;
 `;
 
-export const ReturnOfServiceContainer = styled(Container)`
+export const ChatReturnContainer = styled(Container)`
   padding: 8px 0px 18px;
   margin-bottom: 14px;
   border: none;
