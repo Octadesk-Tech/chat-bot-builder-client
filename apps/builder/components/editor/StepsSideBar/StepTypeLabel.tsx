@@ -53,7 +53,7 @@ export const StepTypeLabel = ({ type }: Props) => {
     //   return <Text>Set variable</Text>
     case LogicStepType.CONDITION:
       return <Text>Valide uma informação</Text>
-    case LogicStepType.RETURN_OF_SERVICE:
+    case LogicStepType.CHAT_RETURN:
       return <Text>Retorno de atendimento</Text>
     // case LogicStepType.REDIRECT:
     //   return <Text>Redirect</Text>

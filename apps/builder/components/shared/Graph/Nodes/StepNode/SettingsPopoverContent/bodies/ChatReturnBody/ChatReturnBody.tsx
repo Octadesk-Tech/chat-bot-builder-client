@@ -1,7 +1,7 @@
 import { Stack, Text } from '@chakra-ui/react'
 import {
-  ReturnOfServiceOptions,
-  ReturnOfServiceStep,
+  ChatReturnOptions,
+  ChatReturnStep,
   TimeType,
   TimeTypeValue
 } from 'models'
@@ -19,15 +19,15 @@ const typeOptions = [
   },
 ]
 
-type ReturnOfServiceBodyProps = {
-  step: ReturnOfServiceStep
-  onOptionsChange: (options: ReturnOfServiceOptions) => void
+type ChatReturnBodyProps = {
+  step: ChatReturnStep
+  onOptionsChange: (options: ChatReturnOptions) => void
 }
 
-export const ReturnOfServiceBody = ({
+export const ChatReturnBody = ({
   step,
   onOptionsChange,
-}: ReturnOfServiceBodyProps) => {
+}: ChatReturnBodyProps) => {
 
   const defaultTimeValue = step?.options?.time ? String(step.options.time) : ""
   const defaultTimeTypeValue = typeOptions?.find(option => option.value === step?.options?.timeTypeValue) ?? typeOptions[0]

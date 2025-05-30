@@ -132,7 +132,7 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
       });
     }
 
-    if (LogicStepType.RETURN_OF_SERVICE === step.type) {
+    if (LogicStepType.CHAT_RETURN === step.type) {
       if (!step.options?.time || step.options?.validationError) {
         data.push({message: undefined}
         )
