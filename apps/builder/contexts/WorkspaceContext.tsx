@@ -199,7 +199,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   const { verifyFeatureToggle } = useUser()
   const { user } = useUser()
   const userId = user?.id
-  const { typebot, setVariables } = useTypebot()
+  const { typebot, setVariables, domain } = useTypebot()
   const { workspaces, isLoading, mutate } = useWorkspaces({ userId })
   const [currentWorkspace, setCurrentWorkspace] =
     useState<WorkspaceWithMembers>()
@@ -572,9 +572,12 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (loaded && setVariables) {
+      const upperCaseDomain = domain?.toUpperCase() || ''
+      const haveChatItems =
+        upperCaseDomain !== 'SURVEY' && upperCaseDomain !== 'TICKET'
       const variables = [
         ...octaPersonItems,
-        ...octaChatItems,
+        ...(haveChatItems ? octaChatItems : []),
         ...octaOrganizationItems,
       ]
 

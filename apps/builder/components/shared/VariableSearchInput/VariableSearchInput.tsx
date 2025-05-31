@@ -79,6 +79,10 @@ export const VariableSearchInput = ({
         return CustomFieldTitle.CHAT
       case 'ORGANIZATION':
         return CustomFieldTitle.ORGANIZATION
+      case 'TICKET':
+        return CustomFieldTitle.TICKET
+      case 'SURVEY':
+        return CustomFieldTitle.SURVEY
       default:
         return ''
     }
