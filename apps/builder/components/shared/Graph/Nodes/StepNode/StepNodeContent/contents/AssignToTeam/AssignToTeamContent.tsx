@@ -9,6 +9,7 @@ import { useTypebot } from 'contexts/TypebotContext'
 import { parseVariableHighlight } from 'services/utils'
 import { TextHtmlContent } from '../TextHtmlContent'
 import { hasAnyChatReturnInItsTree } from './hasAnyChatReturnInItsTree'
+import { useUser } from 'contexts/UserContext'
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {
@@ -20,9 +21,14 @@ export const AssignToTeamContent = ({
   step, onUpdateStep
 }: Props) => {
   const { octaAgents, typebot } = useTypebot();
+  const { verifyFeatureToggle } = useUser()
 
   React.useEffect(() => {
-    if (typeof onUpdateStep !== 'function') return
+    if (
+      !verifyFeatureToggle('customer-recontact') 
+      || typeof onUpdateStep !== 'function'
+    ) return
+    
     const showChatReturnOption = hasAnyChatReturnInItsTree(typebot, step.blockId)
     let options = {} as AssignToTeamOptions
     if (!showChatReturnOption && step.options?.assignType === '@CHAT-RETURN') {
