@@ -228,6 +228,7 @@ export type CommerceOptions = BaseOctaOptions & {
 export type AssignToTeamOptions = BaseOctaOptions & {
   assignTo: string
   assignType: string
+  exceedLimit: boolean
   subType: string
   messages: {
     firstMessage?: {
@@ -245,7 +246,8 @@ export type AssignToTeamOptions = BaseOctaOptions & {
   labels: {
     placeholder: { assignToTeam: string; connectionMessage: string }
     button: string
-  }
+  },
+  showChatReturnOption: boolean
 }
 
 export type PreReserveOptions = BaseOctaOptions & {
@@ -405,8 +407,10 @@ export const defaultAssignToTeamOptions: AssignToTeamOptions = {
   subject: '',
   assignTo: '',
   assignType: '',
+  exceedLimit: false,
   subType: '',
   isAvailable: false,
+  showChatReturnOption: false
 }
 
 export const defaultPreReserveOptions: PreReserveOptions = {
