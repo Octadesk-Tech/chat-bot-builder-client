@@ -1,7 +1,7 @@
 import { Text } from '@chakra-ui/react'
 import {
   BubbleStepType,
-  InputOptions,
+  StepOptions,
   InputStepType,
   IntegrationStepType,
   LogicStepType,
@@ -44,7 +44,7 @@ type Props = {
 }
 export const StepNodeContent = ({ step, indices }: Props) => {
   const { updateStep } = useTypebot()
-  const handleStepUpdate = (options: InputOptions): void => {
+  const handleStepUpdate = (options: StepOptions): void => {
     const stepWithOptions = step as StepWithOptions
     if (stepWithOptions.options) {
       stepWithOptions.options = { ...stepWithOptions.options, ...options }
@@ -94,6 +94,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     //   return <SetVariableContent step={step} />
     // }
     case LogicStepType.CONDITION: {
+      return <ItemNodesList step={step} indices={indices} isReadOnly />
+    }
+    case LogicStepType.CHAT_RETURN: {
       return <ItemNodesList step={step} indices={indices} isReadOnly />
     }
     // case LogicStepType.REDIRECT: {
@@ -165,7 +168,7 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     }
     case OctaStepType.ASSIGN_TO_TEAM: {
       return (
-        <AssignToTeamContent step={step} />
+        <AssignToTeamContent step={step} onUpdateStep={handleStepUpdate} />
       )
     }
     case OctaStepType.CALL_OTHER_BOT: {
