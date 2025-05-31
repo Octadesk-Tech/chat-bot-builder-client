@@ -695,6 +695,16 @@ export const InformationIcon = (props: IconProps) => (
   </Icon>
 )
 
+export const OutlineInformationIcon = (props: any) => (
+  <IconContext.Provider
+    value={{ color: props.color, className: 'global-class-name' }}
+  >
+    <div>
+      <MaterialDesign.MdOutlineInfo />
+    </div>
+  </IconContext.Provider>
+)
+
 export const QuestionIcon = (props: any) => (
   <IconContext.Provider
     value={{ color: props.color, className: 'global-class-name' }}
