@@ -84,6 +84,7 @@ export type SetEmptyFields = (
 ) => void
 const typebotContext = createContext<
   {
+    domain?: string | null
     typebot?: Typebot
     emptyFields: EmptyFields[]
     customVariables: ICustomVariable[]
@@ -123,10 +124,10 @@ const typebotContext = createContext<
     wozProfiles: Array<any>
     currentTypebot?: Typebot
   } & BlocksActions &
-  StepsActions &
-  ItemsActions &
-  VariablesActions &
-  EdgesActions
+    StepsActions &
+    ItemsActions &
+    VariablesActions &
+    EdgesActions
 >({} as any)
 
 export const TypebotContext = ({
@@ -142,15 +143,22 @@ export const TypebotContext = ({
     status: 'error',
   })
 
-  const { typebot, publishedTypebot, webhooks, isReadOnly, isLoading, mutate } =
-    useFetchedTypebot({
-      typebotId,
-      onError: (error) =>
-        toast({
-          title: 'Error while fetching typebot',
-          description: error.message,
-        }),
-    })
+  const {
+    typebot,
+    publishedTypebot,
+    webhooks,
+    isReadOnly,
+    isLoading,
+    mutate,
+    domain,
+  } = useFetchedTypebot({
+    typebotId,
+    onError: (error) =>
+      toast({
+        title: 'Error while fetching typebot',
+        description: error.message,
+      }),
+  })
 
   const updateLocalTypebot = (updates: UpdateTypebotPayload) =>
     localTypebot && setLocalTypebot({ ...localTypebot, ...updates })
@@ -174,7 +182,7 @@ export const TypebotContext = ({
     .reduce<string[]>(
       (typebotIds, step) =>
         step.type === LogicStepType.TYPEBOT_LINK &&
-          isDefined(step.options.typebotId)
+        isDefined(step.options.typebotId)
           ? [...typebotIds, step.options.typebotId]
           : typebotIds,
       []
@@ -441,53 +449,53 @@ export const TypebotContext = ({
 
         const agentPromise = shouldGetAgents
           ? Agents()
-            .getAgents()
-            .then((res) => {
-              let agentsList = res
-                .sort((a: any, b: any) => a.name.localeCompare(b.name))
-                .map((agent: any) => ({
-                  ...agent,
-                  operationType: ASSIGN_TO.agent,
-                }))
+              .getAgents()
+              .then((res) => {
+                let agentsList = res
+                  .sort((a: any, b: any) => a.name.localeCompare(b.name))
+                  .map((agent: any) => ({
+                    ...agent,
+                    operationType: ASSIGN_TO.agent,
+                  }))
 
-              agentsList = [
-                {
-                  name: 'Atribuir a conversa para um usuário',
-                  disabled: true,
-                  id: 'agent',
-                  isTitle: true,
-                },
-                ...agentsList,
-              ]
+                agentsList = [
+                  {
+                    name: 'Atribuir a conversa para um usuário',
+                    disabled: true,
+                    id: 'agent',
+                    isTitle: true,
+                  },
+                  ...agentsList,
+                ]
 
-              agentsGroupsList.push(...agentsList)
-            })
+                agentsGroupsList.push(...agentsList)
+              })
           : undefined
 
         const groupPromise = shouldGetGroups
           ? Groups()
-            .getGroups()
-            .then((res) => {
-              let groupsList: Array<any> = []
-              const groups = res
-                .sort((a: any, b: any) => a.name.localeCompare(b.name))
-                .map((group: any) => ({
-                  ...group,
-                  operationType: ASSIGN_TO.group,
-                }))
+              .getGroups()
+              .then((res) => {
+                let groupsList: Array<any> = []
+                const groups = res
+                  .sort((a: any, b: any) => a.name.localeCompare(b.name))
+                  .map((group: any) => ({
+                    ...group,
+                    operationType: ASSIGN_TO.group,
+                  }))
 
-              groupsList = [
-                {
-                  name: 'Atribuir a conversa para um grupo',
-                  id: 'group',
-                  disabled: true,
-                  isTitle: true,
-                },
-                ...groups,
-              ]
+                groupsList = [
+                  {
+                    name: 'Atribuir a conversa para um grupo',
+                    id: 'group',
+                    disabled: true,
+                    isTitle: true,
+                  },
+                  ...groups,
+                ]
 
-              agentsGroupsList.push(...groupsList)
-            })
+                agentsGroupsList.push(...groupsList)
+              })
           : undefined
 
         const promises = [agentPromise, groupPromise]
@@ -643,6 +651,7 @@ export const TypebotContext = ({
 
   const contextValue = useMemo(() => {
     return {
+      domain,
       typebot: localTypebot,
       customVariables: customVariables,
       emptyFields,
@@ -681,9 +690,10 @@ export const TypebotContext = ({
       octaGroups,
       botFluxesList,
       tagsList,
-      wozProfiles
+      wozProfiles,
     }
   }, [
+    domain,
     localTypebot,
     customVariables,
     emptyFields,
@@ -711,7 +721,7 @@ export const TypebotContext = ({
     octaGroups,
     botFluxesList,
     tagsList,
-    wozProfiles
+    wozProfiles,
   ])
   return (
     <typebotContext.Provider value={contextValue}>
@@ -743,6 +753,7 @@ export const useFetchedTypebot = ({
 
   if (error) onError(error)
   return {
+    domain: data?.typebot?.domain,
     typebot: data?.typebot,
     webhooks: data?.webhooks,
     publishedTypebot: data?.publishedTypebot,
