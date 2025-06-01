@@ -315,39 +315,6 @@ export const Graph = memo(
             </Tooltip>
           </Stack>
 
-          {/* <Stack
-            pos="fixed"
-            top={`calc(${headerHeight}px + 230px)`}
-            right="40px"
-            bgColor="white"
-            rounded="md"
-            zIndex={1}
-            spacing="0"
-            shadow="lg"
-          >
-            {' '}
-            <Tooltip
-              label={hideEdges ? 'Mostrar conexões' : 'Esconder conexões'}
-            >
-              <IconButton
-                display={['none', 'flex']}
-                icon={
-                  !hideEdges ? (
-                    <TbRoute />
-                  ) : (
-                    <TbRouteOff color={colors.red[400]} />
-                  )
-                }
-                size="sm"
-                aria-label={
-                  hideEdges ? 'Mostrar conexões' : 'Esconder conexões'
-                }
-                onClick={() => {
-                  setHideEdges((v: boolean) => !v)
-                }}
-              />
-            </Tooltip>
-          </Stack> */}
           <Flex
             flex="1"
             w="full"
