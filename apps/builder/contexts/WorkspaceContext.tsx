@@ -624,6 +624,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     }
   }, [
     loaded,
+    domain,
     typebot?.variables,
     octaPersonItems,
     octaChatItems,
