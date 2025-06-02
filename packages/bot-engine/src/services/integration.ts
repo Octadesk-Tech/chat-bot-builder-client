@@ -15,7 +15,6 @@ import {
 } from 'models'
 import { stringify } from 'qs'
 import { byId, sendRequest } from 'utils'
-import { sendGaEvent } from '../../lib/gtag'
 import { parseVariables, parseVariablesInObject } from './variable'
 
 type IntegrationContext = {
@@ -161,7 +160,7 @@ const getRowFromGoogleSheets = async (
         column: options.referenceCell.column,
         value: parseVariables(variables)(options.referenceCell.value ?? ''),
       },
-      columns: options.cellsToExtract.map((cell) => cell.column),
+      columns: options.cellsToExtract.map((cell: any) => cell.column),
       resultId,
     },
     { indices: false }
@@ -178,14 +177,14 @@ const getRowFromGoogleSheets = async (
     )
   )
   if (!data) return
-  const newVariables = {} as any;
+  const newVariables = {} as any
   updateVariables(newVariables)
 }
 const parseCellValues = (
   cells: any,
   variables: any
 ): { [key: string]: string } =>
-  cells.reduce((row, cell) => {
+  cells.reduce((row: any, cell: any) => {
     return !cell.column || !cell.value
       ? row
       : {
