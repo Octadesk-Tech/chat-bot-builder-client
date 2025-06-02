@@ -20,5 +20,7 @@ export const HostBubble = ({ step, onTransitionEnd }: Props) => {
       return <VideoBubble step={step} onTransitionEnd={onTransitionEnd} />
     case BubbleStepType.EMBED:
       return <EmbedBubble step={step} onTransitionEnd={onTransitionEnd} />
+    default:
+      return null
   }
 }
