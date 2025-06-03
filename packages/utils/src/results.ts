@@ -30,7 +30,7 @@ const parseInputsResultHeader = ({
 }: {
   blocks: Block[]
   variables: Variable[]
-}): ResultHeaderCell[] =>
+}): any[] =>
   (
     blocks
       .flatMap((b) =>

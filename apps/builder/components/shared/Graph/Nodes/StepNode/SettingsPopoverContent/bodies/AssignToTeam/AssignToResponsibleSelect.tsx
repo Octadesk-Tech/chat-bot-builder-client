@@ -5,7 +5,7 @@ import { OptionType } from 'components/octaComponents/OctaSelect/OctaSelect.type
 
 type Props = {
   onSelect: (option: any) => void
-  options: IOptions
+  options: IOptions | any
   hasResponsibleContact: boolean
   showChatReturnOption?: boolean
   setIsChatReturnSelected: (isSelected: boolean) => void

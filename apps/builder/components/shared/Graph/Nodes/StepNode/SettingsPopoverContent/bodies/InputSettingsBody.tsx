@@ -82,7 +82,7 @@ export const InputSettingBody = ({
     }
   }
 
-  const onAssign = (v) => {
+  const onAssign = (v: any) => {
     onOptionsChange({
       ...step.options,
       ...v,
