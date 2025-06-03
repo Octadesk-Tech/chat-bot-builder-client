@@ -27,16 +27,16 @@ import {
   WhatsAppButtonsListStep,
   WhatsAppOptionsListStep,
   WOZAssignStep,
-  WOZStepType
+  WOZStepType,
 } from 'models'
 
 export const sendRequest = async <ResponseData>(
   params:
     | {
-      url: string
-      method: string
-      body?: Record<string, unknown>
-    }
+        url: string
+        method: string
+        body?: Record<string, unknown>
+      }
     | string
 ): Promise<{ data?: ResponseData; error?: Error }> => {
   try {
@@ -47,8 +47,8 @@ export const sendRequest = async <ResponseData>(
       headers:
         typeof params !== 'string' && isDefined(params.body)
           ? {
-            'Content-Type': 'application/json',
-          }
+              'Content-Type': 'application/json',
+            }
           : undefined,
       body:
         typeof params !== 'string' && isDefined(params.body)
@@ -96,7 +96,9 @@ export const isTextBubbleStep = (step: Step): step is TextBubbleStep =>
 export const isMediaBubbleStep = (
   step: Step
 ): step is ImageBubbleStep | MediaBubbleStep | VideoBubbleStep =>
-  step.type === BubbleStepType.IMAGE || step.type === BubbleStepType.MEDIA || step.type === BubbleStepType.VIDEO
+  step.type === BubbleStepType.IMAGE ||
+  step.type === BubbleStepType.MEDIA ||
+  step.type === BubbleStepType.VIDEO
 
 // export const isTextInputStep = (step: Step): step is TextInputStep =>
 //   step.type === InputStepType.TEXT
@@ -116,14 +118,16 @@ export const isIntegrationStep = (step: Step): step is IntegrationStep =>
   (Object.values(IntegrationStepType) as string[]).includes(step.type)
 
 export const isWebhookStep = (step: Step): step is WebhookStep =>
-  [
-    IntegrationStepType.WEBHOOK
-  ].includes(step.type as IntegrationStepType.WEBHOOK)
+  [IntegrationStepType.WEBHOOK].includes(
+    step.type as IntegrationStepType.WEBHOOK
+  )
 
 export const isBubbleStepType = (type: StepType): type is BubbleStepType =>
   (Object.values(BubbleStepType) as string[]).includes(type)
 
-export const isOctaBubbleStepType = (type: StepType): type is OctaBubbleStepType =>
+export const isOctaBubbleStepType = (
+  type: StepType
+): type is OctaBubbleStepType =>
   (Object.values(OctaBubbleStepType) as string[]).includes(type)
 
 // export const hasRedirectWhenNoneAvailable = (step: Step): step is OctaBubbleStepType =>
@@ -138,7 +142,6 @@ export const isWOZStepType = (type: StepType): type is WOZStepType => {
   return [...octaType].includes(type)
 }
 
-
 export const stepTypeHasOption = (
   type: StepType
 ): type is StepWithOptionsType =>
@@ -150,29 +153,57 @@ export const stepTypeHasOption = (
 export const OctaStepTypeHasOption = (
   type: OctaStepType
 ): type is OctaStepType =>
-  (Object.values(OctaStepType) as string[])
-    .includes(type)
+  (Object.values(OctaStepType) as string[]).includes(type)
 
 export const stepTypeHasWebhook = (
   type: StepType
 ): type is IntegrationStepType.WEBHOOK =>
-  Object.values([
-    IntegrationStepType.WEBHOOK
-  ] as string[]).includes(type)
+  Object.values([IntegrationStepType.WEBHOOK] as string[]).includes(type)
 
 export const stepTypeHasItems = (
-  type: StepType
-): type is LogicStepType.CONDITION | LogicStepType.CHAT_RETURN |InputStepType.CHOICE | OctaStepType.OFFICE_HOURS | IntegrationStepType.WEBHOOK | IntegrationStepType.EXTERNAL_EVENT | OctaWabaStepType.WHATSAPP_OPTIONS_LIST | OctaWabaStepType.WHATSAPP_BUTTONS_LIST | OctaWabaStepType.COMMERCE | WOZStepType.ASSIGN =>
-  [LogicStepType.CONDITION, LogicStepType.CHAT_RETURN, InputStepType.CHOICE, OctaStepType.OFFICE_HOURS, IntegrationStepType.WEBHOOK, IntegrationStepType.EXTERNAL_EVENT, OctaWabaStepType.WHATSAPP_OPTIONS_LIST, OctaWabaStepType.WHATSAPP_BUTTONS_LIST, OctaWabaStepType.COMMERCE, WOZStepType.ASSIGN].includes(type)
+  type: StepType | any
+): type is
+  | LogicStepType.CONDITION
+  | InputStepType.CHOICE
+  | OctaStepType.OFFICE_HOURS
+  | IntegrationStepType.WEBHOOK
+  | IntegrationStepType.EXTERNAL_EVENT
+  | OctaWabaStepType.WHATSAPP_OPTIONS_LIST
+  | OctaWabaStepType.WHATSAPP_BUTTONS_LIST
+  | OctaWabaStepType.COMMERCE
+  | WOZStepType.ASSIGN
+  | LogicStepType.CHAT_RETURN =>
+  [
+    LogicStepType.CONDITION,
+    InputStepType.CHOICE,
+    OctaStepType.OFFICE_HOURS,
+    IntegrationStepType.WEBHOOK,
+    IntegrationStepType.EXTERNAL_EVENT,
+    OctaWabaStepType.WHATSAPP_OPTIONS_LIST,
+    OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
+    OctaWabaStepType.COMMERCE,
+    WOZStepType.ASSIGN,
+    LogicStepType.CHAT_RETURN,
+  ].includes(type)
 
 export const stepHasItems = (
   step: Step
-): step is ConditionStep | ChoiceInputStep | OfficeHourStep | WebhookStep | ExternalEventStep | WhatsAppOptionsListStep | WhatsAppButtonsListStep | WOZAssignStep | ChatReturnStep => 
-  'items' in step && isDefined(step.items)
+): step is
+  | ConditionStep
+  | ChoiceInputStep
+  | OfficeHourStep
+  | WebhookStep
+  | ExternalEventStep
+  | WhatsAppOptionsListStep
+  | WhatsAppButtonsListStep
+  | WOZAssignStep
+  | ChatReturnStep => 'items' in step && isDefined(step.items)
 
 export const byId = (id?: string) => (obj: { id: string }) => obj.id === id
 
-export const byIdOrToken = (comparison?: string) => (obj: { id: string, token: string }) => obj.id === comparison || obj.token === comparison
+export const byIdOrToken =
+  (comparison?: string) => (obj: { id: string; token: string }) =>
+    obj.id === comparison || obj.token === comparison
 
 export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
@@ -198,9 +229,9 @@ export const omit: Omit = (obj, ...keys) => {
 
 export const sanitizeUrl = (url: string): string =>
   url.startsWith('http') ||
-    url.startsWith('mailto:') ||
-    url.startsWith('tel:') ||
-    url.startsWith('sms:')
+  url.startsWith('mailto:') ||
+  url.startsWith('tel:') ||
+  url.startsWith('sms:')
     ? url
     : `https://${url}`
 

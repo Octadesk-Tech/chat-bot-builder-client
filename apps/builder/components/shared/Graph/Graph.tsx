@@ -98,6 +98,7 @@ export const Graph = memo(
     useEffect(() => {
       if (JSON.stringify(globalGraphPosition) === JSON.stringify(graphPosition))
         return
+
       setGraphPosition({ ...globalGraphPosition })
     }, [globalGraphPosition])
 
@@ -147,6 +148,7 @@ export const Graph = memo(
 
     const handleMouseUp = (e: MouseEvent) => {
       if (!typebot) return
+      setHideEdges(false)
 
       if (draggedItem) setDraggedItem(undefined)
 
@@ -175,8 +177,10 @@ export const Graph = memo(
 
     const handleCaptureMouseDown = (e: MouseEvent) => {
       const isRightClick = e.button === 2
-
       if (isRightClick) e.stopPropagation()
+      if (!isRightClick) {
+        setHideEdges(true)
+      }
     }
 
     const handleClick = () => {
@@ -245,9 +249,14 @@ export const Graph = memo(
 
     useEventListener('wheel', handleMouseWheel, graphContainerRef.current)
 
-    useEventListener('mousedown', handleCaptureMouseDown, undefined, {
-      capture: true,
-    })
+    useEventListener(
+      'mousedown',
+      handleCaptureMouseDown,
+      graphContainerRef.current,
+      {
+        capture: true,
+      }
+    )
 
     useEventListener('mouseup', handleMouseUp, graphContainerRef.current)
 
@@ -306,39 +315,6 @@ export const Graph = memo(
             </Tooltip>
           </Stack>
 
-          <Stack
-            pos="fixed"
-            top={`calc(${headerHeight}px + 230px)`}
-            right="40px"
-            bgColor="white"
-            rounded="md"
-            zIndex={1}
-            spacing="0"
-            shadow="lg"
-          >
-            {' '}
-            <Tooltip
-              label={hideEdges ? 'Mostrar conexões' : 'Esconder conexões'}
-            >
-              <IconButton
-                display={['none', 'flex']}
-                icon={
-                  !hideEdges ? (
-                    <TbRoute />
-                  ) : (
-                    <TbRouteOff color={colors.red[400]} />
-                  )
-                }
-                size="sm"
-                aria-label={
-                  hideEdges ? 'Mostrar conexões' : 'Esconder conexões'
-                }
-                onClick={() => {
-                  setHideEdges((v: boolean) => !v)
-                }}
-              />
-            </Tooltip>
-          </Stack>
           <Flex
             flex="1"
             w="full"
