@@ -34,7 +34,7 @@ export const InputSettingBody = ({
   const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   const handleVariableChange = (variable: Variable) => {
-    if (variable) {
+    if (variable?.variableId) {
       onOptionsChange({
         ...step.options,
         variableId: variable?.id,
@@ -45,12 +45,11 @@ export const InputSettingBody = ({
           token: variable.token,
         },
       })
-    } else {
-      onOptionsChange({
-        ...step.options,
-        variableId: undefined,
-      })
-    }
+      return;
+    } 
+    onOptionsChange({
+      variableId: undefined,
+    } as InputOptions)
   }
 
   const handleCloseEditorBotMessage = (content: TextBubbleContent) => {
