@@ -45,11 +45,11 @@ export const InputSettingBody = ({
           token: variable.token,
         },
       })
-    } else {
-      onOptionsChange({
-        variableId: undefined,
-      } as InputOptions)
-    }
+      return;
+    } 
+    onOptionsChange({
+      variableId: undefined,
+    } as InputOptions)
   }
 
   const handleCloseEditorBotMessage = (content: TextBubbleContent) => {
@@ -70,18 +70,17 @@ export const InputSettingBody = ({
       ...step.options,
     })
   }
-  console.log(step.options.variableId);
-  // if (!step.options.variableId && step.options.initialVariableToken) {
-  //   const myVariable = typebot?.variables?.find(
-  //     (v) => v.token === step.options.initialVariableToken
-  //   )
-  //   if (myVariable) {
-  //     step.options.variableId = myVariable.id
-  //     handleVariableChange(myVariable)
-  //   } else {
-  //     step.options.variableId = undefined
-  //   } 
-  // }
+  if (!step.options.variableId && step.options.initialVariableToken) {
+    const myVariable = typebot?.variables?.find(
+      (v) => v.token === step.options.initialVariableToken
+    )
+    if (myVariable) {
+      step.options.variableId = myVariable.id
+      handleVariableChange(myVariable)
+    } else {
+      step.options.variableId = undefined
+    } 
+  }
 
   const onAssign = (v: any) => {
     onOptionsChange({
