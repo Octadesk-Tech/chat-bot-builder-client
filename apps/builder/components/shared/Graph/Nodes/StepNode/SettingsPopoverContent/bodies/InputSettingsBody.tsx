@@ -34,7 +34,7 @@ export const InputSettingBody = ({
   const [isCollapsed, setIsCollapsed] = React.useState(false)
 
   const handleVariableChange = (variable: Variable) => {
-    if (variable) {
+    if (variable?.variableId) {
       onOptionsChange({
         ...step.options,
         variableId: variable?.id,
@@ -47,9 +47,8 @@ export const InputSettingBody = ({
       })
     } else {
       onOptionsChange({
-        ...step.options,
         variableId: undefined,
-      })
+      } as InputOptions)
     }
   }
 
@@ -71,16 +70,18 @@ export const InputSettingBody = ({
       ...step.options,
     })
   }
-
-  if (!step.options.variableId && step.options.initialVariableToken) {
-    const myVariable = typebot?.variables?.find(
-      (v) => v.token === step.options.initialVariableToken
-    )
-    if (myVariable) {
-      step.options.variableId = myVariable.id
-      handleVariableChange(myVariable)
-    }
-  }
+  console.log(step.options.variableId);
+  // if (!step.options.variableId && step.options.initialVariableToken) {
+  //   const myVariable = typebot?.variables?.find(
+  //     (v) => v.token === step.options.initialVariableToken
+  //   )
+  //   if (myVariable) {
+  //     step.options.variableId = myVariable.id
+  //     handleVariableChange(myVariable)
+  //   } else {
+  //     step.options.variableId = undefined
+  //   } 
+  // }
 
   const onAssign = (v: any) => {
     onOptionsChange({
