@@ -77,9 +77,7 @@ export const InputSettingBody = ({
     if (myVariable) {
       step.options.variableId = myVariable.id
       handleVariableChange(myVariable)
-    } else {
-      step.options.variableId = undefined
-    } 
+    }
   }
 
   const onAssign = (v: any) => {
