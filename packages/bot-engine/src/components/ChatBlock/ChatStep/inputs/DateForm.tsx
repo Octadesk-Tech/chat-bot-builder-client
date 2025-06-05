@@ -4,7 +4,7 @@ import { SendButton } from './SendButton'
 
 type DateInputProps = {
   onSubmit: (inputValue: `${string} to ${string}` | string) => void
-  options?: DateInputOptions
+  options?: DateInputOptions | any
 }
 
 export const DateForm = ({
