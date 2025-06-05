@@ -1,4 +1,5 @@
 import { ItemType, StepBase } from '.'
+import { ReturnType, TimeTypeValue } from '../../chatReturn'
 import { ItemBase } from './item'
 
 export type LogicStep =
@@ -7,12 +8,14 @@ export type LogicStep =
   | RedirectStep
   | CodeStep
   | TypebotLinkStep
+  | ChatReturnStep
 
 export type LogicStepOptions =
   // | SetVariableOptions
   | RedirectOptions
   | CodeOptions
   | TypebotLinkOptions
+  | ChatReturnOptions
 
 export enum LogicStepType {
   SET_VARIABLE = 'Set variable',
@@ -20,6 +23,7 @@ export enum LogicStepType {
   REDIRECT = 'Redirect',
   CODE = 'Code',
   TYPEBOT_LINK = 'Typebot link',
+  CHAT_RETURN = 'chat-return',
 }
 
 export type SetVariableStep = StepBase & {
@@ -51,6 +55,21 @@ export type TypebotLinkStep = StepBase & {
   type: LogicStepType.TYPEBOT_LINK
   options: TypebotLinkOptions
 }
+
+export type ChatReturnStep = StepBase & {
+  type: LogicStepType.CHAT_RETURN
+  options: ChatReturnOptions
+  items: Array<ChatReturnItem>;
+}
+
+export declare type ChatReturnItem = ItemBase & {
+  type: ItemType.CHAT_RETURN;
+  content: ChatReturnContent;
+};
+
+export declare type ChatReturnContent = {
+  returnType: ReturnType;
+};
 
 export enum LogicalOperator {
   OR = 'OU',
@@ -110,6 +129,12 @@ export type TypebotLinkOptions = {
   blockId?: string
 }
 
+export type ChatReturnOptions = {
+  time: number
+  timeTypeValue: TimeTypeValue
+  validationError: boolean
+}
+
 export const defaultSetVariablesOptions: SetVariableOptions = {}
 
 export const defaultConditionContent: ConditionContent = {
@@ -122,3 +147,9 @@ export const defaultRedirectOptions: RedirectOptions = { isNewTab: false }
 export const defaultCodeOptions: CodeOptions = { name: 'Code snippet' }
 
 export const defaultTypebotLinkOptions: TypebotLinkOptions = {}
+
+export const defaultChatReturnOptions: ChatReturnOptions = {
+  time: 5,
+  timeTypeValue: TimeTypeValue.MINUTE,
+  validationError: false
+}
