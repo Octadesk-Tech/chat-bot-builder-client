@@ -8,16 +8,38 @@ import { ASSIGN_TO } from 'enums/assign-to'
 import { useTypebot } from 'contexts/TypebotContext'
 import { parseVariableHighlight } from 'services/utils'
 import { TextHtmlContent } from '../TextHtmlContent'
+import { hasAnyChatReturnInItsTree } from './hasAnyChatReturnInItsTree'
+import { useUser } from 'contexts/UserContext'
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 type Props = {
   step: AssignToTeamStep
+  onUpdateStep: (options: AssignToTeamOptions) => void
 }
 
 export const AssignToTeamContent = ({
-  step,
+  step, onUpdateStep
 }: Props) => {
-  const { octaAgents } = useTypebot();
+  const { octaAgents, typebot } = useTypebot();
+  const { verifyFeatureToggle } = useUser()
+
+  React.useEffect(() => {
+    if (
+      !verifyFeatureToggle('customer-recontact') 
+      || typeof onUpdateStep !== 'function'
+    ) return
+    
+    const showChatReturnOption = hasAnyChatReturnInItsTree(typebot, step.blockId)
+    let options = {} as AssignToTeamOptions
+    if (!showChatReturnOption && step.options?.assignType === '@CHAT-RETURN') {
+      options.assignTo = ''
+      options.assignType = ''
+    }
+    
+    onUpdateStep({
+      ...step.options, ... options, showChatReturnOption
+    })
+  }, [typebot?.edges])
 
   const resolveAssignTo = (assignTo: string) => {
     const value = octaAgents.find(s => s.id === assignTo)
@@ -53,7 +75,12 @@ export const AssignToTeamContent = ({
           py="0.5"
           px="1"
         >
-          {resolveAssignTo(step.options.assignTo)}
+          {
+          step?.options?.assignType === ASSIGN_TO.chatReturn ? 
+          'Retorno de atendimento' 
+          : 
+          resolveAssignTo(step.options.assignTo)
+          }
         </chakra.span>
       }
       <OctaDivider />
