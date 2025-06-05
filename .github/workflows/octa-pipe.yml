@@ -1,0 +1,13 @@
+name: Run Script from Repo and Push Output to octa-pipe
+
+on:
+  push:
+    branches:
+      #- main
+      - development
+      #- staging
+
+jobs:
+  call-workflow-branch-ref:
+    uses: Octadesk-Tech/octa-pipe/.github/workflows/0-generate-docs.yaml@main
+    secrets: inherit

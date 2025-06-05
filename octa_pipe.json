@@ -1,0 +1,18 @@
+{
+    "project": "chat-bot-builder-client",
+    "label": "Chat Bot Builder Client",
+    "description": "Documentação gerada pela IA do projeto Chat Bot Builder Client",
+    "imgs": [],
+    "pages": [
+        {
+            "position": 1,
+            "path": "README.md",
+            "name": "Quick Start"
+        },
+        {
+            "position": 2,
+            "path": "docs/doc_functional.md",
+            "name": "Documentação Funcional"
+        }
+    ]
+}
