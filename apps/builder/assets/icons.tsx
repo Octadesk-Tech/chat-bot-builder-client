@@ -695,6 +695,16 @@ export const InformationIcon = (props: IconProps) => (
   </Icon>
 )
 
+export const OutlineInformationIcon = (props: any) => (
+  <IconContext.Provider
+    value={{ color: props.color, className: 'global-class-name' }}
+  >
+    <div>
+      <MaterialDesign.MdOutlineInfo />
+    </div>
+  </IconContext.Provider>
+)
+
 export const QuestionIcon = (props: any) => (
   <IconContext.Provider
     value={{ color: props.color, className: 'global-class-name' }}
@@ -757,4 +767,20 @@ export const ErrorIcon = (props: any) => (
   >
     <MaterialDesign.MdError />
   </IconContext.Provider>
+)
+
+export const ReturnArrow = ({ color, ...props }: any) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M12 9.125C12 10.4179 11.4864 11.6579 10.5721 12.5721C9.65791 13.4864 8.41793 14 7.125 14H1.5V12.5H7.125C9 12.5 10.5 11 10.5 9.125C10.5 7.25 9 5.75 7.125 5.75H2.8725L5.1825 8.0675L4.125 9.125L0 5L4.125 0.875L5.19 1.9325L2.8725 4.25H7.125C8.41793 4.25 9.65791 4.76361 10.5721 5.67785C11.4864 6.59209 12 7.83207 12 9.125Z"
+      fill={color}
+    />
+  </svg>
 )
