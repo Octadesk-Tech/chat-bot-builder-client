@@ -1,10 +1,13 @@
 import {
+  Checkbox,
   Collapse,
   Flex,
   FormLabel,
+  IconButton,
   Spacer,
   Stack,
   Text,
+  Tooltip,
   useModalContext,
 } from '@chakra-ui/react'
 import { SwitchWithLabel } from 'components/shared/SwitchWithLabel'
@@ -14,6 +17,7 @@ import { AutoAssignToSelect } from './AutoAssignToSelect'
 import { AssignToResponsibleSelect } from './AssignToResponsibleSelect'
 import { TextBubbleEditor } from '../../../TextBubbleEditor'
 import { useUser } from 'contexts/UserContext'
+import { OutlineInformationIcon } from 'assets/icons'
 
 type AssignToTeamSettingsBodyProps = {
   options: AssignToTeamOptions
@@ -27,18 +31,19 @@ export const AssignToTeamSettingsBody = (
 ) => {
   const { dialogRef } = useModalContext()
   const settingsModal = dialogRef?.current?.querySelector('#settings-modal')
-
+  
   const { verifyFeatureToggle } = useUser()
   const { options, onOptionsChange } = props
   const [hasResponsibleContact, setHasResponsibleContact] =
-    useState<boolean>(false)
+  useState<boolean>(false)
 
+  const [isChatReturnSelected, setIsChatReturnSelected] = useState(false)
   useEffect(() => {
     const responsibleContactEnabled = verifyFeatureToggle(
       'responsible-contact-enabled'
     )
     setHasResponsibleContact(responsibleContactEnabled)
-  }, [])
+    }, [])
 
   const handleCloseEditorBotMessage = (content: TextBubbleContent) => {
     onOptionsChange({
@@ -103,6 +108,21 @@ export const AssignToTeamSettingsBody = (
     }, 500)
   }
 
+  const handleExceedLimitChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const exceedLimit = Boolean(event.target?.checked)
+    updateExceedLimit(exceedLimit)
+  }
+
+  const updateExceedLimit = (exceedLimit: boolean) => {
+    onOptionsChange({ ...options, exceedLimit })
+  }
+
+  const handleChatReturnChange = (isSelected: boolean) => {
+    setIsChatReturnSelected(isSelected)
+    !isSelected && updateExceedLimit(false)
+  }
+
+
   return (
     <Stack spacing={4}>
       <Stack>
@@ -137,7 +157,40 @@ export const AssignToTeamSettingsBody = (
           hasResponsibleContact={hasResponsibleContact}
           options={options}
           onSelect={handleAssignToResponsibleChange}
+          setIsChatReturnSelected={handleChatReturnChange}
+          showChatReturnOption={options.showChatReturnOption}
         />
+        {
+          isChatReturnSelected && 
+            <>
+              <Text fontSize={"12px"} color={"#4F5464"}>
+                <span>Se o usuário atribuído anteriormente não estiver disponível, a conversa será direcionada para a mesma fila de atendimento.</span>
+              </Text>
+              <Flex justify="space-between" align="center" data-testid="checkbox">
+                <Checkbox
+                  style={{outline: '1px solid #4F5464'}}
+                  defaultChecked={options?.exceedLimit ?? false}
+                  onChange={handleExceedLimitChange}
+                />
+                <Text fontSize={"16px"} paddingLeft={4} color={"#4F5464"}>
+                  <span>Permitir ultrapassar o limite de conversas simultâneas do usuário?</span>
+                </Text>
+                  <Tooltip
+                    label="Se o usuário já atingiu o limite de conversas simultâneas e essa opção não estiver ativada, a conversa será enviada para a fila normal de atendimentos."
+                    hasArrow
+                  >
+                    <IconButton
+                      icon={<OutlineInformationIcon color="#4F5464" />}
+                      aria-label={'Lock'}
+                      size="lg"
+                      variant="outline"
+                      border="none"
+                      cursor="default"
+                    />
+                  </Tooltip>
+              </Flex>
+            </>
+        }
       </Stack>
       {options.subType === 'RESPONSIBLE_CONTACT' && (
         <Stack>
