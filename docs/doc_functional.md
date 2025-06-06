@@ -1,121 +1,106 @@
 # Documentação funcional
 
 ## Visão geral das funcionalidades
-O Chat Bot Builder Client é uma aplicação projetada para facilitar a criação, configuração e gestão de chatbots. Esta plataforma permite aos usuários definir interações automatizadas que podem ser integradas em sites ou sistemas de comunicação. A aplicação oferece uma interface intuitiva, integrações com diversos serviços e fornece ferramentas para monitoramento e análise de performance dos bots.
 
-## Funcionalidade 1: Gerenciamento de Usuários
+O Chat Bot Builder Client é uma aplicação que permite aos usuários criar e gerenciar chatbots de forma eficiente. A principal funcionalidade é a criação de fluxos de conversação por meio de uma interface amigável, que atende às necessidades de negócios para automatização de atendimento ao cliente, captação de leads, entre outros. O sistema possui características modulares, suportando a integração com diversos serviços externos e oferecendo uma interface intuitiva para usuários leigos e profissionais.
+
+## Funcionalidade 1: Gestão de usuários e permissões
+
 ### Descrição
-A funcionalidade de Gerenciamento de Usuários permite controlar o acesso e as permissões dos usuários dentro da plataforma. Com base no papel do usuário, diferentes níveis de acesso às funcionalidades são concedidos.
+A aplicação suporta diferentes tipos de usuários, cada um com permissões distintas em relação às operações que podem realizar. Os papéis incluem:
 
-### Telas e Funcionalidades Envolvidas
-- **Dashboard de Usuários**: Visualização dos usuários registrados.
-- **Definição de Papéis**: ADMIN, MEMBER e GUEST.
-- **Controles de Acesso**: Sistema de permissões baseado em papéis.
+- **Administrador**: pode criar, editar e excluir todos os tipos de dados, bem como gerenciar configurações do sistema.
+- **Membro**: pode criar e editar bots, mas com restrições em configurações globais do sistema.
+- **Convidado**: tem acesso limitado somente para visualização, sem poder editar ou criar novos elementos.
 
-### Permissões
-- **ADMIN**: Acesso total à plataforma, incluindo modificações críticas.
-- **MEMBER**: Acesso a funcionalidades principais sem permissões administrativas.
-- **GUEST**: Acesso limitado para visualização.
-
-### Diagrama de Fluxo de Usuários
-```mermaid
-graph LR;
-A[Usuário faz login] -- Verifica Role --> B\{Autorização\};
-B -- ADMIN --> C[Acesso Completo];
-B -- MEMBER --> D[Acesso Parcial];
-B -- GUEST --> E[Acesso Restrito];
-```
-
-## Funcionalidade 2: Criação de Chatbots
-### Descrição
-Ferramenta para criar chatbots personalizados usando uma interface gráfica intuitiva. Permite a definição de diálogos e comportamento automatizado.
-
-### Telas e Funcionalidades Envolvidas
-- **Editor de Bot**: Interface para montagem das interações.
-- **Biblioteca de Recursos**: Importação de elementos como ícones e templates.
-- **Simulador de Chat**: Testa o comportamento do bot em diferentes cenários.
-
-### Regras de Negócio
-- As configurações devem ser salvas antes de serem publicadas.
-- Os bots não publicados não estarão disponíveis para interação pública.
-
-### Diagrama de Criação de Bot
+### Diagrama
 ```mermaid
 graph TD;
-A[Iniciar Criação do Bot] --> B[Selecionar Template];
-B --> C[Configurar Diálogos];
-C --> D\{Salvar Configuração?\};
-D -->|Sim| E[Testar Bot];
-E --> G[Publicar Bot];
-D -->|Não| F[Revisar Configurações];
+    Admin["Administrador"]
+    Member["Membro"]
+    Guest["Convidado"]
+    System["Sistema"]
+
+    Admin -->|Acesso Completo| System
+    Member -->|Acesso Parcial| System
+    Guest -->|Somente Visualização| System
 ```
 
-## Funcionalidade 3: Análise de Performance
+## Funcionalidade 2: Criação de fluxos de bot
+
 ### Descrição
-Proporciona ferramentas analíticas para monitorar o desempenho dos chatbots, permitindo a otimização contínua.
+Interface de criação de bot com opções de personalização de conversas, configuração de respostas automáticas e integração com APIs externas para enriquecer a experiência dos usuários finais.
 
-### Telas e Funcionalidades Envolvidas
-- **Dashboard de Análise**: Visualização de métricas como interações, respostas e satisfação.
-- **Relatórios Detalhados**: Download de relatórios de performance.
-
-### Regras de Negócio
-- Dados analíticos são atualizados em tempo real para usuários com permissão adequada.
-
-### Diagrama de Análise de Performance
+### Diagrama
 ```mermaid
 graph LR;
-A[Captura de Dados] --> B[Processamento de Dados];
-B --> C[Análise de Métricas];
-C --> D[Apresentação no Dashboard];
-C --> E[Geração de Relatórios];
+    User[Usuário] --> UI("Interface do usuário")
+    UI --> Create["Criar Fluxo"]
+    Create --> API["Integração com APIs Externas"]
+    API --> Bot["Chat Bot"]
+    Bot --> FinalUser["Usuário Final"]
+```
+
+## Funcionalidade 3: Integração com serviços externos
+
+### Descrição
+O sistema permite integração com serviços de terceiros como Google Drive, Slack, e plataformas de e-mail, para ampliar a funcionalidade do chatbot com inclusão de dados externos.
+
+### Diagrama
+```mermaid
+graph LR;
+    ExternalServices["Serviços Externos"]
+    ChatBot["Chat Bot"]
+    
+    ExternalServices -- Integração --> ChatBot
 ```
 
 ## Regras de negócios
-### Gerenciamento de Usuários
-- **ADMIN** tem controle total.
-- **MEMBER** pode modificar mas não gerenciar usuários.
-- **GUEST** apenas visualiza dados públicos.
 
-### Criação de Chatbots
-- Bots devem passar por um controle de qualidade antes da publicação.
-- Modificações críticas requerem revisão.
+### Regras de negócios implementadas
+1. **Criação de Bot**: Apenas usuários com permissão de **Membro** ou superior podem criar ou editar bots.
+2. **Gestão de Permissões**: Alterações de roles só podem ser realizadas por **Administradores**.
+3. **Integração de Serviço Externo**: Necessário ter uma chave de API válida para realizar integrações, e ela deve ser gerida pelo **Administrador**.
+4. **Manutenção de Dados**: Dados sensíveis são armazenados de forma a garantir conformidade com leis de proteção de dados, com acesso restrito a usuários **Autorizados**.
 
-### Análise de Performance
-- Somente usuários com permissões específicas podem acessar relatórios completos.
+### Casos de uso
+- Usuários precisam realizar a autenticação para acessar a plataforma.
+- A todo momento, um log de atividades é atualizado para manter um histórico das operações realizadas.
 
-## Diagrama de C4 Arquitetura
+---
 
-### Nível 1: Diagrama de Contexto
+## Diagrama C4 Nível 1: Contexto
+
 ```mermaid
 C4Context
-title Contexto do Sistema para Chat Bot Builder Client
-Enterprise_Boundary(b0, "Boundary") \{
-    Person(user, "Usuário", "Usuário que utiliza a platforma.")
-    System(chatbotClient, "Chat Bot Builder Client", "Permite criação e gerenciamento de chatbots.")
+    title Diagrama de Contexto do Sistema Chat Bot Builder
+    Person(user, Usuário, "Usuário que interage com a aplicação para criar e gerenciar chat bots.")
+    System(chatBotSystem, "Chat Bot Builder", "Sistema para criação e gestão de chat bots.")
 
-    System_Ext(externalService, "Serviço Externo", "Serviços como integração com Google Drive, etc.")
-
-    BiRel(user, chatbotClient, "Usa")
-    BiRel(chatbotClient, externalService, "Integra")
-\}
+    BiRel(user, chatBotSystem, "Interage")
 ```
 
-### Nível 2: Diagrama de Contêiner
+## Diagrama C4 Nível 2: Container
+
 ```mermaid
 C4Container
-title Contêiner para Chat Bot Builder Client
-System_Boundary(c1, "Chat Bot Builder Client") \{
-    Container(webApp, "Web Application", "React + NextJS", "Interface do usuário para criação de bots.")
-    Container(api, "API", "NodeJS", "Backend que processa lógica do negócio.")
-    Container_Db(db, "Database", "SQL", "Armazena dados de configuração.")
+    title Diagrama de Contêiner do Chat Bot Builder
+    System_Boundary(chatBotSystem, "Chat Bot Builder") \{
+        Container(webApp, "Web Application", "React, Chakra UI", "Interface do usuário para criação e gerenciamento de bots.")
+        Container(api, "API Gateway", "Node.js, Express", "Coordena as requisições entre a aplicação e os serviços externos.")
+        ContainerDb(database, "Database", "PostgreSQL", "Armazena informações dos bots e usuários.")
+    \}
+    System_Ext(externalServices, "External Services", "Serviços de terceiros para integração.")
 
-    Rel(user, webApp, "Usa", "HTTPS")
-    Rel(webApp, api, "Consultas", "HTTPS/JSON")
-    Rel_Back(api, db, "Lê e escreve", "JDBC")
-\}
+    Rel(user, webApp, "Usa")
+    Rel(webApp, api, "Consulta/Atualiza")
+    Rel(api, externalServices, "Comunica")
+    Rel_Back(database, api, "Lê/Escreve")
 ```
 
-Esta documentação fornece uma visão geral clara das funcionalidades, arquitetura e regras de negócios do Chat Bot Builder Client, facilitando a compreensão para equipes técnicas e não técnicas.
+---
+
+Esta documentação resume as principais funcionalidades do sistema, suas características e papéis de usuário, além de fornecer uma visão arquitetural para entendimento de como os elementos se relacionam dentro da aplicação.
 
 ## Instalação
 
