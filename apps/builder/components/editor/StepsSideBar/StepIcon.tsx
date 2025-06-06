@@ -25,7 +25,8 @@ import {
   TextIcon,
   WandIcon,
   WavingHandIcon,
-  WebhookIcon
+  WebhookIcon,
+  ReturnArrow,
 } from 'assets/icons'
 import { colors } from 'libs/theme'
 import {
@@ -82,6 +83,8 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
       return <ExternalLinkIcon color="purple.500" {...props} />
     case LogicStepType.CODE:
       return <CodeIcon color="purple.500" {...props} />
+    case LogicStepType.CHAT_RETURN:
+      return <ReturnArrow color="#D1155D" {...props} />
     case IntegrationStepType.WEBHOOK:
       return <WebhookIcon {...props} />
     case IntegrationStepType.EXTERNAL_EVENT:

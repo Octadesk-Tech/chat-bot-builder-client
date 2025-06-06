@@ -97,8 +97,18 @@ export const CreateChatFieldModal = ({
 
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
-      const { data: resData } = await CustomFields().createCustomField({
+      const defaultChatFieldData = {
         domainType: DomainType.Chat,
+        isEnabled: true,
+        isCustomerVisible: false,
+        isCustomerEditable: false,
+        required: false,
+        isSearchable: false,
+        isShowAtClose: false,
+        alphabeticallyOrdered: false
+      }
+      const { data: resData } = await CustomFields().createCustomField({
+        ...defaultChatFieldData,
         ...data,
       })
 

@@ -344,6 +344,7 @@ export type FeatureFlags = {
   'commerce-enabled': FeatureFlagsProps
   'use-new-bot-builder': FeatureFlagsProps
   'responsible-contact-enabled': FeatureFlagsProps
+  'customer-recontact': FeatureFlagsProps
 }
 
 export type CollaborationType =
