@@ -1,124 +1,172 @@
 # Documentação funcional
 
 ## Visão geral das funcionalidades
-O Chat Bot Builder Client é uma aplicação projetada para permitir que os usuários criem, gerenciem e personalizem bots de conversa. Esta ferramenta facilita a automação de interações em plataformas de mensagens, melhorando a eficiência e a capacidade de resposta para empresas e serviços. 
+O Chat Bot Builder Client é uma aplicação projetada para facilitar a criação, configuração e gestão de chatbots. Esta plataforma permite aos usuários definir interações automatizadas que podem ser integradas em sites ou sistemas de comunicação. A aplicação oferece uma interface intuitiva, integrações com diversos serviços e fornece ferramentas para monitoramento e análise de performance dos bots.
 
-## Funcionalidade 1: Criação de Bots
-Os usuários podem criar bots personalizados, determinando as respostas automáticas e as interações que estes devem realizar. Esta funcionalidade permite que os criadores de bot definam lógicas de fluxo de conversação e personalizem a experiência do usuário.
+## Funcionalidade 1: Gerenciamento de Usuários
+### Descrição
+A funcionalidade de Gerenciamento de Usuários permite controlar o acesso e as permissões dos usuários dentro da plataforma. Com base no papel do usuário, diferentes níveis de acesso às funcionalidades são concedidos.
 
-### Diagrama de fluxo
+### Telas e Funcionalidades Envolvidas
+- **Dashboard de Usuários**: Visualização dos usuários registrados.
+- **Definição de Papéis**: ADMIN, MEMBER e GUEST.
+- **Controles de Acesso**: Sistema de permissões baseado em papéis.
+
+### Permissões
+- **ADMIN**: Acesso total à plataforma, incluindo modificações críticas.
+- **MEMBER**: Acesso a funcionalidades principais sem permissões administrativas.
+- **GUEST**: Acesso limitado para visualização.
+
+### Diagrama de Fluxo de Usuários
 ```mermaid
 graph LR;
-A[Iniciar] --> B[Escolher Template]
-B --> C\{Configurar Respostas\}
-C -->|Sim| D[Configurar Fluxo]
-D --> E[Salvar Bot]
+A[Usuário faz login] -- Verifica Role --> B\{Autorização\};
+B -- ADMIN --> C[Acesso Completo];
+B -- MEMBER --> D[Acesso Parcial];
+B -- GUEST --> E[Acesso Restrito];
 ```
 
-### Permissões
-- **Administrador**: Pode criar, editar e excluir bots.
-- **Usuário Padrão**: Pode criar e editar bots, mas não excluir.
+## Funcionalidade 2: Criação de Chatbots
+### Descrição
+Ferramenta para criar chatbots personalizados usando uma interface gráfica intuitiva. Permite a definição de diálogos e comportamento automatizado.
 
-## Funcionalidade 2: Gerenciamento de Sessões de Chat
-Esta funcionalidade permite visualizar e gerenciar sessões de chat em andamento ou encerradas. Os gerentes podem avaliar o desempenho do bot e as respostas dos usuários.
+### Telas e Funcionalidades Envolvidas
+- **Editor de Bot**: Interface para montagem das interações.
+- **Biblioteca de Recursos**: Importação de elementos como ícones e templates.
+- **Simulador de Chat**: Testa o comportamento do bot em diferentes cenários.
 
-### Diagrama de sequência
+### Regras de Negócio
+- As configurações devem ser salvas antes de serem publicadas.
+- Os bots não publicados não estarão disponíveis para interação pública.
+
+### Diagrama de Criação de Bot
 ```mermaid
-sequenceDiagram
-User->>System: Visualizar Sessões de Chat
-System-->>User: Exibir Lista de Sessões
-User->>System: Selecionar Sessão
-System-->>User: Exibir Detalhes da Sessão
+graph TD;
+A[Iniciar Criação do Bot] --> B[Selecionar Template];
+B --> C[Configurar Diálogos];
+C --> D\{Salvar Configuração?\};
+D -->|Sim| E[Testar Bot];
+E --> G[Publicar Bot];
+D -->|Não| F[Revisar Configurações];
 ```
 
-### Permissões
-- **Administrador**: Acesso completo a todas as sessões.
-- **Usuário Padrão**: Pode visualizar apenas suas próprias sessões.
+## Funcionalidade 3: Análise de Performance
+### Descrição
+Proporciona ferramentas analíticas para monitorar o desempenho dos chatbots, permitindo a otimização contínua.
 
-## Funcionalidade 3: Análise e Relatórios
-O sistema oferece análise de dados e relatórios sobre o desempenho dos bots, como a quantidade de interações, sucesso dos objetivos e satisfação do usuário.
+### Telas e Funcionalidades Envolvidas
+- **Dashboard de Análise**: Visualização de métricas como interações, respostas e satisfação.
+- **Relatórios Detalhados**: Download de relatórios de performance.
 
-### Diagrama de requerimentos
+### Regras de Negócio
+- Dados analíticos são atualizados em tempo real para usuários com permissão adequada.
+
+### Diagrama de Análise de Performance
 ```mermaid
-requirementDiagram
-requirement analysis_req \{
-  id: 1
-  text: O sistema deve gerar relatórios diários de desempenho dos bots.
-  risk: medium
-  verifymethod: automated test
-\}
-element test_suite_analise \{
-  type: manual test
-\}
-test_suite_analise - verifies -> analysis_req
+graph LR;
+A[Captura de Dados] --> B[Processamento de Dados];
+B --> C[Análise de Métricas];
+C --> D[Apresentação no Dashboard];
+C --> E[Geração de Relatórios];
 ```
-
-### Permissões
-- **Administrador**: Pode gerar e visualizar todos os relatórios.
-- **Usuário Padrão**: Pode visualizar relatórios somente de seus próprios bots.
 
 ## Regras de negócios
-- **Criação de Bot**: Cada bot deve pertencer a um domínio específico.
-- **Sessão de Chat**: Uma sessão expira se inativa por mais de 30 minutos.
-- **Relatórios de Performance**: Relatórios são gerados automaticamente ao final do dia.
-- **Permissões de Usuário**: Usuários padrão possuem restrições de edição e exclusão de conteúdos não pertencentes a eles.
+### Gerenciamento de Usuários
+- **ADMIN** tem controle total.
+- **MEMBER** pode modificar mas não gerenciar usuários.
+- **GUEST** apenas visualiza dados públicos.
 
----
+### Criação de Chatbots
+- Bots devem passar por um controle de qualidade antes da publicação.
+- Modificações críticas requerem revisão.
 
-## Diagrama C4
+### Análise de Performance
+- Somente usuários com permissões específicas podem acessar relatórios completos.
 
-### Diagrama de Contexto (Nível 1)
+## Diagrama de C4 Arquitetura
+
+### Nível 1: Diagrama de Contexto
 ```mermaid
 C4Context
-title Diagrama de Contexto para o Sistema Chat Bot Builder Client
-Enterprise_Boundary(b0, "Sistema Chat Bot") \{
-  Person(admin, "Administrador", "Gerente dos Bots e Análises")
-  Person(user, "Usuário Padrão", "Criadores e Gerentes de Bots")
-  System(chat_bot_sys, "Chat Bot Builder System", "Sistema onde os bots são criados e gerenciados")
+title Contexto do Sistema para Chat Bot Builder Client
+Enterprise_Boundary(b0, "Boundary") \{
+    Person(user, "Usuário", "Usuário que utiliza a platforma.")
+    System(chatbotClient, "Chat Bot Builder Client", "Permite criação e gerenciamento de chatbots.")
 
-  Rel(admin, chat_bot_sys, "Usa")
-  Rel(user, chat_bot_sys, "Usa")
+    System_Ext(externalService, "Serviço Externo", "Serviços como integração com Google Drive, etc.")
+
+    BiRel(user, chatbotClient, "Usa")
+    BiRel(chatbotClient, externalService, "Integra")
 \}
 ```
 
-### Diagrama de Containers (Nível 2)
+### Nível 2: Diagrama de Contêiner
 ```mermaid
 C4Container
-title Diagrama de Container para o Sistema Chat Bot Builder
+title Contêiner para Chat Bot Builder Client
+System_Boundary(c1, "Chat Bot Builder Client") \{
+    Container(webApp, "Web Application", "React + NextJS", "Interface do usuário para criação de bots.")
+    Container(api, "API", "NodeJS", "Backend que processa lógica do negócio.")
+    Container_Db(db, "Database", "SQL", "Armazena dados de configuração.")
 
-Container_Boundary(c1, "Chat Bot Builder") \{
-    Container(ui_app, "Aplicação Web", "React", "Interface para criar e gerenciar bots")
-    Container(api_backend, "API Backend", "Node.js", "Lógica de Negócios e Comunicação com banco de dados")
-    ContainerDb(db, "Banco de Dados", "MongoDB", "Armazena dados dos bots e sessões")
+    Rel(user, webApp, "Usa", "HTTPS")
+    Rel(webApp, api, "Consultas", "HTTPS/JSON")
+    Rel_Back(api, db, "Lê e escreve", "JDBC")
 \}
-
-Rel(user, ui_app, "Usa", "HTTPS")
-Rel(admin, ui_app, "Usa", "HTTPS")
-Rel(ui_app, api_backend, "Usa", "REST API/HTTPS")
-Rel(api_backend, db, "Ler/Escrever", "MongoDB Wire Protocol")
-
-System_Ext(external_chat, "Plataformas de Mensagens", "WhatsApp, Messenger, etc.")
-Rel(api_backend, external_chat, "Envia/Recebe Mensagens", "HTTP")
 ```
 
----
+Esta documentação fornece uma visão geral clara das funcionalidades, arquitetura e regras de negócios do Chat Bot Builder Client, facilitando a compreensão para equipes técnicas e não técnicas.
 
-Esta documentação fornece uma visão abrangente das funcionalidades e arquitetura instalada no Chat Bot Builder Client, proporcionando às equipes interessadas uma compreensão clara e direta das capacidades e dos componentes do sistema.
+## Instalação
 
-## Como rodar
+Made with [Nestjs](https://docs.nestjs.com)
 
-- Necessário estar conectado à VPN, caso precise se conectar ao MongoDB.
+```bash
+$ npm install
+```
 
-Execute o container do [docker](https://github.com/Octadesk-Tech/octadesk-system).
- 
-  **Abrir o Visual Studio**: Inicie o Visual Studio e abra o projeto ou solução que deseja executar.
-  
-  **Selecionar a Configuração**: No menu superior, escolha a configuração desejada (geralmente _Debug_ ) e o projeto de inicialização (caso sua solução tenha vários).
-  
-  **Identificar os Perfis**: No arquivo `Properties/launchSettings.json`, há seções chamadas `profiles`, onde cada perfil tem configurações específicas (como URLs, argumentos de linha de comando, etc.).
-  
-  **Executar o Projeto**: Clique no botão **"Iniciar Depuração"** (ícone verde com uma seta ou `F5`) para rodar o projeto com suporte de depuração, ou em **"Iniciar Sem Depuração"** (`Ctrl+F5`) para rodá-lo sem ferramentas de depuração.
-   
-  **Acompanhar a Saída**: O Visual Studio abrirá uma janela de saída ou o navegador (para projetos web), e você pode observar logs ou resultados na interface.
+## Executando o aplicativo
 
-  **Obs**: Verificar se no lauchSetting.json está o endereço correto do Banco de Dados (com as senhas preenchidas), caso precise se conectar ao MongoDB.
+```bash
+# create .env file
+cp .env.example .env
+
+# development
+$ npm run start
+
+# watch mode
+$ npm run start:dev
+
+# production mode
+$ npm run start:prod
+```
+
+## Teste
+
+```bash
+# unit tests
+$ npm run test
+
+# e2e tests
+$ npm run test:e2e
+
+# test coverage
+$ npm run test:cov
+```
+
+[![semantic-release](https://img.shields.io/badge/semantic-release-e10079.svg?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+
+## Publicação
+
+Após a implantação, certifique-se de que todos os métodos alterados estejam refletidos na documentação README.
+
+Url: https://dash.readme.com/
+Staging: tech+staging@octadesk.com
+Prd: tech@octadesk.com
+
+As senhas estão no Keeper.
+
+Acesse-o e vá para Api Reference no menu lateral. No topo da nova janela, clique em resync.
+
+Para validar, acesse a documentação e vá para o exemplo no método que você alterou.
+
