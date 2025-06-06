@@ -91,7 +91,8 @@ export const updateBlocksHasConnections = ({
         step.type === OctaStepType.OFFICE_HOURS ||
         step.type === OctaWabaStepType.WHATSAPP_OPTIONS_LIST ||
         step.type === OctaWabaStepType.WHATSAPP_BUTTONS_LIST ||
-        step.type === WOZStepType.ASSIGN
+        step.type === WOZStepType.ASSIGN ||
+        step.type === LogicStepType.CHAT_RETURN
 
       if (hasToConnectEachItem) {
         if (!areAllItemsConnected(step)) {
