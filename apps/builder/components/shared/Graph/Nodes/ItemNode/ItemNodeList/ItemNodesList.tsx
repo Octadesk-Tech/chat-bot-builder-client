@@ -21,12 +21,14 @@ import {
   ButtonItem,
   InputStepType,
   IntegrationStepType,
+  LogicStepType,
   OctaStepType,
   OctaWabaStepType,
   StepIndices,
   StepWithItems,
   WOZAssignStep,
   WOZStepType,
+  TimeTypeValue
 } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
 import { SourceEndpoint } from '../../../Endpoints'
@@ -34,6 +36,7 @@ import { ItemNode } from '../ItemNode'
 import { ItemNodeOverlay } from '../ItemNodeOverlay'
 import {
   Container,
+  ChatReturnContainer,
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
@@ -146,6 +149,13 @@ export const ItemNodesList = ({
     path: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.path,
   }
 
+  const chatReturn = {
+    time: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.time,
+    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue 
+      === TimeTypeValue.HOUR ? 'horas' : 'minutos',
+    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError 
+  }
+
   const getWebhookDetails = () => {
     try {
       const headers = {}
@@ -235,6 +245,19 @@ export const ItemNodesList = ({
           <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{step?.options?.url || "Clique para editar..."}</Text>
         </Container>
       )}
+      {step.type === LogicStepType.CHAT_RETURN && (
+        <ChatReturnContainer>
+          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ? 
+          (
+            <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
+          )
+          :
+          (
+            <Text noOfLines={0}>{'Configurar...'}</Text>
+          )
+          }
+        </ChatReturnContainer>
+      )}
       {step &&
         step.items &&
         step.items.map((item, idx) => {
@@ -272,7 +295,8 @@ export const ItemNodesList = ({
         step.type !== IntegrationStepType.EXTERNAL_EVENT &&
         step.type !== OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
         step.type !== OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
-        step.type !== WOZStepType.ASSIGN && (
+        step.type !== WOZStepType.ASSIGN &&
+        step.type !== LogicStepType.CHAT_RETURN && (
           <Flex
             px="4"
             py="2"

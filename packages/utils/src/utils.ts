@@ -17,6 +17,7 @@ import {
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
+  ChatReturnStep,
   Step,
   StepType,
   StepWithOptionsType,
@@ -170,7 +171,8 @@ export const stepTypeHasItems = (
   | OctaWabaStepType.WHATSAPP_OPTIONS_LIST
   | OctaWabaStepType.WHATSAPP_BUTTONS_LIST
   | OctaWabaStepType.COMMERCE
-  | WOZStepType.ASSIGN =>
+  | WOZStepType.ASSIGN
+  | LogicStepType.CHAT_RETURN =>
   [
     LogicStepType.CONDITION,
     InputStepType.CHOICE,
@@ -181,6 +183,7 @@ export const stepTypeHasItems = (
     OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
     OctaWabaStepType.COMMERCE,
     WOZStepType.ASSIGN,
+    LogicStepType.CHAT_RETURN,
   ].includes(type)
 
 export const stepHasItems = (
@@ -193,7 +196,8 @@ export const stepHasItems = (
   | ExternalEventStep
   | WhatsAppOptionsListStep
   | WhatsAppButtonsListStep
-  | WOZAssignStep => 'items' in step && isDefined(step.items)
+  | WOZAssignStep
+  | ChatReturnStep => 'items' in step && isDefined(step.items)
 
 export const byId = (id?: string) => (obj: { id: string }) => obj.id === id
 
