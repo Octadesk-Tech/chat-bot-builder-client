@@ -165,6 +165,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
             onMouseDown={(e) => e.stopPropagation()}
           >
             <Stack
+              id={`block-node-${block?.id}`}
               ref={setMultipleRefs([ref, blockRef])}
               data-testid="block"
               p="4"

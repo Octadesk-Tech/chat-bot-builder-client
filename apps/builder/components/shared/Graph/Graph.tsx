@@ -175,10 +175,17 @@ export const Graph = memo(
       setDraggedStepType(undefined)
     }
 
-    const handleCaptureMouseDown = (e: MouseEvent) => {
+    const handleCaptureMouseDown = (
+      e: MouseEvent & { target: HTMLElement }
+    ) => {
       const isRightClick = e.button === 2
+      const elementId = e?.target?.id || e?.target?.parentElement?.id
+      const hideEdgesOn = ['graph-content', 'block-node-']
       if (isRightClick) e.stopPropagation()
-      if (!isRightClick) {
+      if (
+        !isRightClick &&
+        hideEdgesOn.some((id) => elementId?.startsWith(id))
+      ) {
         setHideEdges(true)
       }
     }
@@ -316,6 +323,7 @@ export const Graph = memo(
           </Stack>
 
           <Flex
+            id="graph-content"
             flex="1"
             w="full"
             h="full"
