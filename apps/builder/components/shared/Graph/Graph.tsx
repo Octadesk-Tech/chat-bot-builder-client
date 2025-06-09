@@ -175,10 +175,17 @@ export const Graph = memo(
       setDraggedStepType(undefined)
     }
 
-    const handleCaptureMouseDown = (e: MouseEvent) => {
+    const handleCaptureMouseDown = (
+      e: MouseEvent & { target: HTMLElement }
+    ) => {
       const isRightClick = e.button === 2
+      const elementId = e?.target?.id || e?.target?.parentElement?.id
+      const hideEdgesOn = ['graph-content', 'block-node-']
       if (isRightClick) e.stopPropagation()
-      if (!isRightClick) {
+      if (
+        !isRightClick &&
+        hideEdgesOn.some((id) => elementId?.startsWith(id))
+      ) {
         setHideEdges(true)
       }
     }
@@ -315,40 +322,8 @@ export const Graph = memo(
             </Tooltip>
           </Stack>
 
-          {/* <Stack
-            pos="fixed"
-            top={`calc(${headerHeight}px + 230px)`}
-            right="40px"
-            bgColor="white"
-            rounded="md"
-            zIndex={1}
-            spacing="0"
-            shadow="lg"
-          >
-            {' '}
-            <Tooltip
-              label={hideEdges ? 'Mostrar conexões' : 'Esconder conexões'}
-            >
-              <IconButton
-                display={['none', 'flex']}
-                icon={
-                  !hideEdges ? (
-                    <TbRoute />
-                  ) : (
-                    <TbRouteOff color={colors.red[400]} />
-                  )
-                }
-                size="sm"
-                aria-label={
-                  hideEdges ? 'Mostrar conexões' : 'Esconder conexões'
-                }
-                onClick={() => {
-                  setHideEdges((v: boolean) => !v)
-                }}
-              />
-            </Tooltip>
-          </Stack> */}
           <Flex
+            id="graph-content"
             flex="1"
             w="full"
             h="full"
