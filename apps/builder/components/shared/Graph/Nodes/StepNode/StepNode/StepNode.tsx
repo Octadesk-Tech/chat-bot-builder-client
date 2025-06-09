@@ -26,9 +26,11 @@ import {
   DraggableStep,
   ExternalEventStep,
   IntegrationStepType,
+  LogicStepType,
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
+  ChatReturnStep,
   Step,
   TextBubbleContent,
   WOZAssignStep,
@@ -207,7 +209,8 @@ export const StepNode = ({
       !isCallOtherBotStep(step) &&
       !isWhatsAppOptionsListStep(step) &&
       !isWhatsAppButtonsListStep(step) &&
-      !isWozAssignStep(step)
+      !isWozAssignStep(step) &&
+      !isChatReturn(step)
     )
   }
 
@@ -449,4 +452,8 @@ const hasStepRedirectCheckAvailability = (
   }
 
   return true
+}
+
+const isChatReturn = (step: Step): step is ChatReturnStep => {
+  return step.type === LogicStepType.CHAT_RETURN
 }
