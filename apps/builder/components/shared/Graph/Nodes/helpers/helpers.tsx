@@ -40,7 +40,7 @@ const inpuStepsWithFallbackMessages = [
   OctaWabaStepType.WHATSAPP_OPTIONS_LIST,
   OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
   InputStepType.CHOICE,
-  IntegrationStepType.EXTERNAL_EVENT  
+  IntegrationStepType.EXTERNAL_EVENT
 ]
 
 export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
@@ -130,6 +130,13 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
           });
         }
       });
+    }
+
+    if (LogicStepType.CHAT_RETURN === step.type) {
+      if (!step.options?.time || step.options?.validationError) {
+        data.push({message: undefined}
+        )
+      }
     }
 
     if (inpuStepsWithFallbackMessages.includes(step.type)) {
