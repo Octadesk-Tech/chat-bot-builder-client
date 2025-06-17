@@ -1,6 +1,7 @@
 import { Text } from '@chakra-ui/react'
 import {
   BubbleStepType,
+  CreateTicketOptions,
   InputOptions,
   InputStepType,
   IntegrationStepType,
@@ -11,6 +12,7 @@ import {
   Step,
   StepIndices,
   StepWithOptions,
+  TicketStepType,
   WOZStepType,
 } from 'models'
 import { ItemNodesList } from '../../../ItemNode'
@@ -36,6 +38,7 @@ import { MediaInputContent } from '../contents/MediaInput'
 import { PreReserveContent } from '../contents/PreReserve'
 import { WOZAssignContent } from '../contents/WOZAssign'
 import { WOZSuggestionContent } from '../contents/WOZSuggestion'
+import { TicketCreateContent } from '../contents/TicketCreate/TicketCreateContent'
 // import { ProviderWebhookContent } from './contents/ZapierContent'
 
 type Props = {
@@ -44,7 +47,7 @@ type Props = {
 }
 export const StepNodeContent = ({ step, indices }: Props) => {
   const { updateStep } = useTypebot()
-  const handleStepUpdate = (options: InputOptions): void => {
+  const handleStepUpdate = (options: InputOptions | CreateTicketOptions): void => {
     const stepWithOptions = step as StepWithOptions
     if (stepWithOptions.options) {
       stepWithOptions.options = { ...stepWithOptions.options, ...options }
@@ -196,6 +199,11 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     }
     case OctaStepType.CONVERSATION_TAG: {
       return <ConversationTagContent step={step} />
+    }
+    case TicketStepType.CREATE_TICKET: {
+      return (
+        <TicketCreateContent step={step} onUpdateStep={handleStepUpdate} />
+      )
     }
     case 'start': {
       return <span></span>

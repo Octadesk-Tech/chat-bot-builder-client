@@ -35,6 +35,7 @@ import {
   fixedChatProperties,
   fixedOrganizationProperties,
   fixedPersonProperties,
+  ticketProperties,
 } from 'helpers/presets/variables-presets'
 import { v4 as uuid } from 'uuid'
 
@@ -217,10 +218,10 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     const defaultWorkspace = lastWorspaceId
       ? workspaces.find(byId(lastWorspaceId))
       : workspaces.find((w) =>
-          w.members.some(
-            (m) => m.userId === userId && m.role === WorkspaceRole.ADMIN
-          )
+        w.members.some(
+          (m) => m.userId === userId && m.role === WorkspaceRole.ADMIN
         )
+      )
 
     setCurrentWorkspace(defaultWorkspace ?? workspaces[0])
   }, [workspaces])
@@ -263,6 +264,8 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   const [octaOrganizationItems, setOctaOrganizationItems] = useState<
     Array<any>
   >([])
+
+  const [octaTicketItems, setOctaTicketItems] = useState<Array<any>>([])
 
   const [botSpecificationsChannelsInfo, setBotSpecificationsChannelsInfo] =
     useState<Array<BotSpecificationOption>>([])
@@ -476,6 +479,12 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     }
   )
 
+  const fixedTicketPropertiesWithId = ticketProperties.map((ticketProperty) => ({
+    ...ticketProperty,
+    variableId: ticketProperty.id,
+    fixed: true,
+  }))
+
   const createChatField = useCallback(
     (property: OctaProperty, variableId?: string): any => {
       if (octaChatFields.find((c) => c.token === property.token)) return
@@ -571,11 +580,16 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   }, [])
 
   useEffect(() => {
+    setOctaTicketItems(fixedTicketPropertiesWithId)
+  }, [])
+
+  useEffect(() => {
     if (loaded && setVariables) {
       const variables = [
         ...octaPersonItems,
         ...octaChatItems,
         ...octaOrganizationItems,
+        ...octaTicketItems,
       ]
 
       const mergeArraysUniqueByToken = (array1: any[], array2: any[]) => {
@@ -625,6 +639,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     octaPersonItems,
     octaChatItems,
     octaOrganizationItems,
+    octaTicketItems,
     verifyFeatureToggle,
   ])
 

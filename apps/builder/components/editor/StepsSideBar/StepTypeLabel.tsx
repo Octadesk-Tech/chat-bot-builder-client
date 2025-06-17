@@ -3,6 +3,7 @@ import {
   BubbleStepType,
   InputStepType,
   IntegrationStepType,
+  TicketStepType,
   LogicStepType,
   OctaBubbleStepType,
   OctaStepType,
@@ -77,6 +78,8 @@ export const StepTypeLabel = ({ type }: Props) => {
       return <Text>Conecte a outro sistema</Text>
     case IntegrationStepType.EXTERNAL_EVENT:
       return <Text>Aguardar Evento Externo</Text>
+    case TicketStepType.CREATE_TICKET:
+      return <Text>Criar ticket</Text>
     // case IntegrationStepType.ZAPIER:
     //   return <Text>Zapier</Text>
     // case IntegrationStepType.MAKE_COM:

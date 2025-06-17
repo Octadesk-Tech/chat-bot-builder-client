@@ -6,6 +6,7 @@ import {
   LogicStepOptions,
 } from '.'
 import { BubbleStep, BubbleStepType, WOZStepType } from './bubble'
+import { HelpDeskStep, HelpDeskStepOptions, TicketStepType } from './helpDesk'
 import { AskNameInputStep, InputOptions, InputStep, InputStepType } from './inputs'
 import { IntegrationStep } from './integration'
 import { ConditionStep, LogicStep, LogicStepType } from './logic'
@@ -17,6 +18,7 @@ export type Step =
   | InputStep
   | LogicStep
   | IntegrationStep
+  | HelpDeskStep
   | OctaStep
   | OctaBubbleStep
   | AskNameInputStep
@@ -24,7 +26,7 @@ export type Step =
   | WOZStep
   | ConversationTagStep
 
-export type DraggableStep = BubbleStep | InputStep | LogicStep | IntegrationStep | OctaStep | OctaBubbleStep | OctaWabaStep
+export type DraggableStep = BubbleStep | InputStep | LogicStep | IntegrationStep | HelpDeskStep | OctaStep | OctaBubbleStep | OctaWabaStep
 
 export type StepType =
   | 'start'
@@ -32,6 +34,7 @@ export type StepType =
   | InputStepType
   | LogicStepType
   | IntegrationStepType
+  | TicketStepType
   | OctaStepType // todos os tipos possíveis
   | OctaBubbleStepType // !!
   | OctaWabaStepType
@@ -42,6 +45,7 @@ export type DraggableStepType =
   | InputStepType
   | LogicStepType
   | IntegrationStepType
+  | TicketStepType
   | OctaStepType
   | OctaBubbleStepType
   | OctaWabaStepType
@@ -51,18 +55,21 @@ export type StepWithOptions =
   | InputStep
   | Exclude<LogicStep, ConditionStep>
   | IntegrationStep
+  | HelpDeskStep
 
 export type StepWithOptionsType =
   | InputStepType
   | Exclude<LogicStepType, LogicStepType.CONDITION>
   | Exclude<IntegrationStepType, IntegrationStepType.WEBHOOK>
   | Exclude<IntegrationStepType, IntegrationStepType.EXTERNAL_EVENT>
+  | TicketStepType
   | IntegrationStepType
 
 export type StepOptions =
   | InputStepOptions
   | LogicStepOptions
   | IntegrationStepOptions
+  | HelpDeskStepOptions
   | InputOptions
 
 export type StepWithItems = Omit<Step, 'items'> & { items: Item[] }

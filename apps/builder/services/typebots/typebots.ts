@@ -29,6 +29,7 @@ import {
   Step,
   StepOptions,
   StepWithOptionsType,
+  TicketStepType,
   Typebot,
   WOZAssignStep,
   WOZStepType,
@@ -56,6 +57,7 @@ import {
   defaultSettings,
   defaultTextBubbleContent,
   defaultTheme,
+  defaultTicketOptions,
   defaultVideoBubbleContent,
   defaultWOZAssignOptions,
   defaultWOZSuggestionOptions,
@@ -320,14 +322,12 @@ export const parseNewStep = (
   blockId: string
 ): DraggableStep => {
   const id = cuid()
-
   const options =
     isOctaStepType(type) || isWOZStepType(type)
       ? parseOctaStepOptions(type)
       : stepTypeHasOption(type)
         ? parseDefaultStepOptions(type)
         : undefined
-
   return {
     id,
     blockId,
@@ -548,6 +548,8 @@ const parseDefaultStepOptions = (
       return defaultDateInputOptions
     case InputStepType.PHONE:
       return defaultPhoneInputOptions
+    case TicketStepType.CREATE_TICKET:
+      return defaultTicketOptions
     // case InputStepType.URL:
     //   return defaultUrlInputOptions
     case InputStepType.CHOICE:

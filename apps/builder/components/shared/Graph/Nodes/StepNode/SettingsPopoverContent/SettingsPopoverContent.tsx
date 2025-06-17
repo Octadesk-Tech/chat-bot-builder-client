@@ -18,6 +18,7 @@ import {
   Step,
   StepOptions,
   TextBubbleStep,
+  TicketStepType,
   Webhook,
   WOZStepType,
 } from 'models'
@@ -45,6 +46,7 @@ import { PaymentSettings } from './bodies/PaymentSettings'
 import { RedirectSettings } from './bodies/RedirectSettings'
 import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
+import { CreateTicket } from './bodies/CreateTicket/CreateTicket'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
@@ -305,6 +307,11 @@ export const StepSettings = ({
     case IntegrationStepType.EXTERNAL_EVENT: {
       return (
         <ExternalEvent step={step} onOptionsChange={handleOptionsChange} />
+      )
+    }
+    case TicketStepType.CREATE_TICKET: {
+      return (
+        <CreateTicket step={step} onOptionsChange={handleOptionsChange} />
       )
     }
     case InputStepType.ASK_NAME:

@@ -338,6 +338,13 @@ export const defaultChoiceInputOptions: ChoiceInputOptions = {
   buttonLabel: '',
 }
 
+export const defaultTicketOptions: any = {
+  initialVariableToken: '#numero-ticket',
+  property: undefined,
+  variableId: undefined,
+}
+
+
 export const defaultPaymentInputOptions: PaymentInputOptions = {
   provider: PaymentProvider.STRIPE,
   labels: { button: 'Pay' },

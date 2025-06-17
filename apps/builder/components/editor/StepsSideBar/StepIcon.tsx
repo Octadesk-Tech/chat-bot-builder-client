@@ -25,7 +25,8 @@ import {
   TextIcon,
   WandIcon,
   WavingHandIcon,
-  WebhookIcon
+  WebhookIcon,
+  CreateTicketIcon
 } from 'assets/icons'
 import { colors } from 'libs/theme'
 import {
@@ -37,6 +38,7 @@ import {
   OctaStepType,
   OctaWabaStepType,
   StepType,
+  TicketStepType,
   WOZStepType,
 } from 'models'
 
@@ -106,6 +108,8 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
       return <PreReserveIcon color="#373A86" {...props} />
     case OctaStepType.CONVERSATION_TAG:
       return <ConversationTagIcon color="#373A86" {...props} />
+    case TicketStepType.CREATE_TICKET:
+      return <CreateTicketIcon {...props} />
     case 'start':
       return <FlagIcon {...props} />
     default:

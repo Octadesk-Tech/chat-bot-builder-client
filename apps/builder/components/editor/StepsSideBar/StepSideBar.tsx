@@ -29,6 +29,7 @@ import {
   OctaWabaStepType,
   StepType,
   WOZStepType,
+  TicketStepType
 } from 'models'
 import React, { useState } from 'react'
 import { StepCard, StepCardOverlay } from './StepCard'
@@ -216,6 +217,9 @@ export const StepsSideBar = () => {
   const integrationSteps = Object.values(IntegrationStepType).filter((step) =>
     shouldShowComponent(step)
   )
+  const ticketSteps = Object.values(TicketStepType).filter((step) =>
+    shouldShowComponent(step)
+  )
 
   return (
     <Flex
@@ -387,6 +391,26 @@ export const StepsSideBar = () => {
             )}
           </Stack>
         )}
+        {ticketSteps.length && (
+          <Stack>
+            <Flex>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                Helpdesk
+              </Text>
+              <Spacer />
+            </Flex>
+            <SimpleGrid columns={1} spacing="3">
+              {ticketSteps.map((type) => (
+                <StepCard
+                  key={type}
+                  type={type}
+                  onMouseDown={handleMouseDown}
+                />
+              ))}
+            </SimpleGrid>
+          </Stack>
+        )}
+
         {validationSteps.length && (
           <Stack>
             <Flex>
@@ -429,6 +453,8 @@ export const StepsSideBar = () => {
             </SimpleGrid>
           </Stack>
         )}
+
+
       </Stack>
 
       {draggedStepType && (

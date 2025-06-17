@@ -21,6 +21,7 @@ import {
   StepType,
   StepWithOptionsType,
   TextBubbleStep,
+  TicketStepType,
   VideoBubbleStep,
   WebhookStep,
   WhatsAppButtonsListStep,
@@ -32,10 +33,10 @@ import {
 export const sendRequest = async <ResponseData>(
   params:
     | {
-        url: string
-        method: string
-        body?: Record<string, unknown>
-      }
+      url: string
+      method: string
+      body?: Record<string, unknown>
+    }
     | string
 ): Promise<{ data?: ResponseData; error?: Error }> => {
   try {
@@ -46,8 +47,8 @@ export const sendRequest = async <ResponseData>(
       headers:
         typeof params !== 'string' && isDefined(params.body)
           ? {
-              'Content-Type': 'application/json',
-            }
+            'Content-Type': 'application/json',
+          }
           : undefined,
       body:
         typeof params !== 'string' && isDefined(params.body)
@@ -147,6 +148,7 @@ export const stepTypeHasOption = (
   (Object.values(InputStepType) as string[])
     .concat(Object.values(LogicStepType))
     .concat(Object.values(IntegrationStepType))
+    .concat(Object.values(TicketStepType))
     .includes(type)
 
 export const OctaStepTypeHasOption = (
@@ -225,9 +227,9 @@ export const omit: Omit = (obj, ...keys) => {
 
 export const sanitizeUrl = (url: string): string =>
   url.startsWith('http') ||
-  url.startsWith('mailto:') ||
-  url.startsWith('tel:') ||
-  url.startsWith('sms:')
+    url.startsWith('mailto:') ||
+    url.startsWith('tel:') ||
+    url.startsWith('sms:')
     ? url
     : `https://${url}`
 

@@ -25,6 +25,7 @@ import {
   OctaWabaStepType,
   StepIndices,
   StepWithItems,
+  TicketStepType,
   WOZAssignStep,
   WOZStepType,
 } from 'models'
@@ -235,6 +236,8 @@ export const ItemNodesList = ({
           <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{step?.options?.url || "Clique para editar..."}</Text>
         </Container>
       )}
+
+
       {step &&
         step.items &&
         step.items.map((item, idx) => {
@@ -270,6 +273,7 @@ export const ItemNodesList = ({
         step.type !== InputStepType.CHOICE &&
         step.type !== IntegrationStepType.WEBHOOK &&
         step.type !== IntegrationStepType.EXTERNAL_EVENT &&
+        step.type !== TicketStepType.CREATE_TICKET &&
         step.type !== OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
         step.type !== OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
         step.type !== WOZStepType.ASSIGN && (

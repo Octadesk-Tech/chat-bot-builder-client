@@ -112,30 +112,41 @@ export const fixedPersonProperties = [
 ]
 
 export const fixedOrganizationProperties = [
-	{
+  {
     id: '963862f5-5783-4c32-92f1-255ee356508f',
-		token: '#nome-organizacao',
-		example: 'Organização',
-		domain: 'ORGANIZATION',
-		type: 'string',
-		name: 'name',
-	},
-	{
+    token: '#nome-organizacao',
+    example: 'Organização',
+    domain: 'ORGANIZATION',
+    type: 'string',
+    name: 'name',
+  },
+  {
     id: '72947e96-9bf3-4601-9930-73b005ad9f58',
-		token: '#primeiro-telefone-organizacao',
-		example: 'Telefone',
-		domain: 'ORGANIZATION',
-		type: 'string',
-		name: 'firstPhoneContact',
-	},
-	{
+    token: '#primeiro-telefone-organizacao',
+    example: 'Telefone',
+    domain: 'ORGANIZATION',
+    type: 'string',
+    name: 'firstPhoneContact',
+  },
+  {
     id: '6e6f608a-99eb-4f7d-9f26-e13eb4c8f0cf',
-		token: '#primeiro-dominio-organizacao',
-		example: 'Domínio',
-		domain: 'ORGANIZATION',
-		type: 'string',
-		name: 'firstDomain',
-	},
+    token: '#primeiro-dominio-organizacao',
+    example: 'Domínio',
+    domain: 'ORGANIZATION',
+    type: 'string',
+    name: 'firstDomain',
+  },
 ]
 
 export const sessionChatProperties = []
+
+export const ticketProperties = [
+  {
+    id: 'b832aef9-3b63-453d-8d98-db0535c6ee1b',
+    token: '#numero-ticket',
+    example: 'Numero do ticket',
+    domain: 'TICKET',
+    type: 'string',
+    name: 'ticketNumber',
+  },
+]
