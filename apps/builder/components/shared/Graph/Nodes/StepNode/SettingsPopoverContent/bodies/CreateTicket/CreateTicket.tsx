@@ -15,7 +15,7 @@ export const CreateTicket = React.memo(function CreateTicket({
   return (
     <>
       <TicketConfiguration />
-      <PersonalizedForm />
+      <PersonalizedForm onOptionsChange={onOptionsChange} />
     </>
   )
 })

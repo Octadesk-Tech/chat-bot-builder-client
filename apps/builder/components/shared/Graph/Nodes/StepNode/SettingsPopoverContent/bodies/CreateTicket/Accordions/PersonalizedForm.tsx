@@ -1,7 +1,22 @@
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, Box, Stack, Text } from "@chakra-ui/react";
+import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
+  Box,
+  Stack,
+  Text,
+} from '@chakra-ui/react'
 import React from 'react'
+import { FormsSelect } from './FormSelect'
+import { CreateTicketOptions } from 'models'
 
-export const PersonalizedForm = () => {
+export const PersonalizedForm = ({
+  onOptionsChange,
+}: {
+  onOptionsChange: (options: CreateTicketOptions) => void
+}) => {
   return (
     <Stack mt="10px">
       <Accordion allowToggle>
@@ -12,8 +27,8 @@ export const PersonalizedForm = () => {
           boxShadow="sm"
         >
           <AccordionButton
-            _expanded={{ bg: "white" }}
-            _hover={{ bg: "white" }}
+            _expanded={{ bg: 'white' }}
+            _hover={{ bg: 'white' }}
             borderRadius="8px"
           >
             <Text
@@ -28,7 +43,11 @@ export const PersonalizedForm = () => {
             <AccordionIcon ml="auto" />
           </AccordionButton>
           <AccordionPanel pb={4} as={Stack} spacing="6">
-            <Box>Teste</Box>
+            <Box>
+              Os formularios de ticket devem ser preenchidos ao abrir uma
+              solicitação
+            </Box>
+            <FormsSelect onSelect={onOptionsChange} />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
