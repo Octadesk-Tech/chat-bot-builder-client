@@ -29,8 +29,7 @@ export const FormsSelect = ({ onSelect }: Props) => {
   const [options, setOptions] = useState<Array<OptionType>>([])
 
   const handleOnChange = (selected: any): void => {
-    console.log('Selected form:', selected)
-    onSelect(selected.data)
+    onSelect(selected)
   }
 
   useEffect(() => {
@@ -43,7 +42,7 @@ export const FormsSelect = ({ onSelect }: Props) => {
       const formattedOptions = data.map((item: any) => ({
         key: item.id,
         label: item.name,
-        value: item,
+        value: item.id,
       }))
 
       setOptions(formattedOptions)

@@ -4,19 +4,18 @@ import { TicketConfiguration } from './Accordions/TicketConfiguration'
 import { PersonalizedForm } from './Accordions/PersonalizedForm'
 
 type IProps = {
-  step: CreateTicketStep,
+  step: CreateTicketStep
   onOptionsChange: (options: CreateTicketOptions) => void
 }
 
 export const CreateTicket = React.memo(function CreateTicket({
   step,
-  onOptionsChange
+  onOptionsChange,
 }: IProps) {
   return (
     <>
       <TicketConfiguration />
-      <PersonalizedForm onOptionsChange={onOptionsChange} />
+      <PersonalizedForm onOptionsChange={onOptionsChange} step={step || {}} />
     </>
   )
 })
-

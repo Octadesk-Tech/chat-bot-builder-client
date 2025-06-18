@@ -10,12 +10,14 @@ import {
 } from '@chakra-ui/react'
 import React from 'react'
 import { FormsSelect } from './FormSelect'
-import { CreateTicketOptions } from 'models'
+import { CreateTicketOptions, CreateTicketStep } from 'models'
 
 export const PersonalizedForm = ({
   onOptionsChange,
+  step,
 }: {
   onOptionsChange: (options: CreateTicketOptions) => void
+  step: CreateTicketStep
 }) => {
   return (
     <Stack mt="10px">
@@ -47,7 +49,14 @@ export const PersonalizedForm = ({
               Os formularios de ticket devem ser preenchidos ao abrir uma
               solicitação
             </Box>
-            <FormsSelect onSelect={onOptionsChange} />
+            <FormsSelect
+              onSelect={(idForm) => {
+                onOptionsChange({
+                  ...(step.options || {}),
+                  body: { ...step.options?.body, idForm },
+                })
+              }}
+            />
           </AccordionPanel>
         </AccordionItem>
       </Accordion>
