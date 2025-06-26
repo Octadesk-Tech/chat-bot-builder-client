@@ -217,10 +217,10 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     const defaultWorkspace = lastWorspaceId
       ? workspaces.find(byId(lastWorspaceId))
       : workspaces.find((w) =>
-          w.members.some(
-            (m) => m.userId === userId && m.role === WorkspaceRole.ADMIN
-          )
+        w.members.some(
+          (m) => m.userId === userId && m.role === WorkspaceRole.ADMIN
         )
+      )
 
     setCurrentWorkspace(defaultWorkspace ?? workspaces[0])
   }, [workspaces])
@@ -655,6 +655,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     const typesToExcludeFromChatFields = [
       CustomFieldTypes.List,
       CustomFieldTypes.Select,
+      CustomFieldTypes.ListLevel,
     ]
     const octaChatFieldsFiltered = octaChatFields.filter(
       (field) => !typesToExcludeFromChatFields.includes(field.type)
