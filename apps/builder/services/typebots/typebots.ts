@@ -10,7 +10,6 @@ import {
   BubbleStepType,
   ChoiceInputStep,
   ConditionStep,
-  ConversationTagOptions,
   DraggableStep,
   DraggableStepType,
   InputStepType,
@@ -42,6 +41,7 @@ import {
   defaultCommerceOptions,
   defaultConditionContent,
   defaultConversationTagOptions,
+  ConversationTagOptions,
   defaultCpfInputOptions,
   defaultDateInputOptions,
   defaultEmailInputOptions,
@@ -149,8 +149,7 @@ const generateExternalEventValue = (stepId: string, event: string): Item => ({
     subType: null,
     values: [event],
   },
-});
-
+})
 
 export const importTypebot = async (typebot: Typebot, userPlan: Plan) => {
   const { typebot: newTypebot, webhookIdsMapping } = duplicateTypebot(
@@ -264,11 +263,11 @@ const duplicateTypebot = (
       })),
       settings:
         typebot.settings.general.isBrandingEnabled === false &&
-          userPlan === Plan.FREE
+        userPlan === Plan.FREE
           ? {
-            ...typebot.settings,
-            general: { ...typebot.settings.general, isBrandingEnabled: true },
-          }
+              ...typebot.settings,
+              general: { ...typebot.settings.general, isBrandingEnabled: true },
+            }
           : typebot.settings,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -327,8 +326,8 @@ export const parseNewStep = (
     isOctaStepType(type) || isWOZStepType(type)
       ? parseOctaStepOptions(type)
       : stepTypeHasOption(type)
-        ? parseDefaultStepOptions(type)
-        : undefined
+      ? parseDefaultStepOptions(type)
+      : undefined
 
   return {
     id,
@@ -496,7 +495,7 @@ const parseDefaultItems = (
       return [
         generateExternalEventValue(stepId, '@EXTERNAL_EVENT_RECEIVED'),
         generateExternalEventValue(stepId, '@EXTERNAL_EVENT_TIMEOUT'),
-        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_ERROR')
+        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_ERROR'),
       ]
   }
 }
