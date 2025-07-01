@@ -34,4 +34,5 @@ export enum CustomFieldTypes {
   SearchableList = 25,
   Subcategory = 26,
   ReplyMail = 27,
+  ListLevel = 29
 }
