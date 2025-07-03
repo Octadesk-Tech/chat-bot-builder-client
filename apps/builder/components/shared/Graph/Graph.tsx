@@ -34,7 +34,7 @@ import { headerHeight } from '../TypebotHeader'
 import { ZoomButtons } from './ZoomButtons'
 
 const maxScale = 2.0
-const minScale = 0.4
+const minScale = 0.2
 const zoomButtonsScaleStep = 0.2
 const hideEdgesOn = ['graph-content', 'block-node-']
 
