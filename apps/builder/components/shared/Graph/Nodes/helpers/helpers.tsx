@@ -46,7 +46,6 @@ const inpuStepsWithFallbackMessages = [
 export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
   try {
     const data = []
-
     if (isInputStep(step) || OctaWabaStepType.COMMERCE === step.type) {
       data.push({
         message: step?.options?.message?.plainText,
@@ -71,6 +70,13 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
           message: step?.content?.plainText,
         })
       }
+    }
+
+    if(OctaStepType.OFFICE_HOURS === step.type) {
+      data.push({
+        message: step?.options?.id,
+      })
+      console.log(step);
     }
 
     if (
