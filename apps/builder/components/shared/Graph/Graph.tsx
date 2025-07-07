@@ -275,7 +275,6 @@ export const Graph = memo(
         hideEdgesOn.some((id) => elementId?.startsWith(id))
       ) {
         setIsMovingBoard(true)
-        // setHideEdges(true)
       }
     }
 
