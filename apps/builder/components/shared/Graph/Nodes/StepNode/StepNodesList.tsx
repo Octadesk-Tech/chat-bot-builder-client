@@ -131,17 +131,17 @@ export const StepNodesList = ({
 
   const handleStepMouseDown =
     (stepIndex: number) =>
-      (
-        { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
-        step: DraggableStep
-      ) => {
-        if (isReadOnly) return
-        placeholderRefs.current.splice(stepIndex + 1, 1)
-        detachStepFromBlock({ blockIndex, stepIndex })
-        setPosition(absolute)
-        setMousePositionInElement(relative)
-        setDraggedStep(step)
-      }
+    (
+      { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
+      step: DraggableStep
+    ) => {
+      if (isReadOnly) return
+      placeholderRefs.current.splice(stepIndex + 1, 1)
+      detachStepFromBlock({ blockIndex, stepIndex })
+      setPosition(absolute)
+      setMousePositionInElement(relative)
+      setDraggedStep(step)
+    }
 
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
