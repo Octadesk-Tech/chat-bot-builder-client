@@ -37,6 +37,7 @@ const maxScale = 2.0
 const minScale = 0.2
 const zoomButtonsScaleStep = 0.2
 const hideEdgesOn = ['graph-content', 'block-node-']
+const showEdgesTimeOut = 500
 
 export const Graph = memo(
   ({
@@ -102,7 +103,7 @@ export const Graph = memo(
           if (!isMovingBoardRef.current) {
             setHideEdges(false)
           }
-        }, 500)
+        }, showEdgesTimeOut)
 
         return () => clearTimeout(timeout)
       }
@@ -136,6 +137,15 @@ export const Graph = memo(
 
       setGraphPosition({ ...globalGraphPosition })
     }, [globalGraphPosition])
+
+    useEffect(() => {
+      if (!typebot) return
+      setIsMovingBoard(true)
+      goToBegining()
+      setTimeout(() => {
+        setIsMovingBoard(false)
+      }, showEdgesTimeOut)
+    }, [])
 
     useEffect(() => {
       editorContainerRef.current = document.getElementById(
