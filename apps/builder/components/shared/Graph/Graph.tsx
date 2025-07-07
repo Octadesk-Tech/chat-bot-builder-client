@@ -88,25 +88,25 @@ export const Graph = memo(
     const [isMovingBoard, setIsMovingBoard] = useState(false)
 
     const [debouncedGraphPosition] = useDebounce(graphPosition, 200)
+    const isMovingBoardRef = useRef(isMovingBoard)
 
-    const [shouldHideEdges, setShouldHideEdges] = useState(false)
+    useEffect(() => {
+      isMovingBoardRef.current = isMovingBoard
+    }, [isMovingBoard])
 
     useEffect(() => {
       if (isMovingBoard) {
         setHideEdges(true)
       } else {
-        setShouldHideEdges(true)
+        const timeout = setTimeout(() => {
+          if (!isMovingBoardRef.current) {
+            setHideEdges(false)
+          }
+        }, 500)
+
+        return () => clearTimeout(timeout)
       }
     }, [isMovingBoard])
-
-    const [debouncedShouldHideEdges] = useDebounce(shouldHideEdges, 500)
-
-    useEffect(() => {
-      if (debouncedShouldHideEdges) {
-        setHideEdges(false)
-        setShouldHideEdges(false)
-      }
-    }, [debouncedShouldHideEdges])
 
     const transform = useMemo(() => {
       return `translate(${Number(graphPosition.x.toFixed(2))}px, ${Number(
