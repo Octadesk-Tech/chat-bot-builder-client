@@ -180,6 +180,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                 transform: `translate(${blockCoordinates?.x ?? 0}px, ${
                   blockCoordinates?.y ?? 0
                 }px)`,
+                userSelect: 'none',
               }}
               onMouseDown={handleMouseDown}
               onMouseEnter={handleMouseEnter}

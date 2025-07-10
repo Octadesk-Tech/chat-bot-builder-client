@@ -8,7 +8,14 @@ import {
 } from '@chakra-ui/react'
 import { RedoIcon, UndoIcon } from 'assets/icons'
 import { TbRouteOff, TbRoute } from 'react-icons/tb'
-import React, { useRef, useMemo, useEffect, useState, memo } from 'react'
+import React, {
+  useRef,
+  useMemo,
+  useEffect,
+  useState,
+  memo,
+  useCallback,
+} from 'react'
 import {
   blockWidth,
   Coordinates,
@@ -19,17 +26,18 @@ import { useStepDnd } from 'contexts/GraphDndContext'
 import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
 import { DraggableStepType, PublicTypebot, Typebot } from 'models'
 import { AnswersCount } from 'services/analytics'
-import { useDebounce } from 'use-debounce'
+import { useDebounce, useThrottledCallback } from 'use-debounce'
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable'
 import GraphContent from './GraphContent'
 import cuid from 'cuid'
 import { headerHeight } from '../TypebotHeader'
 import { ZoomButtons } from './ZoomButtons'
-import { colors } from 'libs/theme'
 
-const maxScale = 1.5
-const minScale = 0.1
+const maxScale = 2.0
+const minScale = 0.2
 const zoomButtonsScaleStep = 0.2
+const hideEdgesOn = ['graph-content', 'block-node-']
+const showEdgesTimeOut = 500
 
 export const Graph = memo(
   ({
@@ -78,15 +86,39 @@ export const Graph = memo(
       graphPositionDefaultValue
     )
 
+    const [isMovingBoard, setIsMovingBoard] = useState(false)
+
     const [debouncedGraphPosition] = useDebounce(graphPosition, 200)
+    const isMovingBoardRef = useRef(isMovingBoard)
+
+    useEffect(() => {
+      isMovingBoardRef.current = isMovingBoard
+    }, [isMovingBoard])
+
+    useEffect(() => {
+      if (isMovingBoard) {
+        setHideEdges(true)
+      } else {
+        const timeout = setTimeout(() => {
+          if (!isMovingBoardRef.current) {
+            setHideEdges(false)
+          }
+        }, showEdgesTimeOut)
+
+        return () => clearTimeout(timeout)
+      }
+    }, [isMovingBoard])
 
     const transform = useMemo(() => {
-      return `translate(${graphPosition.x}px, ${graphPosition.y}px) scale(${graphPosition.scale})`
+      return `translate(${Number(graphPosition.x.toFixed(2))}px, ${Number(
+        graphPosition.y.toFixed(2)
+      )}px) scale(${Number(graphPosition.scale.toFixed(2))})`
     }, [graphPosition])
 
     const [autoMoveDirection, setAutoMoveDirection] = useState<
       'top' | 'right' | 'bottom' | 'left' | undefined
     >()
+
     useAutoMoveBoard(autoMoveDirection, setGraphPosition)
 
     useEffect(() => {
@@ -96,11 +128,24 @@ export const Graph = memo(
     }, [typebot, graphPosition])
 
     useEffect(() => {
-      if (JSON.stringify(globalGraphPosition) === JSON.stringify(graphPosition))
+      if (
+        globalGraphPosition.scale === graphPosition.scale &&
+        globalGraphPosition.x === graphPosition.x &&
+        globalGraphPosition.y === graphPosition.y
+      )
         return
 
       setGraphPosition({ ...globalGraphPosition })
     }, [globalGraphPosition])
+
+    useEffect(() => {
+      if (!typebot) return
+      setIsMovingBoard(true)
+      goToBegining()
+      setTimeout(() => {
+        setIsMovingBoard(false)
+      }, showEdgesTimeOut)
+    }, [])
 
     useEffect(() => {
       editorContainerRef.current = document.getElementById(
@@ -129,64 +174,117 @@ export const Graph = memo(
       }
     }
 
-    const handleMouseWheel = (e: WheelEvent) => {
-      e.preventDefault()
+    const zoom = useThrottledCallback(
+      useCallback(
+        (delta = zoomButtonsScaleStep, mousePosition?: Coordinates) => {
+          const { x: mouseX, y } = mousePosition ?? { x: 800, y: 500 }
 
-      const isPinchingTrackpad = e.ctrlKey
+          const mouseY = y - headerHeight
 
-      isPinchingTrackpad
-        ? zoom((e.deltaY > 0 ? -1 : 1) * zoomButtonsScaleStep, {
+          let scale = graphPosition.scale + delta
+
+          if (
+            (scale >= maxScale && graphPosition.scale === maxScale) ||
+            (scale <= minScale && graphPosition.scale === minScale)
+          )
+            return
+
+          scale =
+            scale >= maxScale ? maxScale : scale <= minScale ? minScale : scale
+
+          const xs = (mouseX - graphPosition.x) / graphPosition.scale
+
+          const ys = (mouseY - graphPosition.y) / graphPosition.scale
+
+          setGraphPosition({
+            ...graphPosition,
+            x: mouseX - xs * scale,
+            y: mouseY - ys * scale,
+            scale,
+          })
+        },
+        [graphPosition]
+      ),
+      50
+    )
+
+    const handleMouseWheel = useCallback(
+      (e: WheelEvent) => {
+        e.preventDefault()
+
+        const isPinchingTrackpad = e.ctrlKey
+
+        if (isPinchingTrackpad) {
+          zoom((e.deltaY > 0 ? -1 : 1) * zoomButtonsScaleStep, {
             x: e.clientX,
             y: e.clientY,
           })
-        : setGraphPosition({
+        } else {
+          setGraphPosition({
             ...graphPosition,
             x: graphPosition.x - e.deltaX,
             y: graphPosition.y - e.deltaY,
           })
-    }
+        }
+      },
+      [graphPosition, zoom]
+    )
 
-    const handleMouseUp = (e: MouseEvent) => {
-      if (!typebot) return
-      setHideEdges(false)
+    const handleMouseUp = useCallback(
+      (e: MouseEvent) => {
+        setIsMovingBoard(false)
+        if (!typebot) return
 
-      if (draggedItem) setDraggedItem(undefined)
+        if (draggedItem) setDraggedItem(undefined)
 
-      if (!draggedStep && !draggedStepType) return
+        if (!draggedStep && !draggedStepType) return
 
-      const coordinates = projectMouse(
-        { x: e.clientX, y: e.clientY },
-        graphPosition
-      )
+        const coordinates = projectMouse(
+          { x: e.clientX, y: e.clientY },
+          graphPosition
+        )
 
-      const id = cuid()
+        const id = cuid()
 
-      updateBlockCoordinates(id, coordinates)
+        updateBlockCoordinates(id, coordinates)
 
-      createBlock({
-        id,
-        ...coordinates,
-        step: draggedStep ?? (draggedStepType as DraggableStepType),
-        indices: { blockIndex: typebot.blocks.length, stepIndex: 0 },
-      })
+        createBlock({
+          id,
+          ...coordinates,
+          step: draggedStep ?? (draggedStepType as DraggableStepType),
+          indices: { blockIndex: typebot.blocks.length, stepIndex: 0 },
+        })
 
-      setDraggedStep(undefined)
+        setDraggedStep(undefined)
 
-      setDraggedStepType(undefined)
-    }
+        setDraggedStepType(undefined)
+      },
+      [
+        typebot,
+        draggedItem,
+        draggedStep,
+        draggedStepType,
+        graphPosition,
+        updateBlockCoordinates,
+        createBlock,
+      ]
+    )
 
     const handleCaptureMouseDown = (
       e: MouseEvent & { target: HTMLElement }
     ) => {
       const isRightClick = e.button === 2
-      const elementId = e?.target?.id || e?.target?.parentElement?.id
-      const hideEdgesOn = ['graph-content', 'block-node-']
+      let elementId = e?.target?.id || e?.target?.parentElement?.id
+
+      if (e?.target?.children && e?.target?.children[2] && !elementId)
+        elementId = e?.target?.children[2]?.id
+
       if (isRightClick) e.stopPropagation()
       if (
         !isRightClick &&
         hideEdgesOn.some((id) => elementId?.startsWith(id))
       ) {
-        setHideEdges(true)
+        setIsMovingBoard(true)
       }
     }
 
@@ -203,37 +301,6 @@ export const Graph = memo(
         ...graphPosition,
         x: graphPosition.x + deltaX,
         y: graphPosition.y + deltaY,
-      })
-    }
-
-    const zoom = (
-      delta = zoomButtonsScaleStep,
-      mousePosition?: Coordinates
-    ) => {
-      const { x: mouseX, y } = mousePosition ?? { x: 0, y: 0 }
-
-      const mouseY = y - headerHeight
-
-      let scale = graphPosition.scale + delta
-
-      if (
-        (scale >= maxScale && graphPosition.scale === maxScale) ||
-        (scale <= minScale && graphPosition.scale === minScale)
-      )
-        return
-
-      scale =
-        scale >= maxScale ? maxScale : scale <= minScale ? minScale : scale
-
-      const xs = (mouseX - graphPosition.x) / graphPosition.scale
-
-      const ys = (mouseY - graphPosition.y) / graphPosition.scale
-
-      setGraphPosition({
-        ...graphPosition,
-        x: mouseX - xs * scale,
-        y: mouseY - ys * scale,
-        scale,
       })
     }
 
@@ -279,10 +346,11 @@ export const Graph = memo(
           ref={graphContainerRef}
           position="relative"
           {...props}
-          background={draggingStep ? 'gray.200' : '#ffffff'}
+          background={draggingStep || isMovingBoard ? 'gray.200' : '#ffffff'}
           backgroundImage="radial-gradient(#c6d0e1 1px, transparent 0)"
           backgroundSize="40px 40px"
           backgroundPosition="-19px -19px"
+          cursor={isMovingBoard ? 'grabbing' : 'grab'}
         >
           <ZoomButtons
             onZoomIn={() => zoom(zoomButtonsScaleStep)}
