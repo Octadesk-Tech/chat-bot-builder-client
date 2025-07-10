@@ -76,7 +76,6 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
       data.push({
         message: step?.options?.id,
       })
-      console.log(step);
     }
 
     if (
