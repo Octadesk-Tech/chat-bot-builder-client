@@ -37,7 +37,7 @@ import {
   WOZStepType,
   WebhookStep,
   WhatsAppButtonsListStep,
-  WhatsAppOptionsListStep
+  WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
 import React, { createContext, useEffect, useRef, useState } from 'react'
@@ -100,7 +100,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-    step.content.plainText === ''
+      step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -151,7 +151,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-      connectingIds?.target?.stepId === step.id
+        connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
