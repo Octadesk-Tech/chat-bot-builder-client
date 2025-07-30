@@ -232,7 +232,7 @@ export const StepsSideBar = () => {
       transform={isExtended ? 'translateX(0)' : 'translateX(-350px)'}
       transition="transform 350ms cubic-bezier(0.075, 0.82, 0.165, 1) 0s"
     >
-      <Stack
+      <Flex
         w="full"
         rounded="lg"
         borderEndEndRadius={0}
@@ -240,16 +240,13 @@ export const StepsSideBar = () => {
         borderWidth="1px"
         borderLeft={0}
         borderBottom={0}
-        pt="2"
-        pb="10"
-        px="4"
         bgColor="white"
-        spacing={6}
         userSelect="none"
-        overflowY="scroll"
-        className="hide-scrollbar"
+        direction="column"
+        h="full"
       >
-        <HStack w="full">
+        {/* Header fijo */}
+        <HStack w="full" pt="2" px="4" pb="4">
           <Text fontSize="lg" fontWeight="bold" color="gray.600">
             Etapas da conversa
           </Text>
@@ -274,101 +271,77 @@ export const StepsSideBar = () => {
             </Tooltip>
           </Flex>
         </HStack>
-        {(bubbleSteps.length || wabaMessageSteps.length) && (
-          <Stack>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-              Mensagens
-              <Tooltip
-                hasArrow
-                label="Etapa que não requer interação com o usuário"
-                bg="gray.700"
-                color="white"
-                width={'200px'}
-              >
-                <InfoIcon marginLeft={'10px'} color={'gray.300'} />
-              </Tooltip>
-            </Text>
-            <SimpleGrid columns={1} spacing="3">
-              {bubbleSteps.map((type) => (
-                <StepCard
-                  key={type}
-                  type={type}
-                  onMouseDown={handleMouseDown}
-                />
-              ))}
-              {wabaMessageSteps.map((type) => (
-                <StepCard
-                  key={type}
-                  type={type}
-                  onMouseDown={handleMouseDown}
-                  badge={'WAB'}
-                  isDisabled={shouldDisableComponent(type)}
-                />
-              ))}
-            </SimpleGrid>
-          </Stack>
-        )}
-        {wozSteps.length && (
-          <Stack>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-              WOZ
-            </Text>
-            <SimpleGrid columns={1} spacing="3">
-              {wozSteps.map((type) => (
-                <StepCard
-                  key={type}
-                  type={type}
-                  onMouseDown={handleMouseDown}
-                  isDisabled={shouldDisableComponent(type)}
-                />
-              ))}
-            </SimpleGrid>
-          </Stack>
-        )}
-        {inputSteps.length && (
-          <Stack>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-              Perguntas
-              <Tooltip
-                hasArrow
-                label="Etapa em que o usuário interage com o bot"
-                bg="gray.700"
-                color="white"
-                width={'200px'}
-              >
-                <InfoIcon marginLeft={'10px'} color={'gray.300'} />
-              </Tooltip>
-            </Text>
-            <SimpleGrid columns={1} spacing="3">
-              {inputSteps.map((type) => (
-                <StepCard
-                  key={type}
-                  type={type}
-                  onMouseDown={handleMouseDown}
-                  isDisabled={shouldDisableComponent(type)}
-                />
-              ))}
-              {workspace?.channel === 'whatsapp' &&
-                octaWabaSteps.map((type) => (
+
+        { }
+        <Stack
+          flex="1"
+          overflowY="auto"
+          px="4"
+          pb="10"
+          mr="1"
+          spacing={6}
+          css={{
+            '&::-webkit-scrollbar': {
+              width: '6px',
+            },
+            '&::-webkit-scrollbar-track': {
+              background: 'transparent',
+              borderRadius: '4px',
+            },
+            '&::-webkit-scrollbar-thumb': {
+              background: 'transparent',
+              borderRadius: '4px',
+              transition: 'background 0.3s ease',
+            },
+            '&:hover::-webkit-scrollbar-thumb': {
+              background: '#C4C7CF',
+            },
+            '&::-webkit-scrollbar-button': {
+              display: 'none',
+            },
+          }}
+        >
+          {(bubbleSteps.length || wabaMessageSteps.length) && (
+            <Stack>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                Mensagens
+                <Tooltip
+                  hasArrow
+                  label="Etapa que não requer interação com o usuário"
+                  bg="gray.700"
+                  color="white"
+                  width={'200px'}
+                >
+                  <InfoIcon marginLeft={'10px'} color={'gray.300'} />
+                </Tooltip>
+              </Text>
+              <SimpleGrid columns={1} spacing="3">
+                {bubbleSteps.map((type) => (
                   <StepCard
-                    key={type}
+                    key={type as string}
+                    type={type}
+                    onMouseDown={handleMouseDown}
+                  />
+                ))}
+                {wabaMessageSteps.map((type) => (
+                  <StepCard
+                    key={type as string}
                     type={type}
                     onMouseDown={handleMouseDown}
                     badge={'WAB'}
                     isDisabled={shouldDisableComponent(type)}
                   />
                 ))}
-            </SimpleGrid>
-          </Stack>
-        )}
-        {(octaSteps.length || octaBubbleSteps.length) && (
-          <Stack>
-            <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-              Direcionamentos
-            </Text>
-            {octaSteps.length && (
+              </SimpleGrid>
+            </Stack>
+          )}
+          {wozSteps.length && (
+            <Stack>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                WOZ
+              </Text>
               <SimpleGrid columns={1} spacing="3">
-                {octaSteps.map((type) => (
+                {wozSteps.map((type) => (
                   <StepCard
                     key={type}
                     type={type}
@@ -377,10 +350,107 @@ export const StepsSideBar = () => {
                   />
                 ))}
               </SimpleGrid>
-            )}
-            {octaBubbleSteps.length && (
+            </Stack>
+          )}
+          {inputSteps.length && (
+            <Stack>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                Perguntas
+                <Tooltip
+                  hasArrow
+                  label="Etapa em que o usuário interage com o bot"
+                  bg="gray.700"
+                  color="white"
+                  width={'200px'}
+                >
+                  <InfoIcon marginLeft={'10px'} color={'gray.300'} />
+                </Tooltip>
+              </Text>
               <SimpleGrid columns={1} spacing="3">
-                {octaBubbleSteps.map((type) => (
+                {inputSteps.map((type) => (
+                  <StepCard
+                    key={type as string}
+                    type={type}
+                    onMouseDown={handleMouseDown}
+                    isDisabled={shouldDisableComponent(type)}
+                  />
+                ))}
+                {workspace?.channel === 'whatsapp' &&
+                  octaWabaSteps.map((type) => (
+                    <StepCard
+                      key={type as string}
+                      type={type}
+                      onMouseDown={handleMouseDown}
+                      badge={'WAB'}
+                      isDisabled={shouldDisableComponent(type)}
+                    />
+                  ))}
+              </SimpleGrid>
+            </Stack>
+          )}
+          {(octaSteps.length || octaBubbleSteps.length) && (
+            <Stack>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                Direcionamentos
+              </Text>
+              {octaSteps.length && (
+                <SimpleGrid columns={1} spacing="3">
+                  {octaSteps.map((type) => (
+                    <StepCard
+                      key={type as string}
+                      type={type}
+                      onMouseDown={handleMouseDown}
+                      isDisabled={shouldDisableComponent(type)}
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+              {octaBubbleSteps.length && (
+                <SimpleGrid columns={1} spacing="3">
+                  {octaBubbleSteps.map((type) => (
+                    <StepCard
+                      key={type as string}
+                      type={type}
+                      onMouseDown={handleMouseDown}
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+            </Stack>
+          )}
+          {validationSteps.length && (
+            <Stack>
+              <Flex>
+                <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                  Validações
+                </Text>
+                <Spacer />
+              </Flex>
+              <SimpleGrid columns={1} spacing="3">
+                {validationSteps.map(
+                  (type) =>
+                    shouldShowComponent(type) && (
+                      <StepCard
+                        key={type}
+                        type={type}
+                        onMouseDown={handleMouseDown}
+                        isDisabled={shouldDisableComponent(type)}
+                      />
+                    )
+                )}
+              </SimpleGrid>
+            </Stack>
+          )}
+          {integrationSteps.length && (
+            <Stack>
+              <Flex>
+                <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                  Superintegrações
+                </Text>
+                <Spacer />
+              </Flex>
+              <SimpleGrid columns={1} spacing="3">
+                {integrationSteps.map((type) => (
                   <StepCard
                     key={type}
                     type={type}
@@ -388,67 +458,27 @@ export const StepsSideBar = () => {
                   />
                 ))}
               </SimpleGrid>
-            )}
-          </Stack>
-        )}
-        {validationSteps.length && (
-          <Stack>
-            <Flex>
-              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-                Validações
-              </Text>
-              <Spacer />
-            </Flex>
-            <SimpleGrid columns={1} spacing="3">
-              {validationSteps.map(
-                (type) =>
-                  shouldShowComponent(type) && (
-                    <StepCard
-                      key={type}
-                      type={type}
-                      onMouseDown={handleMouseDown}
-                      isDisabled={shouldDisableComponent(type)}
-                    />
-                  )
-              )}
-            </SimpleGrid>
-          </Stack>
-        )}
-        {integrationSteps.length && (
-          <Stack>
-            <Flex>
-              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-                Superintegrações
-              </Text>
-              <Spacer />
-            </Flex>
-            <SimpleGrid columns={1} spacing="3">
-              {integrationSteps.map((type) => (
-                <StepCard
-                  key={type}
-                  type={type}
-                  onMouseDown={handleMouseDown}
-                />
-              ))}
-            </SimpleGrid>
-          </Stack>
-        )}
-      </Stack>
+            </Stack>
+          )}
+        </Stack>
+      </Flex>
 
-      {draggedStepType && (
-        <Portal>
-          <StepCardOverlay
-            type={draggedStepType}
-            onMouseUp={handleMouseUp}
-            pos="fixed"
-            top="0"
-            left="0"
-            style={{
-              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg)`,
-            }}
-          />
-        </Portal>
-      )}
+      {
+        draggedStepType && (
+          <Portal>
+            <StepCardOverlay
+              type={draggedStepType}
+              onMouseUp={handleMouseUp}
+              pos="fixed"
+              top="0"
+              left="0"
+              style={{
+                transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg)`,
+              }}
+            />
+          </Portal>
+        )
+      }
 
       <Fade in={!isLocked} unmountOnExit>
         <Flex
@@ -464,6 +494,6 @@ export const StepsSideBar = () => {
           <Flex w="5px" h="20px" bgColor="gray.400" rounded="md" />
         </Flex>
       </Fade>
-    </Flex>
+    </Flex >
   )
 }
