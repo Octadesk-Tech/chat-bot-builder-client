@@ -1,4 +1,4 @@
-import { Stack, IconButton, Fade, Select, Flex } from '@chakra-ui/react'
+import { Stack, IconButton, Select, Flex } from '@chakra-ui/react'
 import { TrashIcon } from 'assets/icons'
 import { DropdownList } from 'components/shared/DropdownList'
 import { Input } from 'components/shared/Textbox/Input'
@@ -15,10 +15,11 @@ export const ComparisonItem = ({
   required
 }: TableListItemProps<Comparison>) => {
   const { typebot, customVariables } = useTypebot()
-  let myVariable = typebot?.variables?.find(
+
+  const myVariable = typebot?.variables?.find(
     (v: Variable) => v.token === item?.variableId || v.id === item?.variableId
   )
-  let myComparisonOperator = item?.comparisonOperator
+  const myComparisonOperator = item?.comparisonOperator
 
   const [needSecondaryValue, setNeedSecondaryValue] = useState<boolean>(
     !!item.secondaryValue
@@ -26,16 +27,17 @@ export const ComparisonItem = ({
   const [needValue, setNeedValue] = useState<boolean>(true)
 
   const handleSelectVariable = (variable?: Variable) => {
-    if (
-      (variable?.id && variable?.id === item.variableId) ||
-      variable?.token === item.variableId
-    )
+    const newVariableId = variable?.id || variable?.token
+
+    if (newVariableId && newVariableId === item.variableId) {
       return
-    myVariable = variable
+    }
+
     onItemChange({
       ...item,
-      variableId: variable?.id || variable?.token,
+      variableId: newVariableId,
       value: '',
+      secondaryValue: undefined,
     })
   }
 
@@ -47,7 +49,7 @@ export const ComparisonItem = ({
     const val = Object.keys(ComparisonOperators)[indexOf]
 
     if (val === item.comparisonOperator) return
-    myComparisonOperator = comparisonOperator
+
     onItemChange({ ...item, comparisonOperator: val as ComparisonOperators })
   }
   const handleChangeValue = (value: string) => {
@@ -135,11 +137,12 @@ export const ComparisonItem = ({
   }, [needSecondaryValue])
 
   const typeOfInputValue = () => {
-    const onSelect = (e: any) => {
+    const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
       handleChangeValue(e.target.value)
     }
 
     if (!needValue) return
+
     if (myVariable?.type === 'select') {
       return (
         <Select
@@ -152,6 +155,35 @@ export const ComparisonItem = ({
               {v?.name}
             </option>
           ))}
+        </Select>
+      )
+    }
+
+    if (myVariable?.type === 'dropdown' || myVariable?.type === 'list') {
+      return (
+        <Select
+          value={item.value}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          {customVariables.map((option) => (
+            <option key={option?.id} value={option?.name}>
+              {option?.name}
+            </option>
+          ))}
+        </Select>
+      )
+    }
+
+    if (myVariable?.type === 'boolean' || myVariable?.type === 'yesno') {
+      return (
+        <Select
+          value={item.value}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          <option value="true">Sim</option>
+          <option value="false">Não</option>
         </Select>
       )
     }
