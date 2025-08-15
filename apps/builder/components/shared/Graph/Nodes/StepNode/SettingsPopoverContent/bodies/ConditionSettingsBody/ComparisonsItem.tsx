@@ -1,4 +1,4 @@
-import { Stack, IconButton, Fade, Select, Flex } from '@chakra-ui/react'
+import { Stack, IconButton, Select, Flex } from '@chakra-ui/react'
 import { TrashIcon } from 'assets/icons'
 import { DropdownList } from 'components/shared/DropdownList'
 import { Input } from 'components/shared/Textbox/Input'
@@ -7,6 +7,7 @@ import { VariableSearchInput } from 'components/shared/VariableSearchInput/Varia
 import { Comparison, Variable, ComparisonOperators } from 'models'
 import { useTypebot } from 'contexts/TypebotContext'
 import { useEffect, useState } from 'react'
+import CustomFields from 'services/octadesk/customFields/customFields'
 
 export const ComparisonItem = ({
   item,
@@ -15,27 +16,78 @@ export const ComparisonItem = ({
   required
 }: TableListItemProps<Comparison>) => {
   const { typebot, customVariables } = useTypebot()
-  let myVariable = typebot?.variables?.find(
+
+  const myVariable = typebot?.variables?.find(
     (v: Variable) => v.token === item?.variableId || v.id === item?.variableId
   )
-  let myComparisonOperator = item?.comparisonOperator
+  const myComparisonOperator = item?.comparisonOperator
 
   const [needSecondaryValue, setNeedSecondaryValue] = useState<boolean>(
     !!item.secondaryValue
   )
   const [needValue, setNeedValue] = useState<boolean>(true)
+  const [listOptions, setListOptions] = useState<Array<{ key: string | number, value: string, label: string }>>([])
+
+  useEffect(() => {
+    const loadListOptions = async () => {
+      if (!myVariable?.token) {
+        setListOptions([])
+        return
+      }
+
+      const fieldId = myVariable.name?.replace('customField.', '') || myVariable.fieldId
+
+      if (fieldId) {
+        try {
+          const fields = await CustomFields().getCustomFields()
+          const matchingField = fields.find((f: any) => f.fieldId === fieldId)
+
+          if (matchingField && Array.isArray(matchingField.listItem) && matchingField.listItem.length > 0) {
+            const options = matchingField.listItem
+              .sort((a: any, b: any) => a.order - b.order)
+              .map((item: any) => ({
+                key: item.order,
+                value: item.text,
+                label: item.text
+              }))
+            setListOptions(options)
+          } else {
+            setListOptions([])
+          }
+        } catch (error) {
+          console.error('Error loading list options:', error)
+          setListOptions([])
+        }
+      }
+    }
+
+    loadListOptions()
+  }, [myVariable?.token, myVariable?.name, myVariable?.fieldId])
 
   const handleSelectVariable = (variable?: Variable) => {
-    if (
-      (variable?.id && variable?.id === item.variableId) ||
-      variable?.token === item.variableId
-    )
+    if (!variable) {
       return
-    myVariable = variable
+    }
+
+    const newVariableId = variable?.id || variable?.token
+
+    const isSameVariable = (
+      (newVariableId && newVariableId === item.variableId) ||
+      (variable?.id && variable.id === item.variableId) ||
+      (variable?.token && variable.token === item.variableId) ||
+      (variable?.token && variable?.token === item.variableId) ||
+      (variable?.variableId && variable.variableId === item.variableId)
+    )
+
+    if (isSameVariable) {
+      return
+    }
+
     onItemChange({
       ...item,
-      variableId: variable?.id || variable?.token,
+      variableId: newVariableId,
       value: '',
+      secondaryValue: undefined,
     })
   }
 
@@ -47,7 +99,7 @@ export const ComparisonItem = ({
     const val = Object.keys(ComparisonOperators)[indexOf]
 
     if (val === item.comparisonOperator) return
-    myComparisonOperator = comparisonOperator
+
     onItemChange({ ...item, comparisonOperator: val as ComparisonOperators })
   }
   const handleChangeValue = (value: string) => {
@@ -135,11 +187,29 @@ export const ComparisonItem = ({
   }, [needSecondaryValue])
 
   const typeOfInputValue = () => {
-    const onSelect = (e: any) => {
+    const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
       handleChangeValue(e.target.value)
     }
 
     if (!needValue) return
+
+    // Prioridad 1: Si tiene listItems específicos, usarlos
+    if (listOptions.length > 0) {
+      return (
+        <Select
+          value={item.value}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          {listOptions.map((option: any) => (
+            <option key={option.key} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
+      )
+    }
+
     if (myVariable?.type === 'select') {
       return (
         <Select
@@ -152,6 +222,19 @@ export const ComparisonItem = ({
               {v?.name}
             </option>
           ))}
+        </Select>
+      )
+    }
+
+    if (myVariable?.type === 'boolean' || myVariable?.type === 'yesno') {
+      return (
+        <Select
+          value={item.value}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          <option value="true">Sim</option>
+          <option value="false">Não</option>
         </Select>
       )
     }
