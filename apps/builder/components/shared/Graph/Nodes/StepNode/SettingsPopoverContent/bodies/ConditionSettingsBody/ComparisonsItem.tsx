@@ -213,22 +213,6 @@ export const ComparisonItem = ({
       )
     }
 
-    if (myVariable?.type === 'dropdown' || myVariable?.type === 'list') {
-      return (
-        <Select
-          value={item.value}
-          onChange={onSelect}
-          placeholder="selecione uma opção"
-        >
-          {customVariables.map((option) => (
-            <option key={option?.id} value={option?.name}>
-              {option?.name}
-            </option>
-          ))}
-        </Select>
-      )
-    }
-
     if (myVariable?.type === 'boolean' || myVariable?.type === 'yesno') {
       return (
         <Select
