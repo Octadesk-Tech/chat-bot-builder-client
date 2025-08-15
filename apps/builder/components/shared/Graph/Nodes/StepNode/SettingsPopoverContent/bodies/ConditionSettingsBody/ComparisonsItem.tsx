@@ -65,9 +65,21 @@ export const ComparisonItem = ({
   }, [myVariable?.token, myVariable?.name, myVariable?.fieldId])
 
   const handleSelectVariable = (variable?: Variable) => {
+    if (!variable) {
+      return
+    }
+
     const newVariableId = variable?.id || variable?.token
 
-    if (newVariableId && newVariableId === item.variableId) {
+    const isSameVariable = (
+      (newVariableId && newVariableId === item.variableId) ||
+      (variable?.id && variable.id === item.variableId) ||
+      (variable?.token && variable.token === item.variableId) ||
+      (variable?.token && variable?.token === item.variableId) ||
+      (variable?.variableId && variable.variableId === item.variableId)
+    )
+
+    if (isSameVariable) {
       return
     }
 
@@ -181,22 +193,7 @@ export const ComparisonItem = ({
 
     if (!needValue) return
 
-    if (myVariable?.type === 'select') {
-      return (
-        <Select
-          value={item.value}
-          onChange={onSelect}
-          placeholder="selecione uma opção"
-        >
-          {customVariables.map((v) => (
-            <option key={v?.id} value={v?.id}>
-              {v?.name}
-            </option>
-          ))}
-        </Select>
-      )
-    }
-
+    // Prioridad 1: Si tiene listItems específicos, usarlos
     if (listOptions.length > 0) {
       return (
         <Select
@@ -207,6 +204,22 @@ export const ComparisonItem = ({
           {listOptions.map((option: any) => (
             <option key={option.key} value={option.value}>
               {option.label}
+            </option>
+          ))}
+        </Select>
+      )
+    }
+
+    if (myVariable?.type === 'select') {
+      return (
+        <Select
+          value={item.value}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          {customVariables.map((v) => (
+            <option key={v?.id} value={v?.id}>
+              {v?.name}
             </option>
           ))}
         </Select>
