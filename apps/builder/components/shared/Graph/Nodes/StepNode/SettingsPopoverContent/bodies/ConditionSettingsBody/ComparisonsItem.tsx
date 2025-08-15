@@ -7,6 +7,7 @@ import { VariableSearchInput } from 'components/shared/VariableSearchInput/Varia
 import { Comparison, Variable, ComparisonOperators } from 'models'
 import { useTypebot } from 'contexts/TypebotContext'
 import { useEffect, useState } from 'react'
+import CustomFields from 'services/octadesk/customFields/customFields'
 
 export const ComparisonItem = ({
   item,
@@ -25,6 +26,43 @@ export const ComparisonItem = ({
     !!item.secondaryValue
   )
   const [needValue, setNeedValue] = useState<boolean>(true)
+  const [listOptions, setListOptions] = useState<Array<{ key: string | number, value: string, label: string }>>([])
+
+  useEffect(() => {
+    const loadListOptions = async () => {
+      if (!myVariable?.token) {
+        setListOptions([])
+        return
+      }
+
+      const fieldId = myVariable.name?.replace('customField.', '') || myVariable.fieldId
+
+      if (fieldId) {
+        try {
+          const fields = await CustomFields().getCustomFields()
+          const matchingField = fields.find((f: any) => f.fieldId === fieldId)
+
+          if (matchingField && Array.isArray(matchingField.listItem) && matchingField.listItem.length > 0) {
+            const options = matchingField.listItem
+              .sort((a: any, b: any) => a.order - b.order)
+              .map((item: any) => ({
+                key: item.order,
+                value: item.text,
+                label: item.text
+              }))
+            setListOptions(options)
+          } else {
+            setListOptions([])
+          }
+        } catch (error) {
+          console.error('Error loading list options:', error)
+          setListOptions([])
+        }
+      }
+    }
+
+    loadListOptions()
+  }, [myVariable?.token, myVariable?.name, myVariable?.fieldId])
 
   const handleSelectVariable = (variable?: Variable) => {
     const newVariableId = variable?.id || variable?.token
@@ -153,6 +191,22 @@ export const ComparisonItem = ({
           {customVariables.map((v) => (
             <option key={v?.id} value={v?.id}>
               {v?.name}
+            </option>
+          ))}
+        </Select>
+      )
+    }
+
+    if (listOptions.length > 0) {
+      return (
+        <Select
+          value={item.value}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          {listOptions.map((option: any) => (
+            <option key={option.key} value={option.value}>
+              {option.label}
             </option>
           ))}
         </Select>
