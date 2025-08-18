@@ -127,6 +127,7 @@ export const CreateChatFieldModal = ({
           fieldId: resData.fieldId,
           type: resData.type ?? 'string',
           fixed: true,
+          isShowInConversationDetails: resData.isShowInConversationDetails,
         }
 
         createVariable(variable)
