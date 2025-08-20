@@ -17,12 +17,13 @@ import {
   Box,
   Text,
   useToast,
+  Checkbox,
+  Tooltip,
 } from '@chakra-ui/react'
 import { Variable } from 'models'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
-import { useCallback } from 'react'
 import CustomFields from 'services/octadesk/customFields/customFields'
 import { CustomFieldTypes, DomainType } from 'enums/customFieldsEnum'
 import { useTypebot } from 'contexts/TypebotContext'
@@ -63,6 +64,7 @@ const schema = z.object({
   hint: z
     .string()
     .max(240, 'O texto de ajuda do campo deve ter no máximo 240 caracteres.'),
+  isShowInConversationDetails: z.boolean().default(false),
 })
 
 export const CreateChatFieldModal = ({
@@ -92,6 +94,7 @@ export const CreateChatFieldModal = ({
       fieldId: '',
       placeHolder: '',
       hint: '',
+      isShowInConversationDetails: false,
     },
   })
 
@@ -124,6 +127,7 @@ export const CreateChatFieldModal = ({
           fieldId: resData.fieldId,
           type: resData.type ?? 'string',
           fixed: true,
+          isShowInConversationDetails: resData.isShowInConversationDetails,
         }
 
         createVariable(variable)
@@ -173,9 +177,11 @@ export const CreateChatFieldModal = ({
                   setValue('type', newValue?.value || '')
                 }
               />
-              {errors.type && (
-                <FormErrorMessage>{errors.type.message}</FormErrorMessage>
-              )}
+              {
+                errors.type && (
+                  <FormErrorMessage>{errors.type.message}</FormErrorMessage>
+                )
+              }
             </FormControl>
             <FormControl isRequired isInvalid={!!errors.title}>
               <Box
@@ -184,8 +190,8 @@ export const CreateChatFieldModal = ({
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <FormLabel>Título do campo</FormLabel>
-                <Text fontSize="12px">{watch('title').length || 0}/30</Text>
+                <FormLabel>Título do campo </FormLabel>
+                <Text fontSize="12px">{watch('title').length || 0} / 30</Text>
               </Box>
               <Input
                 {...register('title', {
@@ -197,13 +203,16 @@ export const CreateChatFieldModal = ({
                       replaceAllNonAlphanumericWithUnderscore(value)
                     )
                   },
-                })}
+                })
+                }
                 placeholder="Insira o título do campo..."
                 maxLength={30}
               />
-              {errors.title && (
-                <FormErrorMessage>{errors.title.message}</FormErrorMessage>
-              )}
+              {
+                errors.title && (
+                  <FormErrorMessage>{errors.title.message}</FormErrorMessage>
+                )
+              }
             </FormControl>
             <FormControl isRequired isInvalid={!!errors.fieldId}>
               <Box
@@ -212,7 +221,7 @@ export const CreateChatFieldModal = ({
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <FormLabel>Código do campo</FormLabel>
+                <FormLabel>Código do campo </FormLabel>
                 <Text fontSize="12px">{watch('fieldId')?.length || 0}/30</Text>
               </Box>
               <Input
@@ -222,13 +231,16 @@ export const CreateChatFieldModal = ({
                       'fieldId',
                       replaceAllNonAlphanumericWithUnderscore(e.target.value)
                     ),
-                })}
+                })
+                }
                 placeholder="Código do campo..."
                 maxLength={30}
               />
-              {errors.fieldId && (
-                <FormErrorMessage>{errors.fieldId.message}</FormErrorMessage>
-              )}
+              {
+                errors.fieldId && (
+                  <FormErrorMessage>{errors.fieldId.message}</FormErrorMessage>
+                )
+              }
             </FormControl>
             <FormControl isInvalid={!!errors.placeHolder}>
               <Box
@@ -238,22 +250,25 @@ export const CreateChatFieldModal = ({
                 alignItems="center"
               >
                 <FormLabel>Texto de dica do campo</FormLabel>
-                <Text fontSize="12px">
+                <Text fontSize="12px" >
                   {watch('placeHolder')?.length || 0}/30
                 </Text>
               </Box>
               <Input
                 {...register('placeHolder', {
                   onChange: (e) => setValue('placeHolder', e.target.value),
-                })}
+                })
+                }
                 placeholder="Insira o texto de dica do campo..."
                 maxLength={30}
               />
-              {errors.placeHolder && (
-                <FormErrorMessage>
-                  {errors.placeHolder.message}
-                </FormErrorMessage>
-              )}
+              {
+                errors.placeHolder && (
+                  <FormErrorMessage>
+                    {errors.placeHolder.message}
+                  </FormErrorMessage>
+                )
+              }
             </FormControl>
             <FormControl isInvalid={!!errors.hint}>
               <Box
@@ -262,19 +277,53 @@ export const CreateChatFieldModal = ({
                 justifyContent="space-between"
                 alignItems="center"
               >
-                <FormLabel>Texto de ajuda do campo</FormLabel>
-                <Text fontSize="12px">{watch('hint')?.length || 0}/240</Text>
+                <FormLabel>Texto de ajuda do campo </FormLabel>
+                <Text fontSize="12px"> {watch('hint')?.length || 0}/240</Text>
               </Box>
               <Textarea
                 {...register('hint', {
                   onChange: (e) => setValue('hint', e.target.value),
-                })}
+                })
+                }
                 placeholder="Texto de ajuda do campo"
                 maxLength={240}
               />
-              {errors.hint && (
-                <FormErrorMessage>{errors.hint.message}</FormErrorMessage>
-              )}
+              {
+                errors.hint && (
+                  <FormErrorMessage>{errors.hint.message}</FormErrorMessage>
+                )
+              }
+            </FormControl>
+            <FormControl>
+              <HStack spacing={3}>
+                <Checkbox {...register('isShowInConversationDetails')} />
+                <Text fontSize="sm">Exibir campo nos detalhes da conversa</Text>
+                <Tooltip
+                  hasArrow
+                  label="Mostra o campo nos detalhes da conversa, permitindo visualização, preenchimento e edição."
+                  bg="gray.700"
+                  color="white"
+                  fontSize="sm"
+                  placement="top"
+                >
+                  <Box
+                    as="span"
+                    w="4"
+                    h="4"
+                    borderRadius="full"
+                    bg="white"
+                    border="1.5px solid #5A6377"
+                    color="#5A6377"
+                    display="inline-flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    fontSize="xs"
+                    fontWeight="bold"
+                  >
+                    i
+                  </Box>
+                </Tooltip>
+              </HStack>
             </FormControl>
           </Stack>
         </ModalBody>
