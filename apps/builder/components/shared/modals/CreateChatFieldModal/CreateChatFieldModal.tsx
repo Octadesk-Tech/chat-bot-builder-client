@@ -64,7 +64,7 @@ const schema = z.object({
   hint: z
     .string()
     .max(240, 'O texto de ajuda do campo deve ter no máximo 240 caracteres.'),
-  showInConversationDetails: z.boolean().default(false),
+  isShowInConversationDetails: z.boolean().default(false),
 })
 
 export const CreateChatFieldModal = ({
@@ -94,7 +94,7 @@ export const CreateChatFieldModal = ({
       fieldId: '',
       placeHolder: '',
       hint: '',
-      showInConversationDetails: false,
+      isShowInConversationDetails: false,
     },
   })
 
@@ -127,6 +127,7 @@ export const CreateChatFieldModal = ({
           fieldId: resData.fieldId,
           type: resData.type ?? 'string',
           fixed: true,
+          isShowInConversationDetails: resData.isShowInConversationDetails,
         }
 
         createVariable(variable)
@@ -295,7 +296,7 @@ export const CreateChatFieldModal = ({
             </FormControl>
             <FormControl>
               <HStack spacing={3}>
-                <Checkbox {...register('showInConversationDetails')} />
+                <Checkbox {...register('isShowInConversationDetails')} />
                 <Text fontSize="sm">Exibir campo nos detalhes da conversa</Text>
                 <Tooltip
                   hasArrow
