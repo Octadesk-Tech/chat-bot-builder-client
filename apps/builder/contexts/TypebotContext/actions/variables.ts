@@ -25,9 +25,9 @@ export const variablesAction = (setTypebot: SetTypebot): VariablesActions => ({
     ),
   setVariables: (variables: Array<Variable>) =>
     setTypebot((typebot) =>
-      produce(typebot, (typebot) => {
-        if (!typebot) return
-        typebot.variables = variables
+      produce(typebot, (newTypebot) => {
+        if (!newTypebot) return
+        setVariableDraft(typebot, variables)   
       })
     ),
   updateVariable: (
@@ -59,4 +59,14 @@ export const deleteVariableDraft = (
   if (!typebot) return
   const index = typebot.variables.findIndex((v) => v.id === variableId)
   typebot.variables.splice(index, 1)
+}
+
+export const setVariableDraft = (
+  typebot: WritableDraft<Typebot>,
+  variables: Array<Variable>
+) => {
+  const newVariables = variables.filter(
+    (v) => !typebot.variables.some((existing) => existing.token === v.token)
+  )
+  typebot.variables.push(...newVariables)
 }
