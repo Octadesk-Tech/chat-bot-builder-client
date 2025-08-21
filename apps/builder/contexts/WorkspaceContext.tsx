@@ -415,12 +415,14 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   const mountProperties = (properties: any, domainType: string) => {
     const customProperties = properties.map(
       (h: {
+
         id: string
         title: string
         fieldType: number
         type: number
         fieldId: string
         fixed: boolean
+        listItem: []
       }) => {
         const fieldType: string = fieldTypes(h.fieldType || h.type)
         let tokenValue = `#${h.fieldId.replace(/_/g, '-')}`
@@ -431,7 +433,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
           tokenValue = tokenValue.concat('-organizacao')
         }
 
-        return {
+        const result = {
           type: fieldType,
           id: h.id,
           title: h.title,
@@ -441,7 +443,11 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
           name: `customField.${h.fieldId}`,
           example: resolveExample(fieldType),
           fixed: h.fixed,
+          listItem: h.listItem,
+          fieldId: h.fieldId,
         }
+
+        return result
       }
     )
 
@@ -554,8 +560,6 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
         type: 1,
       }
       await CustomFields().createCustomField(payload)
-
-      //createCustomField({ ...property, id: variableId, variableId } as Variable)
 
       setFieldsCreated([...fieldsCreated, key])
 
