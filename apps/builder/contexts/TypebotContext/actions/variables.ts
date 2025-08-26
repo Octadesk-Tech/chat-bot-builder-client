@@ -25,9 +25,12 @@ export const variablesAction = (setTypebot: SetTypebot): VariablesActions => ({
     ),
   setVariables: (variables: Array<Variable>) =>
     setTypebot((typebot) =>
-      produce(typebot, (typebot) => {
-        if (!typebot) return
-        typebot.variables = variables
+      produce(typebot, (newTypebot) => {
+        if (!newTypebot) return
+        const newVariables = variables.filter(
+          (v) => !typebot.variables.some((existing) => existing.token === v.token)
+        )
+        typebot.variables.push(...newVariables)
       })
     ),
   updateVariable: (
