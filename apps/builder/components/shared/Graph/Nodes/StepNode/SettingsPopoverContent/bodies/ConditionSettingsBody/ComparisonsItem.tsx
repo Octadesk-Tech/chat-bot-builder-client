@@ -237,7 +237,7 @@ export const ComparisonItem = ({
     if (myVariable?.type === 'select') {
       return (
         <Select
-          value={item.value}
+          value={item.value || ''}
           onChange={onSelect}
           placeholder="selecione uma opção"
         >
@@ -253,7 +253,7 @@ export const ComparisonItem = ({
     if (myVariable?.type === 'boolean' || myVariable?.type === 'yesno') {
       return (
         <Select
-          value={item.value}
+          value={item.value || ''}
           onChange={onSelect}
           placeholder="selecione uma opção"
         >
