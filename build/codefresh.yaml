@@ -176,6 +176,13 @@ steps:
           yq w -i "${APPLICATION_NAME}-${{SCOPE}}.yaml" ${{YQ_IMAGE_TAG_FORMAT}} ${TAG}
         fi
 
+        if [[ "${VERSION}" == "${{DEVELOPMENT_FLAG}}" ]]; then
+          cd "${CF_VOLUME_PATH}/${{GIT_IAC_REPOSITORY}}/environments/octa-dev-cloudstack/values"
+          find . -name "${REPO_NAME_PATH}" | while read line; do
+              yq w -i $line "${YQ_IMAGE_TAG_FORMAT}" ${TAG} --anchorName=imageTag;
+          done
+        fi
+
         yq w -i "${CHART_ROOT_PATH}/${{VERSIONS_PATH}}" "${APPLICATION_NAME}-${{SCOPE}}.${VERSION}" "${TAG}"
     when:
       condition:
