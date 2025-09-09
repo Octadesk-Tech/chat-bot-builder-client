@@ -1,92 +1,92 @@
+import { isDefined } from '@chakra-ui/utils'
+import { subDomain } from '@octadesk-tech/services'
+import cuid from 'cuid'
+import { diff } from 'deep-object-diff'
+import { dequal } from 'dequal'
+import { Plan } from 'model'
 import {
   Block,
-  PublicTypebot,
-  StartStep,
-  BubbleStepType,
-  InputStepType,
-  LogicStepType,
-  Step,
-  OctaWabaStepType,
-  DraggableStepType,
-  DraggableStep,
-  defaultTheme,
-  defaultSettings,
-  StepOptions,
   BubbleStepContent,
-  IntegrationStepType,
-  defaultTextBubbleContent,
-  defaultVideoBubbleContent,
-  defaultGenericInputOptions,
-  defaultEmailInputOptions,
-  defaultCpfInputOptions,
-  defaultDateInputOptions,
-  defaultPhoneInputOptions,
-  defaultChoiceInputOptions,
-  defaultAskNameOptions,
-  defaultWebhookOptions,
-  StepWithOptionsType,
-  Item,
-  ItemType,
-  defaultConditionContent,
-  defaultEmbedBubbleContent,
+  BubbleStepType,
   ChoiceInputStep,
   ConditionStep,
+  ConversationTagOptions,
+  DraggableStep,
+  DraggableStepType,
+  InputStepType,
+  IntegrationStepType,
+  Item,
+  ItemType,
+  LogicStepType,
+  OctaBubbleStepType,
   OctaStepOptions,
-  OctaWabaStepOptions,
   OctaStepType,
+  OctaWabaStepOptions,
+  OctaWabaStepType,
+  OfficeHourStep,
+  PublicTypebot,
+  StartStep,
+  Step,
+  StepOptions,
+  StepWithOptionsType,
+  Typebot,
+  WOZAssignStep,
+  WOZStepType,
+  WOZSuggestionOptions,
+  WhatsAppButtonsListStep,
+  WhatsAppOptionsListStep,
+  defaultAskNameOptions,
   defaultAssignToTeamOptions,
   defaultCallOtherBotOptions,
-  defaultEndConversationBubbleContent,
-  OctaBubbleStepType,
-  defaultWhatsAppOptionsListOptions,
-  defaultWhatsAppOptionsListContent,
-  defaultWhatsAppButtonsListOptions,
-  OfficeHourStep,
-  defaultOfficeHoursOptions,
+  defaultChoiceInputOptions,
   defaultCommerceOptions,
-  defaultMediaBubbleContent,
-  WhatsAppOptionsListStep,
-  WhatsAppButtonsListStep,
-  defaultPreReserveOptions,
-  WOZStepType,
-  defaultWOZSuggestionOptions,
-  defaultWOZAssignOptions,
-  WOZSuggestionOptions,
-  WOZAssignStep,
+  defaultConditionContent,
   defaultConversationTagOptions,
-  ConversationTagOptions
+  defaultCpfInputOptions,
+  defaultDateInputOptions,
+  defaultEmailInputOptions,
+  defaultEmbedBubbleContent,
+  defaultEndConversationBubbleContent,
+  defaultExternalEventOptions,
+  defaultGenericInputOptions,
+  defaultMediaBubbleContent,
+  defaultOfficeHoursOptions,
+  defaultPhoneInputOptions,
+  defaultPreReserveOptions,
+  defaultSettings,
+  defaultTextBubbleContent,
+  defaultTheme,
+  defaultVideoBubbleContent,
+  defaultWOZAssignOptions,
+  defaultWOZSuggestionOptions,
+  defaultWebhookOptions,
+  defaultWhatsAppButtonsListOptions,
+  defaultWhatsAppOptionsListContent,
+  defaultWhatsAppOptionsListOptions,
+  ReturnType,
+  defaultChatReturnOptions
 } from 'models'
-import { Typebot } from 'models'
+import { stringify } from 'qs'
+import { duplicateWebhook } from 'services/webhook'
 import useSWR from 'swr'
-import { fetcher, toKebabCase } from '../utils'
+import { sendOctaRequest } from 'util/octaRequest'
 import {
   isBubbleStepType,
+  isChoiceInput,
+  isConditionStep,
+  isNotEmpty,
   isOctaBubbleStepType,
   isOctaStepType,
-  isNotEmpty,
+  isWOZStepType,
   isWebhookStep,
   omit,
+  sendRequest,
   stepHasItems,
   stepTypeHasItems,
   stepTypeHasOption,
-  isWOZStepType,
   stepTypeHasWebhook,
 } from 'utils'
-import { dequal } from 'dequal'
-import { stringify } from 'qs'
-import {
-  isChoiceInput,
-  isConditionStep,
-  sendRequest,
-  isOctaBubbleStep,
-} from 'utils'
-import cuid from 'cuid'
-import { diff } from 'deep-object-diff'
-import { duplicateWebhook } from 'services/webhook'
-import { Plan } from 'model'
-import { isDefined } from '@chakra-ui/utils'
-import { subDomain } from '@octadesk-tech/services'
-import { sendOctaRequest } from 'util/octaRequest'
+import { fetcher, toKebabCase } from '../utils'
 
 export type TypebotInDashboard = Pick<
   Typebot,
@@ -136,6 +136,21 @@ export const createTypebot = async ({
     body: typebot,
   })
 }
+
+const generateExternalEventValue = (stepId: string, event: string): Item => ({
+  id: cuid(),
+  stepId,
+  type: ItemType.EXTERNAL_EVENT,
+  content: {
+    matchType: '$eq',
+    referenceProperty: null,
+    referenceValue: null,
+    source: 'CURRENT_SESSION',
+    subType: null,
+    values: [event],
+  },
+});
+
 
 export const importTypebot = async (typebot: Typebot, userPlan: Plan) => {
   const { typebot: newTypebot, webhookIdsMapping } = duplicateTypebot(
@@ -308,19 +323,21 @@ export const parseNewStep = (
 ): DraggableStep => {
   const id = cuid()
 
-  const options = isOctaStepType(type) || isWOZStepType(type)
-    ? parseOctaStepOptions(type)
-    : stepTypeHasOption(type)
-      ? parseDefaultStepOptions(type)
-      : undefined
+  const options =
+    isOctaStepType(type) || isWOZStepType(type)
+      ? parseOctaStepOptions(type)
+      : stepTypeHasOption(type)
+        ? parseDefaultStepOptions(type)
+        : undefined
 
   return {
     id,
     blockId,
     type,
-    content: isBubbleStepType(type) || isOctaBubbleStepType(type)
-      ? parseDefaultContent(type)
-      : undefined,
+    content:
+      isBubbleStepType(type) || isOctaBubbleStepType(type)
+        ? parseDefaultContent(type)
+        : undefined,
     options,
 
     webhookId: stepTypeHasWebhook(type) ? cuid() : undefined,
@@ -331,9 +348,11 @@ export const parseNewStep = (
 const parseDefaultItems = (
   type:
     | LogicStepType.CONDITION
+    | LogicStepType.CHAT_RETURN
     | InputStepType.CHOICE
     | OctaStepType.OFFICE_HOURS
     | IntegrationStepType.WEBHOOK
+    | IntegrationStepType.EXTERNAL_EVENT
     | OctaWabaStepType.WHATSAPP_OPTIONS_LIST
     | OctaWabaStepType.WHATSAPP_BUTTONS_LIST
     | WOZStepType.ASSIGN
@@ -350,15 +369,16 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.BUTTON,
           content: 'Encerrar a conversa',
-          readonly: true
+          readonly: true,
+          canAddItem: false,
         },
         {
           id: cuid(),
           stepId,
           type: ItemType.BUTTON,
           content: 'Falar com um humano',
-          readonly: true
-        }
+          readonly: true,
+        },
       ]
 
     case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
@@ -386,6 +406,25 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.CONDITION,
           content: defaultConditionContent,
+        },
+      ]
+    case LogicStepType.CHAT_RETURN:
+      return [
+        {
+          id: cuid(),
+          stepId,
+          type: ItemType.CHAT_RETURN,
+          content: {
+            returnType: ReturnType.IS_RETURN
+          },
+        },
+        {
+          id: cuid(),
+          stepId,
+          type: ItemType.CHAT_RETURN,
+          content: {
+            returnType: ReturnType.IS_NOT_RETURN
+          },
         },
       ]
     case OctaStepType.OFFICE_HOURS:
@@ -453,6 +492,12 @@ const parseDefaultItems = (
           },
         },
       ]
+    case IntegrationStepType.EXTERNAL_EVENT:
+      return [
+        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_RECEIVED'),
+        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_TIMEOUT'),
+        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_ERROR')
+      ]
   }
 }
 
@@ -477,7 +522,14 @@ const parseDefaultContent = (
   }
 }
 
-const parseOctaStepOptions = (type: OctaStepType | OctaWabaStepType | WOZStepType): OctaStepOptions | OctaWabaStepOptions | WOZSuggestionOptions | ConversationTagOptions | null => {
+const parseOctaStepOptions = (
+  type: OctaStepType | OctaWabaStepType | WOZStepType
+):
+  | OctaStepOptions
+  | OctaWabaStepOptions
+  | WOZSuggestionOptions
+  | ConversationTagOptions
+  | null => {
   switch (type) {
     case OctaStepType.ASSIGN_TO_TEAM:
       return defaultAssignToTeamOptions
@@ -543,8 +595,12 @@ const parseDefaultStepOptions = (
     // case IntegrationStepType.MAKE_COM:
     case IntegrationStepType.WEBHOOK:
       return defaultWebhookOptions
+    case IntegrationStepType.EXTERNAL_EVENT:
+      return defaultExternalEventOptions
     // case IntegrationStepType.EMAIL:
     //   return defaultSendEmailOptions
+    case LogicStepType.CHAT_RETURN:
+      return defaultChatReturnOptions
     default:
       return null
   }

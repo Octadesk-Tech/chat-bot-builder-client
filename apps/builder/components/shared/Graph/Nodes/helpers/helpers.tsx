@@ -1,10 +1,12 @@
 import {
   BubbleStepType,
   InputStepType,
+  LogicStepType,
   OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   Step,
+  IntegrationStepType
 } from 'models'
 import { isBubbleStepType, isInputStep } from 'utils'
 import { z } from 'zod'
@@ -38,12 +40,12 @@ const inpuStepsWithFallbackMessages = [
   OctaWabaStepType.WHATSAPP_OPTIONS_LIST,
   OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
   InputStepType.CHOICE,
+  IntegrationStepType.EXTERNAL_EVENT
 ]
 
 export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
   try {
     const data = []
-
     if (isInputStep(step) || OctaWabaStepType.COMMERCE === step.type) {
       data.push({
         message: step?.options?.message?.plainText,
@@ -68,6 +70,12 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
           message: step?.content?.plainText,
         })
       }
+    }
+
+    if(OctaStepType.OFFICE_HOURS === step.type) {
+      data.push({
+        message: step?.options?.id,
+      })
     }
 
     if (
@@ -110,6 +118,30 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
         message: step?.content?.plainText,
         min: { value: -1 },
       })
+    }
+
+    if (LogicStepType.CONDITION === step.type) {
+      step?.items?.forEach((item) => {
+        if (item?.content?.comparisons) {
+          item.content.comparisons.forEach((comparison) => {
+            data.push(
+              {
+                message: comparison?.comparisonOperator
+              },
+              {
+                message: comparison?.variableId
+              },
+            );
+          });
+        }
+      });
+    }
+
+    if (LogicStepType.CHAT_RETURN === step.type) {
+      if (!step.options?.time || step.options?.validationError) {
+        data.push({message: undefined}
+        )
+      }
     }
 
     if (inpuStepsWithFallbackMessages.includes(step.type)) {

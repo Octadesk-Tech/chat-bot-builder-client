@@ -1,42 +1,45 @@
 import {
+  Accordion,
+  AccordionButton,
+  AccordionIcon,
+  AccordionItem,
+  AccordionPanel,
   Flex,
   Portal,
   Stack,
   Text,
   useEventListener,
-  Accordion,
-  AccordionItem,
-  AccordionButton,
-  AccordionIcon,
-  AccordionPanel,
 } from '@chakra-ui/react'
+import { CodeEditor } from 'components/shared/CodeEditor'
+import { Coordinates, useGraph } from 'contexts/GraphContext'
 import {
   computeNearestPlaceholderIndex,
   useStepDnd,
 } from 'contexts/GraphDndContext'
-import { Coordinates, useGraph } from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import {
   ButtonItem,
   InputStepType,
   IntegrationStepType,
+  LogicStepType,
   OctaStepType,
   OctaWabaStepType,
   StepIndices,
   StepWithItems,
   WOZAssignStep,
   WOZStepType,
+  TimeTypeValue
 } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
-import { ItemNode } from '../ItemNode'
 import { SourceEndpoint } from '../../../Endpoints'
+import { ItemNode } from '../ItemNode'
 import { ItemNodeOverlay } from '../ItemNodeOverlay'
 import {
   Container,
+  ChatReturnContainer,
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
-import { CodeEditor } from 'components/shared/CodeEditor'
 
 type Props = {
   step: StepWithItems | WOZAssignStep
@@ -146,6 +149,13 @@ export const ItemNodesList = ({
     path: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.path,
   }
 
+  const chatReturn = {
+    time: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.time,
+    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue 
+      === TimeTypeValue.HOUR ? 'horas' : 'minutos',
+    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError 
+  }
+
   const getWebhookDetails = () => {
     try {
       const headers = {}
@@ -168,6 +178,7 @@ export const ItemNodesList = ({
       return 'Is not valid JSON'
     }
   }
+
 
   return (
     <Stack
@@ -192,6 +203,7 @@ export const ItemNodesList = ({
           )}
         </Stack>
       )}
+
       {step.type === IntegrationStepType.WEBHOOK && (
         <Container>
           {!webhook?.url && (
@@ -228,6 +240,24 @@ export const ItemNodesList = ({
           )}
         </Container>
       )}
+      {step.type === IntegrationStepType.EXTERNAL_EVENT && (
+        <Container>
+          <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{step?.options?.url || "Clique para editar..."}</Text>
+        </Container>
+      )}
+      {step.type === LogicStepType.CHAT_RETURN && (
+        <ChatReturnContainer>
+          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ? 
+          (
+            <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
+          )
+          :
+          (
+            <Text noOfLines={0}>{'Configurar...'}</Text>
+          )
+          }
+        </ChatReturnContainer>
+      )}
       {step &&
         step.items &&
         step.items.map((item, idx) => {
@@ -257,13 +287,16 @@ export const ItemNodesList = ({
             </Stack>
           )
         })}
+
       {isLastStep &&
         step.type !== OctaStepType.OFFICE_HOURS &&
         step.type !== InputStepType.CHOICE &&
         step.type !== IntegrationStepType.WEBHOOK &&
+        step.type !== IntegrationStepType.EXTERNAL_EVENT &&
         step.type !== OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
         step.type !== OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
-        step.type !== WOZStepType.ASSIGN && (
+        step.type !== WOZStepType.ASSIGN &&
+        step.type !== LogicStepType.CHAT_RETURN && (
           <Flex
             px="4"
             py="2"

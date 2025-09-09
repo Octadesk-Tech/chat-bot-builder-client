@@ -1,5 +1,5 @@
 import { useTypebot } from 'contexts/TypebotContext'
-import React, { memo, useEffect, useMemo, useState } from 'react'
+import React, { memo, useMemo } from 'react'
 import { AnswersCount } from 'services/analytics'
 import { Edges } from './Edges'
 import { BlockNode } from './Nodes/BlockNode'
@@ -12,65 +12,71 @@ type Props = {
   onUnlockProPlanClick?: () => void
   graphContainerRef: React.MutableRefObject<HTMLDivElement | null>
 }
+
 const MyComponent = memo(
   ({ answersCounts, onUnlockProPlanClick, graphContainerRef }: Props) => {
     const { typebot, hideEdges } = useTypebot()
     const { graphPosition } = useGraph()
-    const [isVirtualizationEnabled, setIsVirtualizationEnabled] =
-      useState(false)
 
-    useEffect(() => {
-      const interval = setTimeout(() => {
-        setIsVirtualizationEnabled(true)
-        return () => clearTimeout(interval)
-      }, 1000)
-    }, [])
+    const visibleItems = useMemo(() => {
+      if (!typebot?.blocks || !graphContainerRef.current) return []
 
-    const visibleItems = useMemo(
-      () =>
-        typebot?.blocks.filter((item) =>
-          isItemVisible(
-            item,
-            graphPosition,
-            graphContainerRef.current?.offsetWidth,
-            graphContainerRef.current?.offsetHeight
-          )
-        ),
-      [typebot?.blocks, graphPosition, graphContainerRef]
-    )
+      const containerWidth = graphContainerRef.current.offsetWidth
+      const containerHeight = graphContainerRef.current.offsetHeight
+
+      return typebot.blocks.filter((block) => {
+        if (!block.graphCoordinates) return false
+
+        return isItemVisible(
+          block,
+          graphPosition,
+          containerWidth,
+          containerHeight
+        )
+      })
+    }, [typebot?.blocks, graphPosition, graphContainerRef])
+
+    const visibleItemsMap = useMemo(() => {
+      const map = new Map<string, Block>()
+      visibleItems.forEach((item) => {
+        map.set(item.id, item)
+      })
+      return map
+    }, [visibleItems])
+
+    const visibleEdges = useMemo(() => {
+      if (!typebot?.edges) return []
+
+      return typebot.edges.filter((edge) => {
+        const fromVisible = visibleItemsMap.has(edge.from.blockId)
+        const toVisible = visibleItemsMap.has(edge.to.blockId)
+
+        return fromVisible || toVisible
+      })
+    }, [typebot?.edges, visibleItemsMap])
 
     return (
       <>
         {!hideEdges && (
           <Edges
-            visibleItems={visibleItems ?? []}
-            edges={typebot?.edges ?? []}
+            visibleItems={visibleItems}
+            edges={visibleEdges}
             blocks={typebot?.blocks ?? []}
             answersCounts={answersCounts}
             onUnlockProPlanClick={onUnlockProPlanClick}
           />
         )}
 
-        {isVirtualizationEnabled
-          ? visibleItems?.map((block) => {
-              const blockIndex = typebot?.blocks.findIndex(
-                (b) => b.id === block.id
-              )
-              return (
-                <BlockNode
-                  block={block}
-                  blockIndex={blockIndex ?? 0}
-                  key={block.id}
-                />
-              )
-            })
-          : typebot?.blocks.map((block, idx) => (
-              <BlockNode
-                block={block as Block}
-                blockIndex={idx}
-                key={block.id}
-              />
-            ))}
+        {visibleItems.map((block) => {
+          const blockIndex = typebot?.blocks.findIndex((b) => b.id === block.id)
+          return (
+            <BlockNode
+              block={block}
+              blockIndex={blockIndex ?? 0}
+              key={block.id}
+            />
+          )
+        })}
       </>
     )
   }

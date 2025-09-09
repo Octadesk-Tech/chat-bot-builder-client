@@ -41,8 +41,6 @@ export const Edge = ({
   const [isMouseOver, setIsMouseOver] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [edgeMenuPosition, setEdgeMenuPosition] = useState({ x: 0, y: 0 })
-  const [refreshEdge, setRefreshEdge] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
 
   const isPreviewing = isMouseOver || previewingEdge?.id === edge.id
 
@@ -51,68 +49,25 @@ export const Edge = ({
   const targetBlockCoordinates =
     blocksCoordinates && blocksCoordinates[edge.to.blockId]
 
-  const sourceTop = useMemo(
-    () => {
-      return getEndpointTopOffset({
-        endpoints: sourceEndpoints,
-        graphOffsetY: graphPosition.y,
-        endpointId: getSourceEndpointId(edge),
-        graphScale: graphPosition.scale,
-      })
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [refreshEdge]
-  )
+  const sourceTop = useMemo(() => {
+    if (!sourceEndpoints || !graphPosition) return 0
+    return getEndpointTopOffset({
+      endpoints: sourceEndpoints,
+      graphOffsetY: graphPosition.y,
+      endpointId: getSourceEndpointId(edge),
+      graphScale: graphPosition.scale,
+    })
+  }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge])
 
-  useEffect(() => {
-    if (
-      isRefreshing ||
-      Object.keys(block).length < 1 ||
-      !visibleItems.some((v: Block) => block.id === v.id)
-    ) {
-      return
-    }
-
-    setIsRefreshing(true)
-    const timer = setTimeout(() => {
-      setRefreshEdge((v) => !v)
-      setIsRefreshing(false)
-
-      return () => clearTimeout(timer)
-    }, 200)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    sourceBlockCoordinates?.y,
-    edge,
-    sourceEndpoints.block,
-    block,
-    graphPosition.y,
-  ])
-
-  const [targetTop, setTargetTop] = useState(
-    getEndpointTopOffset({
+  const targetTop = useMemo(() => {
+    if (!targetEndpoints || !graphPosition) return 0
+    return getEndpointTopOffset({
       endpoints: targetEndpoints,
       graphOffsetY: graphPosition.y,
       endpointId: edge?.to.stepId,
       graphScale: graphPosition.scale,
     })
-  )
-  useEffect(() => {
-    setTargetTop(
-      getEndpointTopOffset({
-        endpoints: targetEndpoints,
-        graphOffsetY: graphPosition.y,
-        endpointId: edge?.to.stepId,
-        graphScale: graphPosition.scale,
-      })
-    )
-  }, [
-    targetBlockCoordinates?.y,
-    targetEndpoints,
-    graphPosition.y,
-    edge?.to.stepId,
-    graphPosition.scale,
-  ])
+  }, [targetEndpoints, graphPosition?.y, edge?.to.stepId, graphPosition?.scale])
 
   const path = useMemo(() => {
     if (!sourceBlockCoordinates || !targetBlockCoordinates || !sourceTop)
@@ -125,13 +80,14 @@ export const Edge = ({
       graphScale: graphPosition.scale,
     })
     return computeEdgePath(anchorsPosition)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     sourceBlockCoordinates?.x,
     sourceBlockCoordinates?.y,
     targetBlockCoordinates?.x,
     targetBlockCoordinates?.y,
     sourceTop,
+    targetTop,
+    graphPosition.scale,
   ])
 
   const handleMouseEnter = () => setIsMouseOver(true)

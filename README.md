@@ -21,6 +21,10 @@ This fork is being used solely for bot flow construction. We do not use the bot 
 
 Typebot is an open-source alternative to Landbot. It allows you to create conversational apps/forms (Lead qualification, Product launch, User onboarding, Customer support), embed them anywhere on your web/mobile apps, and collect results in real-time.
 
+# New architecture
+
+We are migrating our project structure. From now on, when creating new requests, follow the established pattern inside apps/builder/hooks.
+
 ## Local setup
 
 1. Clone the repo
@@ -33,7 +37,9 @@ Typebot is an open-source alternative to Landbot. It allows you to create conver
 
 3. Make sure you have Docker running
 
-4. Start the application
+4. Make sure you configured your .npmrc (https://octatech.notion.site/Github-Actions-84a2930eaea34abfaf81d3b07ac1a32b#6ef3d1fa396b438b87f229f9a1a6715e)
+
+5. Start the application
 
    `yarn && yarn dev`
    Builder is available at `http://localhost:8081/typebots/{bot_id}/edit`

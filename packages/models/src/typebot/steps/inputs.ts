@@ -80,6 +80,7 @@ export type ButtonItem = ItemBase & {
   type: ItemType.BUTTON
   content?: string
   readonly?: boolean
+  canAddItem?: boolean
 }
 
 export type PaymentInputStep = StepBase & {
@@ -144,6 +145,11 @@ export type InputOptions = OptionBase & {
   useFallback: boolean
   fallbackMessages?: Array<TextBubbleContent>
   initialVariableToken?: string
+  isRequired?: any
+  defaultCountryCode?: any
+  labels?: any
+  isLong?: any
+  retryMessageContent?: any
 }
 
 export type TextInputOptions = OptionBase &

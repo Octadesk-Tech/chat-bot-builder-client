@@ -6,7 +6,7 @@ import {
   Options,
   SpecialDateContainer,
 } from './OfficeHoursBody.style'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Interval, SpecialDate } from './OfficeHoursBody'
 import { TableListItemProps } from 'components/shared/TableListOcta'
 import { Box, FormControl, HStack, Stack, Text, Button } from '@chakra-ui/react'
@@ -47,6 +47,10 @@ export const SpecialDateComponent = (
 
     props.onItemChange({ ...props.item, hours: values })
   }
+
+  useEffect(() => {
+    changeDate(currentDate);
+  },[])
 
   const changeDate = (date: Date) => {
     setCurrentDate(date)

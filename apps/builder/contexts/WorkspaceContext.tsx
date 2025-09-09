@@ -29,13 +29,14 @@ import CustomFields from 'services/octadesk/customFields/customFields'
 
 import { BotsService } from 'services/octadesk/bots/bots'
 
-import { DomainType } from 'enums/customFieldsEnum'
+import { CustomFieldTypes, DomainType } from 'enums/customFieldsEnum'
 
 import {
   fixedChatProperties,
   fixedOrganizationProperties,
   fixedPersonProperties,
 } from 'helpers/presets/variables-presets'
+import { v4 as uuid } from 'uuid'
 
 import { OctaProperty } from 'models'
 
@@ -198,7 +199,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   const { verifyFeatureToggle } = useUser()
   const { user } = useUser()
   const userId = user?.id
-  const { typebot, setVariables } = useTypebot()
+  const { typebot, setVariables, domain } = useTypebot()
   const { workspaces, isLoading, mutate } = useWorkspaces({ userId })
   const [currentWorkspace, setCurrentWorkspace] =
     useState<WorkspaceWithMembers>()
@@ -216,10 +217,10 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     const defaultWorkspace = lastWorspaceId
       ? workspaces.find(byId(lastWorspaceId))
       : workspaces.find((w) =>
-          w.members.some(
-            (m) => m.userId === userId && m.role === WorkspaceRole.ADMIN
-          )
+        w.members.some(
+          (m) => m.userId === userId && m.role === WorkspaceRole.ADMIN
         )
+      )
 
     setCurrentWorkspace(defaultWorkspace ?? workspaces[0])
   }, [workspaces])
@@ -414,11 +415,14 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   const mountProperties = (properties: any, domainType: string) => {
     const customProperties = properties.map(
       (h: {
+
         id: string
+        title: string
         fieldType: number
         type: number
         fieldId: string
         fixed: boolean
+        listItem: []
       }) => {
         const fieldType: string = fieldTypes(h.fieldType || h.type)
         let tokenValue = `#${h.fieldId.replace(/_/g, '-')}`
@@ -429,16 +433,21 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
           tokenValue = tokenValue.concat('-organizacao')
         }
 
-        return {
+        const result = {
           type: fieldType,
           id: h.id,
+          title: h.title,
           variableId: h.id,
           token: tokenValue,
           domain: domainType,
           name: `customField.${h.fieldId}`,
           example: resolveExample(fieldType),
           fixed: h.fixed,
+          listItem: h.listItem,
+          fieldId: h.fieldId,
         }
+
+        return result
       }
     )
 
@@ -486,6 +495,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
         type: property.type,
         id: variableId,
         variableId,
+        title: property.name,
         token: property.token,
         domain: 'CHAT',
         name: 'customField.' + property.name,
@@ -551,8 +561,6 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
       }
       await CustomFields().createCustomField(payload)
 
-      //createCustomField({ ...property, id: variableId, variableId } as Variable)
-
       setFieldsCreated([...fieldsCreated, key])
 
       setLoaded(false)
@@ -568,9 +576,12 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (loaded && setVariables) {
+      const upperCaseDomain = domain?.toUpperCase() || ''
+      const haveChatItems =
+        upperCaseDomain !== 'SURVEY' && upperCaseDomain !== 'TICKET'
       const variables = [
         ...octaPersonItems,
-        ...octaChatItems,
+        ...(haveChatItems ? octaChatItems : []),
         ...octaOrganizationItems,
       ]
 
@@ -595,12 +606,15 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
 
       if (isResponsibleContactEnabled) {
         if (!mergedItems.some((mi) => mi.token === '#responsavel-contato')) {
+          const variableId = uuid()
           mergedItems.push({
             token: '#responsavel-contato',
             example: 'Agente responsável',
             domain: 'PERSON',
             type: 'responsavel-contato',
             name: 'responsavel-contato',
+            id: variableId,
+            variableId,
           })
         }
       } else {
@@ -614,6 +628,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
     }
   }, [
     loaded,
+    domain,
     typebot?.variables,
     octaPersonItems,
     octaChatItems,
@@ -641,10 +656,18 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   }, [octaPersonFields])
 
   useEffect(() => {
-    if (octaChatFields) {
+    const typesToExcludeFromChatFields = [
+      CustomFieldTypes.List,
+      CustomFieldTypes.Select,
+      CustomFieldTypes.ListLevel,
+    ]
+    const octaChatFieldsFiltered = octaChatFields.filter(
+      (field) => !typesToExcludeFromChatFields.includes(field.type)
+    )
+    if (octaChatFieldsFiltered) {
       const octaChatProperties = mountPropertiesOptions(
         'CHAT',
-        mountProperties(octaChatFields, 'CHAT')
+        mountProperties(octaChatFieldsFiltered, 'CHAT')
       )
 
       if (octaChatProperties) {

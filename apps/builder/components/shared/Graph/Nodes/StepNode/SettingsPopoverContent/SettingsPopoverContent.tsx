@@ -1,49 +1,51 @@
 import {
-  PopoverContent,
+  IconButton,
   PopoverArrow,
   PopoverBody,
-  useEventListener,
+  PopoverContent,
   Portal,
-  IconButton,
+  useEventListener,
 } from '@chakra-ui/react'
 import { ExpandIcon } from 'assets/icons'
 import {
+  BubbleStepType,
   InputStepType,
   IntegrationStepType,
   LogicStepType,
+  MediaBubbleContent,
   OctaStepType,
+  OctaWabaStepType,
   Step,
   StepOptions,
   TextBubbleStep,
   Webhook,
-  OctaWabaStepType,
-  BubbleStepType,
-  MediaBubbleContent,
   WOZStepType,
 } from 'models'
 import { useRef } from 'react'
 import {
-  UrlInputSettingsBody,
   AssignToTeamSettingsBody,
-  PreReserveSettingsBody,
   CallOtherBotSettingsBody,
-  WhatsAppOptionsListSettingsBody,
-  WhatsAppButtonsListSettingsBody,
-  WOZSuggestionSettingBody,
-  WOZAssignSettingBody,
   ConversationTagBody,
+  PreReserveSettingsBody,
+  UrlInputSettingsBody,
+  WhatsAppButtonsListSettingsBody,
+  WhatsAppOptionsListSettingsBody,
+  WOZAssignSettingBody,
+  WOZSuggestionSettingBody,
 } from './bodies'
 import { ChoiceInputSettingsBody } from './bodies/ChoiceInputSettingsBody'
 import { CodeSettings } from './bodies/CodeSettings'
 import { ConditionSettingsBody } from './bodies/ConditionSettingsBody'
+import { ExternalEvent } from './bodies/ExternalEvent/ExternalEvent'
+import { InputMediaSettingBody } from './bodies/InputMediaSettingsBody'
+import { InputSettingBody } from './bodies/InputSettingsBody'
 import { OctaCommerceBody } from './bodies/OctaCommerceBody'
 import { OfficeHoursBody } from './bodies/OfficeHoursBody'
 import { PaymentSettings } from './bodies/PaymentSettings'
 import { RedirectSettings } from './bodies/RedirectSettings'
 import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
-import { InputSettingBody } from './bodies/InputSettingsBody'
-import { InputMediaSettingBody } from './bodies/InputMediaSettingsBody'
+import { ChatReturnBody } from './bodies/ChatReturnBody'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
@@ -72,7 +74,11 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
       case IntegrationStepType.WEBHOOK:
         width = 500
         break
+      case IntegrationStepType.EXTERNAL_EVENT:
+        width = 500
+        break
       case LogicStepType.CONDITION:
+      case LogicStepType.CHAT_RETURN:
       case OctaStepType.ASSIGN_TO_TEAM:
       case OctaStepType.CALL_OTHER_BOT:
       case OctaStepType.CONVERSATION_TAG:
@@ -183,6 +189,11 @@ export const StepSettings = ({
     case LogicStepType.CONDITION: {
       return (
         <ConditionSettingsBody step={step} onItemChange={handleItemChange} />
+      )
+    }
+    case LogicStepType.CHAT_RETURN: {
+      return (
+        <ChatReturnBody step={step} onOptionsChange={handleOptionsChange} />
       )
     }
     case LogicStepType.REDIRECT: {
@@ -296,6 +307,11 @@ export const StepSettings = ({
     case IntegrationStepType.WEBHOOK: {
       return (
         <WebhookSettings step={step} onOptionsChange={handleOptionsChange} />
+      )
+    }
+    case IntegrationStepType.EXTERNAL_EVENT: {
+      return (
+        <ExternalEvent step={step} onOptionsChange={handleOptionsChange} />
       )
     }
     case InputStepType.ASK_NAME:

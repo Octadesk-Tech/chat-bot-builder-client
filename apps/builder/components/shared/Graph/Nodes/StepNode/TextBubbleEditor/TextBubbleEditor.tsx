@@ -35,6 +35,7 @@ type TextBubbleEditorProps = {
   maxLength?: number
   required?: boolean | { errorMsg?: string }
   menuPosition?: 'absolute' | 'fixed'
+  wabaHeader?: boolean
 }
 
 export const TextBubbleEditor = ({
@@ -45,6 +46,7 @@ export const TextBubbleEditor = ({
   maxLength,
   required,
   menuPosition = 'fixed',
+  wabaHeader,
 }: TextBubbleEditorProps) => {
   const [value, setValue] = useState(initialValue)
   const [focus, setFocus] = useState(false)
@@ -102,8 +104,19 @@ export const TextBubbleEditor = ({
 
         return
       }
+      if (wabaHeader) {
+        const lastNode = editor.children[editor.children.length - 1]
+        lastNode.children = [
+          {
+            text: lastNode.children
+              .map((children) => {
+                return children.text
+              })
+              .join(''),
+          },
+        ]
+      }
     }
-
     return editor
   }
   const closeEditor = () => {
@@ -118,7 +131,12 @@ export const TextBubbleEditor = ({
 
   useOutsideClick({
     ref: textEditorRef,
-    handler: closeEditor,
+    handler: (event) => {
+      const target = event.target as HTMLElement
+      if (varDropdownRef.current?.contains(target)) return
+      if (target.closest('[data-create-variable-modal]')) return
+      closeEditor()
+    },
   })
 
   const convertValueToStepContent = (v: TElement[]): TextBubbleContent => {
@@ -246,6 +264,7 @@ export const TextBubbleEditor = ({
             setIsVariableDropdownOpen(showDialog)
           }}
           onEmojiSelected={handleEmoji}
+          wabaHeader={wabaHeader}
         />
         <Plate
           id={randomEditorId}

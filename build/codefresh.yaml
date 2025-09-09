@@ -87,7 +87,7 @@ steps:
     image_name: "${{CF_REPO_NAME}}"
     tag: "${{TAG}}"
     dockerfile: build/Dockerfile
-    registry: gcr-octadesk
+    registry: gcr-octadesk-us-east1
     build_arguments:
       - GIT_TOKEN=${{GIT_NPM_TOKEN}}
       - GIT_NPM_TOKEN=${{GIT_NPM_TOKEN}}
@@ -98,13 +98,25 @@ steps:
         all:
           releaseIsInBuildConditions: '${{SKIP_DEPLOY}} == "false"'
 
-  push_docker:
+  push_docker_sa:
     stage: build
-    title: "Push Docker Image"
+    title: "Push Docker Image (southamerica-east1)"
     type: push
     candidate: "${{build_docker}}"
     tag: "${{TAG}}"
-    registry: gcr-octadesk
+    registry: gcr-octadesk-southamerica-east1
+    when:
+      condition:
+        all:
+          releaseIsInBuildConditions: '${{SKIP_DEPLOY}} == "false"'
+
+  push_docker_us:
+    stage: build
+    title: "Push Docker Image (us-east1)"
+    type: push
+    candidate: "${{build_docker}}"
+    tag: "${{TAG}}"
+    registry: gcr-octadesk-us-east1
     when:
       condition:
         all:
@@ -224,4 +236,3 @@ steps:
     #    - name: pending_approval
     #      on:
     #        - approved
-    #

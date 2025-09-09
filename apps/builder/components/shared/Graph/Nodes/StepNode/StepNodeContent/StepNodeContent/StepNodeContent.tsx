@@ -1,16 +1,16 @@
 import { Text } from '@chakra-ui/react'
 import {
-  Step,
   BubbleStepType,
+  StepOptions,
   InputStepType,
-  LogicStepType,
   IntegrationStepType,
-  StepIndices,
+  LogicStepType,
   OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
+  Step,
+  StepIndices,
   StepWithOptions,
-  InputOptions,
   WOZStepType,
 } from 'models'
 import { ItemNodesList } from '../../../ItemNode'
@@ -24,19 +24,18 @@ import { CallOtherBotContent } from '../contents/CallOtherBot/CallOtherBotConten
 // import { WhatsAppOptionsContent } from '../contents/WhatsAppOptions/'
 // import { ConfigureContent } from './contents/ConfigureContent'
 import { OctaCommerceContent } from '../contents/OctaCommerceContent'
-import { WhatsAppOptionsContent } from '../contents/WhatsApp/WhatsAppOptions'
 import { WhatsAppButtonsContent } from '../contents/WhatsApp/WhatsAppButtons'
-import { } from '../contents/WhatsApp/WhatsAppOptions'
+import { WhatsAppOptionsContent } from '../contents/WhatsApp/WhatsAppOptions'
 // import { PaymentInputContent } from './contents/PaymentInputContent'
 // import { SendEmailContent } from './contents/SendEmailContent'
-import { PreReserveContent } from '../contents/PreReserve'
-import { InputContent } from '../contents/Input'
 import { useTypebot } from 'contexts/TypebotContext'
-import { MediaInputContent } from '../contents/MediaInput'
-import { InputItemsContent } from '../contents/InputItemsContent'
-import { WOZSuggestionContent } from '../contents/WOZSuggestion'
-import { WOZAssignContent } from '../contents/WOZAssign'
 import { ConversationTagContent } from '../contents/ConversationTag'
+import { InputContent } from '../contents/Input'
+import { InputItemsContent } from '../contents/InputItemsContent'
+import { MediaInputContent } from '../contents/MediaInput'
+import { PreReserveContent } from '../contents/PreReserve'
+import { WOZAssignContent } from '../contents/WOZAssign'
+import { WOZSuggestionContent } from '../contents/WOZSuggestion'
 // import { ProviderWebhookContent } from './contents/ZapierContent'
 
 type Props = {
@@ -45,7 +44,7 @@ type Props = {
 }
 export const StepNodeContent = ({ step, indices }: Props) => {
   const { updateStep } = useTypebot()
-  const handleStepUpdate = (options: InputOptions): void => {
+  const handleStepUpdate = (options: StepOptions): void => {
     const stepWithOptions = step as StepWithOptions
     if (stepWithOptions.options) {
       stepWithOptions.options = { ...stepWithOptions.options, ...options }
@@ -97,6 +96,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     case LogicStepType.CONDITION: {
       return <ItemNodesList step={step} indices={indices} isReadOnly />
     }
+    case LogicStepType.CHAT_RETURN: {
+      return <ItemNodesList step={step} indices={indices} isReadOnly />
+    }
     // case LogicStepType.REDIRECT: {
     //   return (
     //     <ConfigureContent
@@ -141,6 +143,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     case IntegrationStepType.WEBHOOK: {
       return <ItemNodesList step={step} indices={indices} isReadOnly />
     }
+    case IntegrationStepType.EXTERNAL_EVENT: {
+      return <ItemNodesList step={step} indices={indices} isReadOnly />
+    }
     // case IntegrationStepType.ZAPIER: {
     //   return (
     //     <ProviderWebhookContent step={step} configuredLabel="Trigger zap" />
@@ -163,7 +168,7 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     }
     case OctaStepType.ASSIGN_TO_TEAM: {
       return (
-        <AssignToTeamContent step={step} />
+        <AssignToTeamContent step={step} onUpdateStep={handleStepUpdate} />
       )
     }
     case OctaStepType.CALL_OTHER_BOT: {

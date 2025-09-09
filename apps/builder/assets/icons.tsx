@@ -1,4 +1,4 @@
-import { IconProps, Icon, Image } from '@chakra-ui/react'
+import { IconProps, Icon } from '@chakra-ui/react'
 import * as MaterialDesign from 'react-icons/md'
 import { IconContext } from 'react-icons'
 
@@ -86,16 +86,12 @@ export const TextIcon = (props: any) => (
   </IconContext.Provider>
 )
 
-const getBasePath = () => {
-  return (process.env.BASE_PATH || (window as any).BASE_PATH)
-}
-
 export const WandIcon = (props: any) => (
   <IconContext.Provider
     value={{ color: props.color, className: 'global-class-name' }}
   >
     <div>
-      <Image src={getBasePath() + '/images/auto-fix.svg'} color={props.color} />
+      <MaterialDesign.MdAutoFixHigh />
     </div>
   </IconContext.Provider>
 )
@@ -112,7 +108,11 @@ export const AskNameIcon = (props: any) => (
 
 export const ImageIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdOutlineImage />
@@ -122,7 +122,11 @@ export const ImageIcon = (props: any) => (
 
 export const CheckCircleOutlineIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdCheckCircleOutline />
@@ -132,7 +136,11 @@ export const CheckCircleOutlineIcon = (props: any) => (
 
 export const BlockIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdBlock />
@@ -142,7 +150,11 @@ export const BlockIcon = (props: any) => (
 
 export const UploadFileIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdUploadFile />
@@ -169,7 +181,11 @@ export const FlagIcon = (props: IconProps) => (
 
 export const BoldIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdFormatBold />
@@ -179,7 +195,11 @@ export const BoldIcon = (props: any) => (
 
 export const ItalicIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdFormatItalic />
@@ -189,7 +209,11 @@ export const ItalicIcon = (props: any) => (
 
 export const UnderlineIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdFormatUnderlined />
@@ -199,7 +223,11 @@ export const UnderlineIcon = (props: any) => (
 
 export const StrikethroughIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdFormatStrikethrough />
@@ -209,7 +237,11 @@ export const StrikethroughIcon = (props: any) => (
 
 export const LinkIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdLink />
@@ -219,7 +251,11 @@ export const LinkIcon = (props: any) => (
 
 export const EmojiIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdInsertEmoticon />
@@ -415,7 +451,11 @@ export const AlarmIcon = (props: any) => (
 
 export const ListIcon = (props: any) => (
   <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name', size: props.fontSize }}
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
   >
     <div>
       <MaterialDesign.MdFormatListBulleted />
@@ -646,13 +686,23 @@ export const CreditCardIcon = (props: IconProps) => (
 )
 
 export const InformationIcon = (props: IconProps) => (
-  <Icon viewBox="0 0 16 16"  {...featherIconsBaseProps} {...props}>
+  <Icon viewBox="0 0 16 16" {...featherIconsBaseProps} {...props}>
     <path
       d="M8.00004 1.3335C4.32004 1.3335 1.33337 4.32016 1.33337 8.00016C1.33337 11.6802 4.32004 14.6668 8.00004 14.6668C11.68 14.6668 14.6667 11.6802 14.6667 8.00016C14.6667 4.32016 11.68 1.3335 8.00004 1.3335ZM8.00004 11.3335C7.63337 11.3335 7.33337 11.0335 7.33337 10.6668V8.00016C7.33337 7.6335 7.63337 7.3335 8.00004 7.3335C8.36671 7.3335 8.66671 7.6335 8.66671 8.00016V10.6668C8.66671 11.0335 8.36671 11.3335 8.00004 11.3335ZM8.66671 6.00016H7.33337V4.66683H8.66671V6.00016Z"
       fill="#C4C7CF"
       stroke="none"
     />
   </Icon>
+)
+
+export const OutlineInformationIcon = (props: any) => (
+  <IconContext.Provider
+    value={{ color: props.color, className: 'global-class-name' }}
+  >
+    <div>
+      <MaterialDesign.MdOutlineInfo />
+    </div>
+  </IconContext.Provider>
 )
 
 export const QuestionIcon = (props: any) => (
@@ -694,6 +744,12 @@ export const WebhookIcon = (props: any) => (
     </div>
   </IconContext.Provider>
 )
+export const ExternalEventIcon = (props: any) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.4 10.8H11.104C11.32 10.552 11.64 10.4 12 10.4C12.664 10.4 13.2 10.936 13.2 11.6C13.2 12.264 12.664 12.8 12 12.8C11.648 12.8 11.328 12.648 11.104 12.4H7.92C7.552 14.224 5.936 15.6 4 15.6C1.792 15.6 0 13.808 0 11.6C0 9.66399 1.376 8.04799 3.2 7.67999V9.33599C2.272 9.66399 1.6 10.56 1.6 11.6C1.6 12.92 2.68 14 4 14C5.32 14 6.4 12.92 6.4 11.6V10.8ZM8.4 1.99999C9.72 1.99999 10.8 3.07999 10.8 4.39999H12.4C12.4 2.19199 10.608 0.399994 8.4 0.399994C6.192 0.399994 4.4 2.19199 4.4 4.39999C4.4 5.54399 4.88 6.56799 5.64 7.29599L3.76 10.416C3.216 10.528 2.8 11.016 2.8 11.6C2.8 12.264 3.336 12.8 4 12.8C4.664 12.8 5.2 12.264 5.2 11.6C5.2 11.472 5.184 11.352 5.144 11.24L7.848 6.73599C6.792 6.48799 6 5.53599 6 4.39999C6 3.07999 7.08 1.99999 8.4 1.99999ZM12 9.19999C11.488 9.19999 11.016 9.35999 10.624 9.63199L8.184 5.57599C7.624 5.47999 7.2 4.99199 7.2 4.39999C7.2 3.73599 7.736 3.19999 8.4 3.19999C9.064 3.19999 9.6 3.73599 9.6 4.39999C9.6 4.51999 9.584 4.63199 9.552 4.74399L11.304 7.66399C11.528 7.62399 11.76 7.59999 12 7.59999C14.208 7.59999 16 9.39199 16 11.6C16 13.808 14.208 15.6 12 15.6C10.52 15.6 9.224 14.792 8.536 13.6H10.672C11.056 13.856 11.512 14 12 14C13.32 14 14.4 12.92 14.4 11.6C14.4 10.28 13.32 9.19999 12 9.19999Z" fill="black" />
+  </svg>
+
+)
 
 export const WarningIcon = (props: any) => (
   <IconContext.Provider
@@ -709,6 +765,22 @@ export const ErrorIcon = (props: any) => (
   <IconContext.Provider
     value={{ ...props, color: props.color, className: 'global-class-name' }}
   >
-    <MaterialDesign.MdError/>
+    <MaterialDesign.MdError />
   </IconContext.Provider>
+)
+
+export const ReturnArrow = ({ color, ...props }: any) => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 16 16"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M12 9.125C12 10.4179 11.4864 11.6579 10.5721 12.5721C9.65791 13.4864 8.41793 14 7.125 14H1.5V12.5H7.125C9 12.5 10.5 11 10.5 9.125C10.5 7.25 9 5.75 7.125 5.75H2.8725L5.1825 8.0675L4.125 9.125L0 5L4.125 0.875L5.19 1.9325L2.8725 4.25H7.125C8.41793 4.25 9.65791 4.76361 10.5721 5.67785C11.4864 6.59209 12 7.83207 12 9.125Z"
+      fill={color}
+    />
+  </svg>
 )

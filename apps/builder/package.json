@@ -79,6 +79,7 @@
     "qs": "^6.10.3",
     "react": "^18.2.0",
     "react-datepicker": "^4.16.0",
+    "@tanstack/react-virtual": "^3.13.12",
     "react-dom": "^18.2.0",
     "dompurify": "^3.1.5",
     "@types/dompurify": "3.0.5",

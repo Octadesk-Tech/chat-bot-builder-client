@@ -1,12 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import OctaSelect from 'components/octaComponents/OctaSelect/OctaSelect'
 import { useTypebot } from 'contexts/TypebotContext'
 import { OptionType } from 'components/octaComponents/OctaSelect/OctaSelect.type'
 
 type Props = {
   onSelect: (option: any) => void
-  options: IOptions
+  options: IOptions | any
   hasResponsibleContact: boolean
+  showChatReturnOption?: boolean
+  setIsChatReturnSelected?: (isSelected: boolean) => void
 }
 
 interface IParsedAgents {
@@ -20,9 +22,9 @@ interface IParsedAgents {
 }
 
 interface IOptions {
-  assignTo: string
-  assignType: '@NO-ONE' | '@AGENT'
-  subType: 'RESPONSIBLE_CONTACT'
+  assignTo?: string
+  assignType?: '@NO-ONE' | '@AGENT' | '@GROUP'
+  subType?: 'RESPONSIBLE_CONTACT'
 }
 
 type Combination =
@@ -32,11 +34,14 @@ type Combination =
   | '@AGENT'
   | '@GROUP'
   | 'RESPONSIBLE_CONTACT@GROUP'
+  | '@CHAT-RETURN'
 
 export const AssignToResponsibleSelect = ({
   onSelect,
   options,
   hasResponsibleContact,
+  setIsChatReturnSelected,
+  showChatReturnOption,
 }: Props) => {
   const { octaAgents } = useTypebot()
   const [itemsToResponsibleAssign, setItemsToResponsibleAssign] = useState<
@@ -76,6 +81,14 @@ export const AssignToResponsibleSelect = ({
     },
     key: agent?.key,
   })
+  const chatReturnOption = {
+    label: 'Retorno de atendimento',
+    key: 'chatReturn',
+    value: {
+      assignTo: 'chat-return',
+      assignType: '@CHAT-RETURN',
+    },
+  }
 
   const selectedOption = {
     'RESPONSIBLE_CONTACT@NO-ONE': () => responsibleContactDefault,
@@ -88,6 +101,15 @@ export const AssignToResponsibleSelect = ({
       generateAgentValue(agent),
     '@GROUP': (agent: IParsedAgents, options: IOptions) =>
       generateAgentValue(agent),
+    'interactive-list@AGENT': (agent: IParsedAgents, options: IOptions) =>
+      generateAgentValue(agent),
+    'interactive-buttons@AGENT': (agent: IParsedAgents, options: IOptions) =>
+      generateAgentValue(agent),
+    'interactive-list@GROUP': (agent: IParsedAgents, options: IOptions) =>
+      generateAgentValue(agent),
+    'interactive-buttons@GROUP': (agent: IParsedAgents, options: IOptions) =>
+      generateAgentValue(agent),
+    '@CHAT-RETURN': () => (showChatReturnOption ? chatReturnOption : noOne),
   }
 
   const chooseCurrentSelected = (
@@ -122,12 +144,22 @@ export const AssignToResponsibleSelect = ({
       const agents: IParsedAgents[] =
         parsedAgents.filter((agent, index) => index > 0) || []
 
-      let list = [parsedAgents[0], responsibleContactDefault, ...agents]
+      const firstOptions = [
+        parsedAgents[0],
+        ...(showChatReturnOption ? [chatReturnOption] : []),
+      ]
+
+      let list = [...firstOptions, responsibleContactDefault, ...agents]
 
       if (!hasResponsibleContact) {
-        list = [parsedAgents[0], ...agents]
+        list = [...firstOptions, ...agents]
       }
       const currentSelected = chooseCurrentSelected(options, agents)
+
+      setIsChatReturnSelected &&
+        setIsChatReturnSelected(
+          currentSelected.value?.assignType === '@CHAT-RETURN'
+        )
 
       setDefaultSelected(currentSelected)
       setItemsToResponsibleAssign(list)
@@ -136,9 +168,11 @@ export const AssignToResponsibleSelect = ({
       setItemsToResponsibleAssign([])
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [octaAgents, hasResponsibleContact])
+  }, [octaAgents, hasResponsibleContact, showChatReturnOption])
 
   const handleOnChange = (selected: any): void => {
+    setIsChatReturnSelected &&
+      setIsChatReturnSelected(selected.assignType === '@CHAT-RETURN')
     onSelect(selected)
   }
 

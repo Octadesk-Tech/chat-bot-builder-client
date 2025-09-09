@@ -365,7 +365,10 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     }
 
     variablesForTest.forEach((testVariable) => {
-      const variable = variables.find((v) => v.id === testVariable.variableId)
+      const variable = variables.find(
+        (v) => v.id === testVariable.variableId || v.id === testVariable.id
+      )
+
       if (!variable) return
 
       const light: VariableLight = {

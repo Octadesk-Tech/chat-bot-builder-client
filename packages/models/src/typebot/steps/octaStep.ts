@@ -1,11 +1,4 @@
-import {
-  StepBase,
-  StepWithItems,
-  ItemBase,
-  Step,
-  ItemType,
-  OctaProperty,
-} from '.'
+import { ItemBase, ItemType, OctaProperty, StepBase } from '.'
 import { TextBubbleContent, WOZStepType } from './bubble'
 
 // Regular steps
@@ -235,6 +228,7 @@ export type CommerceOptions = BaseOctaOptions & {
 export type AssignToTeamOptions = BaseOctaOptions & {
   assignTo: string
   assignType: string
+  exceedLimit: boolean
   subType: string
   messages: {
     firstMessage?: {
@@ -252,7 +246,8 @@ export type AssignToTeamOptions = BaseOctaOptions & {
   labels: {
     placeholder: { assignToTeam: string; connectionMessage: string }
     button: string
-  }
+  },
+  showChatReturnOption: boolean
 }
 
 export type PreReserveOptions = BaseOctaOptions & {
@@ -273,8 +268,7 @@ export type WOZSuggestionOptions = BaseOctaOptions & {
 
 export type WOZAssignOptions = BaseOctaOptions & {
   virtualAgentId?: string
-  introduceAsIA: boolean
-  confirmContext: boolean
+  limitAnswerNoContent: number
 }
 
 export type CallOtherBotOptions = BaseOctaOptions & {
@@ -413,8 +407,10 @@ export const defaultAssignToTeamOptions: AssignToTeamOptions = {
   subject: '',
   assignTo: '',
   assignType: '',
+  exceedLimit: false,
   subType: '',
   isAvailable: false,
+  showChatReturnOption: false
 }
 
 export const defaultPreReserveOptions: PreReserveOptions = {
@@ -443,8 +439,7 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
   name: '',
   subject: '',
   virtualAgentId: undefined,
-  introduceAsIA: true,
-  confirmContext: false,
+  limitAnswerNoContent: 3,
 }
 
 export const defaultCallOtherBotOptions: CallOtherBotOptions = {

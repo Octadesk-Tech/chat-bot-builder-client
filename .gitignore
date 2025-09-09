@@ -19,6 +19,8 @@ apps/docs/build/
 .cache-loader
 #build
 firebaseServiceAccount.json
+# tsbuildinfo file
+tsconfig.tsbuildinfo
 
 .env.production
 

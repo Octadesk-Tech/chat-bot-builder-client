@@ -48,7 +48,7 @@ const InputContent = ({ step, onUpdateStep }: Props) => {
         ...step.options, variableId: variable?.id, property: {
           domain: variable.domain,
           name: variable.name,
-          type: variable.type ? variable.type : "string",
+          type: variable.type ?? "string",
           token: variable.token
         }
       })
