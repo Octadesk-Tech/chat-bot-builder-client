@@ -21,6 +21,10 @@ export const ConditionNodeContent = ({ item }: Props) => {
     variable: Variable | undefined,
     comparison: Comparison
   ) => {
+    if (variable?.token === '#status-do-contato') {
+      return comparison.value
+    }
+
     if (variable?.type !== 'select' || !variable) return comparison.value
 
     return customVariables.find((v) => comparison.value === v.id)?.name
@@ -43,8 +47,7 @@ export const ConditionNodeContent = ({ item }: Props) => {
             <Wrap key={comparison.id} spacing={1} noOfLines={0}>
               {idx > 0 && (
                 <Text>
-                  {parseLogicalOperatorSymbol(item.content.logicalOperator) ??
-                    ''}
+                  {parseLogicalOperatorSymbol(item.content.logicalOperator)}
                 </Text>
               )}
               {variable?.token && (
@@ -91,10 +94,13 @@ const comparisonIsEmpty = (comparison: Comparison) =>
   isNotDefined(comparison.value) &&
   isNotDefined(comparison.variableId)
 
-const parseLogicalOperatorSymbol = (operator: LogicalOperator) => {
-  const toCompare = Object.keys(LogicalOperator).indexOf(operator)
+const parseLogicalOperatorSymbol = (operator: LogicalOperator): string => {
+  if (!operator) return ''
 
-  return Object.values(LogicalOperator)[toCompare]
+  const toCompare = Object.keys(LogicalOperator).indexOf(operator)
+  const result = Object.values(LogicalOperator)[toCompare]
+
+  return typeof result === 'string' ? result : ''
 }
 
 const parseComparisonOperatorSymbol = (operator: ComparisonOperators) => {

@@ -30,13 +30,12 @@ export const ComparisonItem = ({
 
   useEffect(() => {
     const loadListOptions = async () => {
-      if (!myVariable?.token) {
+      if (!myVariable?.token || myVariable.token === '#status-do-contato') {
         setListOptions([])
         return
       }
 
       const fieldId = myVariable.name?.replace('customField.', '') || myVariable.fieldId
-
       if (fieldId) {
         try {
           const fields = await CustomFields().getCustomFields()
@@ -193,15 +192,40 @@ export const ComparisonItem = ({
 
     if (!needValue) return
 
-    // Prioridad 1: Si tiene listItems específicos, usarlos
     if (listOptions.length > 0) {
       return (
         <Select
-          value={item.value}
+          value={item.value || ''}
           onChange={onSelect}
           placeholder="selecione uma opção"
         >
+          {item.value && !listOptions.some(opt => opt.value === item.value) && (
+            <option key="saved-value" value={item.value}>
+              {item.value} (valor guardado)
+            </option>
+          )}
           {listOptions.map((option: any) => (
+            <option key={option.key} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </Select>
+      )
+    }
+
+    if (myVariable?.token === '#status-do-contato') {
+      const basicOptions = [
+        { key: 0, value: 'Lead', label: 'Lead' },
+        { key: 1, value: 'Cliente', label: 'Cliente' }
+      ]
+
+      return (
+        <Select
+          value={item.value || ''}
+          onChange={onSelect}
+          placeholder="selecione uma opção"
+        >
+          {basicOptions.map((option) => (
             <option key={option.key} value={option.value}>
               {option.label}
             </option>
@@ -213,7 +237,7 @@ export const ComparisonItem = ({
     if (myVariable?.type === 'select') {
       return (
         <Select
-          value={item.value}
+          value={item.value || ''}
           onChange={onSelect}
           placeholder="selecione uma opção"
         >
@@ -229,7 +253,7 @@ export const ComparisonItem = ({
     if (myVariable?.type === 'boolean' || myVariable?.type === 'yesno') {
       return (
         <Select
-          value={item.value}
+          value={item.value || ''}
           onChange={onSelect}
           placeholder="selecione uma opção"
         >
