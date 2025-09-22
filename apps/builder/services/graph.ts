@@ -319,16 +319,22 @@ const computedItemHeight = (item) => {
   return base
 }
 
+const MAX_BLOCKS_BUFFER = 100
+
 export const isItemVisible = (
-  item,
-  graphPosition,
-  containerWidth,
-  containerHeight
+  item: any,
+  graphPosition: any,
+  containerWidth: number,
+  containerHeight: number,
+  totalBlocks: number
 ) => {
   const { x, y, scale } = graphPosition
 
-  const bufferX = 100 / scale + 500
-  const bufferY = 100 / scale + 500
+  const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 50 : 100
+  const scaleBuffer = Math.max(50, baseBuffer / scale)
+  
+  const bufferX = scaleBuffer + baseBuffer
+  const bufferY = scaleBuffer + baseBuffer
 
   const scaledItemX = Math.abs(
     item.graphCoordinates.x * scale + x - containerWidth / 2
