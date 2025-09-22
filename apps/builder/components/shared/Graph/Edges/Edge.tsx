@@ -64,7 +64,7 @@ export const Edge = ({
       if (endpointTop !== undefined) return endpointTop
     }
     
-    if (sourceBlockCoordinates.y) {
+    if (sourceBlockCoordinates && sourceBlockCoordinates.y !== undefined) {
       const sourceBlock = typebot?.blocks?.find(b => b.id === edge.from.blockId)
       if (sourceBlock) {
         const blockHeight = computedItemHeight(sourceBlock)
@@ -74,7 +74,7 @@ export const Edge = ({
     }
     
     return 0
-  }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge, sourceBlockCoordinates.y, typebot?.blocks])
+  }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge, sourceBlockCoordinates, typebot?.blocks])
 
   const targetTop = useMemo(() => {
     if (!graphPosition.y || !graphPosition.scale) return 0
@@ -89,7 +89,7 @@ export const Edge = ({
       if (endpointTop !== undefined) return endpointTop
     }
     
-    if (targetBlockCoordinates.y) {
+    if (targetBlockCoordinates && targetBlockCoordinates.y !== undefined) {
       const targetBlock = typebot?.blocks?.find(b => b.id === edge.to.blockId)
       if (targetBlock) {
         const blockHeight = computedItemHeight(targetBlock)
@@ -99,7 +99,7 @@ export const Edge = ({
     }
     
     return 0
-  }, [targetEndpoints, graphPosition?.y, graphPosition?.scale, edge?.to.stepId, edge?.to.blockId, targetBlockCoordinates.y, typebot?.blocks])
+  }, [targetEndpoints, graphPosition?.y, graphPosition?.scale, edge?.to.stepId, edge?.to.blockId, targetBlockCoordinates, typebot?.blocks])
 
   const path = useMemo(() => {
     if (!sourceBlockCoordinates || !targetBlockCoordinates)
@@ -113,10 +113,8 @@ export const Edge = ({
     })
     return computeEdgePath(anchorsPosition)
   }, [
-    sourceBlockCoordinates?.x,
-    sourceBlockCoordinates?.y,
-    targetBlockCoordinates?.x,
-    targetBlockCoordinates?.y,
+    sourceBlockCoordinates,
+    targetBlockCoordinates,
     sourceTop,
     targetTop,
     graphPosition.scale,
