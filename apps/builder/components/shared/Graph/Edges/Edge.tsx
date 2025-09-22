@@ -29,8 +29,7 @@ export const Edge = ({
   block: Block
   visibleItems: Block[]
 }) => {
-  const { typebot } = useTypebot()
-  const { deleteEdge } = useTypebot()
+  const { typebot, deleteEdge } = useTypebot()
   const {
     previewingEdge,
     sourceEndpoints,
@@ -52,7 +51,7 @@ export const Edge = ({
     blocksCoordinates && blocksCoordinates[edge.to.blockId]
 
   const sourceTop = useMemo(() => {
-    if (!graphPosition.y || !graphPosition.scale) return 0
+    if (!graphPosition || graphPosition.y === undefined || graphPosition.scale === undefined) return 0
     
     if (sourceEndpoints) {
       const endpointTop = getEndpointTopOffset({
@@ -74,10 +73,10 @@ export const Edge = ({
     }
     
     return 0
-  }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge, sourceBlockCoordinates, typebot?.blocks])
+  }, [sourceEndpoints, graphPosition, edge, sourceBlockCoordinates, typebot?.blocks])
 
   const targetTop = useMemo(() => {
-    if (!graphPosition.y || !graphPosition.scale) return 0
+    if (!graphPosition || graphPosition.y === undefined || graphPosition.scale === undefined) return 0
     
     if (targetEndpoints) {
       const endpointTop = getEndpointTopOffset({
@@ -99,10 +98,10 @@ export const Edge = ({
     }
     
     return 0
-  }, [targetEndpoints, graphPosition?.y, graphPosition?.scale, edge?.to.stepId, edge?.to.blockId, targetBlockCoordinates, typebot?.blocks])
+  }, [targetEndpoints, graphPosition, edge?.to.stepId, edge?.to.blockId, targetBlockCoordinates, typebot?.blocks])
 
   const path = useMemo(() => {
-    if (!sourceBlockCoordinates || !targetBlockCoordinates)
+    if (!sourceBlockCoordinates || !targetBlockCoordinates || !graphPosition)
       return ``
     const anchorsPosition = getAnchorsPosition({
       sourceBlockCoordinates,
@@ -117,7 +116,7 @@ export const Edge = ({
     targetBlockCoordinates,
     sourceTop,
     targetTop,
-    graphPosition.scale,
+    graphPosition,
   ])
 
   const handleMouseEnter = () => setIsMouseOver(true)
