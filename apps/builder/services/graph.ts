@@ -306,7 +306,7 @@ export const getEndpointTopOffset = ({
 export const getSourceEndpointId = (edge?: Edge) =>
   edge?.from.itemId ?? edge?.from.stepId
 
-const computedItemHeight = (item) => {
+export const computedItemHeight = (item) => {
   const base = (item.steps.length - 1) * 269 + 500
   const items = item.steps.filter((item) => item.hasOwnProperty('items'))
   const itemsLenght = items.reduce((a, c) => {
