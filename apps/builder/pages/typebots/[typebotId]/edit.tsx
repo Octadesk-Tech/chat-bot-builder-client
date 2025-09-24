@@ -46,7 +46,7 @@ function TypebotEditPage() {
     window.parent.postMessage(
       {
         name: 'hasMoreThanOneBlock',
-        hasGroupsWithoutConnection,
+        hasMoreThanOneBlock,
         value: hasMoreThanOneBlock,
       },
       '*'
