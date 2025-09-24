@@ -319,7 +319,7 @@ export const computedItemHeight = (item) => {
   return base
 }
 
-const MAX_BLOCKS_BUFFER = 100
+const MAX_BLOCKS_BUFFER = 50
 
 export const isItemVisible = (
   item: any,
