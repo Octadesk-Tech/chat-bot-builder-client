@@ -32,10 +32,6 @@ export const Edges = memo(
     visibleItems,
   }: Props) => {
     const blockMap = useMemo(() => getBlockMap(blocks), [blocks])
-    const visibleItemsSet = useMemo(
-      () => new Set(visibleItems.map((item) => item.id)),
-      [visibleItems]
-    )
 
     return (
       <chakra.svg
@@ -51,10 +47,6 @@ export const Edges = memo(
         <DrawingEdge />
         {edges.map((edge) => {
           const block = blockMap.get(edge.from.blockId)
-          const isFromVisible = visibleItemsSet.has(edge.from.blockId)
-          const isToVisible = visibleItemsSet.has(edge.to.blockId)
-
-          if (!isFromVisible && !isToVisible) return null
 
           return (
             <Edge
