@@ -31,8 +31,7 @@ const MyComponent = memo(
           block,
           graphPosition,
           containerWidth,
-          containerHeight,
-          typebot.blocks.length
+          containerHeight
         )
       })
     }, [typebot?.blocks, graphPosition, graphContainerRef])

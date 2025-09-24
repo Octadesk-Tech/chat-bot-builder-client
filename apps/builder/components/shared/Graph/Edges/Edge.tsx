@@ -1,11 +1,10 @@
 import { Coordinates, useGraph } from 'contexts/GraphContext'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
 import {
   getAnchorsPosition,
   computeEdgePath,
   getEndpointTopOffset,
   getSourceEndpointId,
-  computedItemHeight,
 } from 'services/graph'
 import { Block, Edge as EdgeProps } from 'models'
 import { Portal, useDisclosure } from '@chakra-ui/react'
@@ -29,7 +28,7 @@ export const Edge = ({
   block: Block
   visibleItems: Block[]
 }) => {
-  const { typebot, deleteEdge } = useTypebot()
+  const { deleteEdge } = useTypebot()
   const {
     previewingEdge,
     sourceEndpoints,
@@ -51,57 +50,27 @@ export const Edge = ({
     blocksCoordinates && blocksCoordinates[edge.to.blockId]
 
   const sourceTop = useMemo(() => {
-    if (!graphPosition || graphPosition.y === undefined || graphPosition.scale === undefined) return 0
-    
-    if (sourceEndpoints) {
-      const endpointTop = getEndpointTopOffset({
-        endpoints: sourceEndpoints,
-        graphOffsetY: graphPosition.y,
-        endpointId: getSourceEndpointId(edge),
-        graphScale: graphPosition.scale,
-      })
-      if (endpointTop !== undefined) return endpointTop
-    }
-    
-    if (sourceBlockCoordinates && sourceBlockCoordinates.y !== undefined) {
-      const sourceBlock = typebot?.blocks?.find(b => b.id === edge.from.blockId)
-      if (sourceBlock) {
-        const blockHeight = computedItemHeight(sourceBlock)
-        return sourceBlockCoordinates.y + (blockHeight / 2)
-      }
-      return sourceBlockCoordinates.y + 250
-    }
-    
-    return 0
-  }, [sourceEndpoints, graphPosition, edge, sourceBlockCoordinates, typebot?.blocks])
+    if (!sourceEndpoints || !graphPosition) return 0
+    return getEndpointTopOffset({
+      endpoints: sourceEndpoints,
+      graphOffsetY: graphPosition.y,
+      endpointId: getSourceEndpointId(edge),
+      graphScale: graphPosition.scale,
+    })
+  }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge])
 
   const targetTop = useMemo(() => {
-    if (!graphPosition || graphPosition.y === undefined || graphPosition.scale === undefined) return 0
-    
-    if (targetEndpoints) {
-      const endpointTop = getEndpointTopOffset({
-        endpoints: targetEndpoints,
-        graphOffsetY: graphPosition.y,
-        endpointId: edge?.to.stepId,
-        graphScale: graphPosition.scale,
-      })
-      if (endpointTop !== undefined) return endpointTop
-    }
-    
-    if (targetBlockCoordinates && targetBlockCoordinates.y !== undefined) {
-      const targetBlock = typebot?.blocks?.find(b => b.id === edge.to.blockId)
-      if (targetBlock) {
-        const blockHeight = computedItemHeight(targetBlock)
-        return targetBlockCoordinates.y + (blockHeight / 2)
-      }
-      return targetBlockCoordinates.y + 250
-    }
-    
-    return 0
-  }, [targetEndpoints, graphPosition, edge?.to.stepId, edge?.to.blockId, targetBlockCoordinates, typebot?.blocks])
+    if (!targetEndpoints || !graphPosition) return 0
+    return getEndpointTopOffset({
+      endpoints: targetEndpoints,
+      graphOffsetY: graphPosition.y,
+      endpointId: edge?.to.stepId,
+      graphScale: graphPosition.scale,
+    })
+  }, [targetEndpoints, graphPosition?.y, edge?.to.stepId, graphPosition?.scale])
 
   const path = useMemo(() => {
-    if (!sourceBlockCoordinates || !targetBlockCoordinates || !graphPosition)
+    if (!sourceBlockCoordinates || !targetBlockCoordinates || !sourceTop)
       return ``
     const anchorsPosition = getAnchorsPosition({
       sourceBlockCoordinates,
@@ -112,11 +81,13 @@ export const Edge = ({
     })
     return computeEdgePath(anchorsPosition)
   }, [
-    sourceBlockCoordinates,
-    targetBlockCoordinates,
+    sourceBlockCoordinates?.x,
+    sourceBlockCoordinates?.y,
+    targetBlockCoordinates?.x,
+    targetBlockCoordinates?.y,
     sourceTop,
     targetTop,
-    graphPosition,
+    graphPosition.scale,
   ])
 
   const handleMouseEnter = () => setIsMouseOver(true)
