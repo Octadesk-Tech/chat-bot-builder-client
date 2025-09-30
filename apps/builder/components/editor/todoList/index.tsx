@@ -36,10 +36,11 @@ export const ToDoList = () => {
   const groupsWithoutConnection = () =>
     typebot?.blocks?.filter((block) => !block.hasConnection)
 
+  const hasMoreThanOneBlock = () => (typebot?.blocks ? typebot.blocks.length : 0) > 1;
   const hasGroupsWithoutConnection = () => !!groupsWithoutConnection()?.length
 
   const showEmptyPendenciesList = () =>
-    !hasGroupsWithoutConnection() && emptyFields.length < 1
+    !hasGroupsWithoutConnection() && hasMoreThanOneBlock() && emptyFields.length < 1
 
   const groupsWithEmptyFields = () => {
     if (emptyFields.length === 0) return []
@@ -232,6 +233,17 @@ export const ToDoList = () => {
                   ))}
                 </>
               )}
+                {!hasMoreThanOneBlock() && (
+                  <Text
+                    color="black"
+                    fontSize="14px"
+                    textAlign="center"
+                    fontFamily="Poppins"
+                    marginTop="24px"
+                  >
+                    Seu bot Não possui blocos.
+                  </Text>
+                )}
             </Flex>
           </Flex>
         )}

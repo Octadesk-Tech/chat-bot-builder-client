@@ -41,7 +41,16 @@ function TypebotEditPage() {
     )
 
     const hasGroupsWithoutConnection = !!groupsWithoutConnection?.length
+    const hasMoreThanOneBlock = (typebot?.blocks ? typebot.blocks.length : 0) > 1;
 
+    window.parent.postMessage(
+      {
+        name: 'hasMoreThanOneBlock',
+        hasMoreThanOneBlock,
+        value: hasMoreThanOneBlock,
+      },
+      '*'
+    )
     window.parent.postMessage(
       {
         name: 'groupsWithoutConnection',
