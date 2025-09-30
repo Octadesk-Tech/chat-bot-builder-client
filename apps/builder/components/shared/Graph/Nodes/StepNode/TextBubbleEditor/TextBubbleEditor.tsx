@@ -67,7 +67,7 @@ export const TextBubbleEditor = ({
         id: randomEditorId,
         plugins: wabaHeader ? platePluginsWithoutBold : platePlugins,
       }) as PlateEditor,
-    [randomEditorId]
+    [randomEditorId, wabaHeader]
   )
   const withMaxLength = (editor: PlateEditor) => {
     editor.normalizeNode = (entry: [Node, Path]) => {
