@@ -37,3 +37,27 @@ export const platePlugins = createPlugins(
     },
   }
 )
+
+export const platePluginsWithoutBold = createPlugins(
+  [
+    createItalicPlugin(),
+    createUnderlinePlugin(),
+    createLinkPlugin(),
+    createStrikethroughPlugin(),
+  ],
+  {
+    components: {
+      [ELEMENT_LINK]: (props) => (
+        <a
+          href={props.element.url}
+          target="_blank"
+          rel="noreferrer"
+          className={props.className}
+        >
+          {props.children}
+        </a>
+      ),
+    },
+  }
+)
+
