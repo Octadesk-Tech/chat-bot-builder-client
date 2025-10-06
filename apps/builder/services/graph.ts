@@ -306,7 +306,7 @@ export const getEndpointTopOffset = ({
 export const getSourceEndpointId = (edge?: Edge) =>
   edge?.from.itemId ?? edge?.from.stepId
 
-const computedItemHeight = (item) => {
+export const computedItemHeight = (item) => {
   const base = (item.steps.length - 1) * 269 + 500
   const items = item.steps.filter((item) => item.hasOwnProperty('items'))
   const itemsLenght = items.reduce((a, c) => {
@@ -319,16 +319,22 @@ const computedItemHeight = (item) => {
   return base
 }
 
+const MAX_BLOCKS_BUFFER = 50
+
 export const isItemVisible = (
-  item,
-  graphPosition,
-  containerWidth,
-  containerHeight
+  item: any,
+  graphPosition: any,
+  containerWidth: number,
+  containerHeight: number,
+  totalBlocks: number
 ) => {
   const { x, y, scale } = graphPosition
 
-  const bufferX = 100 / scale + 500
-  const bufferY = 100 / scale + 500
+  const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 50 : 100
+  const scaleBuffer = Math.max(50, baseBuffer / scale)
+  
+  const bufferX = scaleBuffer + baseBuffer
+  const bufferY = scaleBuffer + baseBuffer
 
   const scaledItemX = Math.abs(
     item.graphCoordinates.x * scale + x - containerWidth / 2
