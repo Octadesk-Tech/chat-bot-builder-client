@@ -72,7 +72,19 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
       }
     }
 
-    if(OctaStepType.OFFICE_HOURS === step.type) {
+    if (OctaStepType.CONVERSATION_TAG === step.type) {
+      if (!step?.options?.tags || step?.options?.tags.length === 0) {
+        data.push(
+          {
+            message:
+              step?.options?.tags,
+            min: { value: 1 },
+          }
+        )
+      }
+    }
+
+    if (OctaStepType.OFFICE_HOURS === step.type) {
       data.push({
         message: step?.options?.id,
       })
@@ -139,7 +151,7 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
 
     if (LogicStepType.CHAT_RETURN === step.type) {
       if (!step.options?.time || step.options?.validationError) {
-        data.push({message: undefined}
+        data.push({ message: undefined }
         )
       }
     }
