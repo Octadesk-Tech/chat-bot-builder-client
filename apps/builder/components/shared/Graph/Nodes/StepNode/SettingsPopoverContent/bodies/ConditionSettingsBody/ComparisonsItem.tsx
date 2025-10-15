@@ -8,6 +8,7 @@ import { Comparison, Variable, ComparisonOperators } from 'models'
 import { useTypebot } from 'contexts/TypebotContext'
 import { useEffect, useState } from 'react'
 import CustomFields from 'services/octadesk/customFields/customFields'
+import { CustomFieldTypes } from 'enums/customFieldsEnum'
 
 export const ComparisonItem = ({
   item,
@@ -119,6 +120,12 @@ export const ComparisonItem = ({
   }
 
   const resolveOperators = () => {
+    function isStringArray(){
+      return Number(myVariable?.type) === CustomFieldTypes.Text || Number(myVariable?.type) === CustomFieldTypes.MultiText
+    }
+    function isNumberArray(){
+      return Number(myVariable?.type) === CustomFieldTypes.Numbers || Number(myVariable?.type) === CustomFieldTypes.Decimal || Number(myVariable?.type) === CustomFieldTypes.Date
+    }
     const allTypesArray = [
       ComparisonOperators.EQUAL,
       ComparisonOperators.NOT_EQUAL,
@@ -145,10 +152,9 @@ export const ComparisonItem = ({
     ]
 
     if (!myVariable || (myVariable?.type || '') === '') return allTypesArray
-
-    if (['string', 'text', 'order'].includes(myVariable.type || ''))
+    if (['string', 'text', 'order'].includes(myVariable.type || '') || isStringArray())
       return [...allTypesArray, ...stringArray]
-    if (['float', 'number', 'date'].includes(myVariable.type || ''))
+    if (['float', 'number', 'date'].includes(myVariable.type || '') || isNumberArray())
       return [...allTypesArray, ...numberArray]
 
     return allTypesArray
