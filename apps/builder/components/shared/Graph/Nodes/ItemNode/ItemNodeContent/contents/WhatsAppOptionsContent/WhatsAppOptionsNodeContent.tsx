@@ -56,6 +56,9 @@ export const WhatsAppOptionsNodeContent = ({
 
   const handlePlusClick = () => {
     const itemIndex = indices.itemIndex + 1
+
+    if ((indices.itemsCount ?? 0) >= 10) return
+
     createItem(
       {
         stepId: item.stepId,
@@ -115,6 +118,7 @@ export const WhatsAppOptionsNodeContent = ({
           aria-label="Add item"
           icon={<PlusIcon />}
           size="xs"
+          disabled={(indices.itemsCount ?? 0) >= 10}
           shadow="md"
           colorScheme="gray"
           onClick={handlePlusClick}
