@@ -11,7 +11,16 @@ export const useWorkspaces = ({ userId }: { userId?: string }) => {
       workspaces: WorkspaceWithMembers[]
     },
     Error
-  >(userId ? `${config.basePath || ''}/api/workspaces` : null, fetcher)
+  >(
+    userId ? `${config.basePath || ''}/api/workspaces` : null,
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+      revalidateIfStale: false,
+      dedupingInterval: 60000,
+    }
+  )
   return {
     workspaces: data?.workspaces,
     isLoading: !error && !data,
