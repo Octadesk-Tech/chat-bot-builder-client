@@ -55,6 +55,8 @@ export const colors = {
     900: '#1d1400',
   },
   blueGray: {
+    100: '#F4F4F5',
+    200: '#E3E4E8',
     400: '#7C8498',
   },
   teste: {
@@ -72,7 +74,9 @@ export const colors = {
     800: '#30272A',
   },
   purple: {
+    100: '#F5F1F9',
     400: '#8B63D1',
+    600: '#612A88',
   },
 }
 

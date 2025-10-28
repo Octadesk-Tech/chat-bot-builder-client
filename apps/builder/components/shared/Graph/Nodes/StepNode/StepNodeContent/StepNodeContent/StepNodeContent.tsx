@@ -36,10 +36,11 @@ import { MediaInputContent } from '../contents/MediaInput'
 import { PreReserveContent } from '../contents/PreReserve'
 import { WOZAssignContent } from '../contents/WOZAssign'
 import { WOZSuggestionContent } from '../contents/WOZSuggestion'
+import { WOZInterpretDataWithAIContent } from '../contents/WOZInterpretDataWithAI'
 // import { ProviderWebhookContent } from './contents/ZapierContent'
 
 type Props = {
-  step: Step;
+  step: Step
   indices: StepIndices
 }
 export const StepNodeContent = ({ step, indices }: Props) => {
@@ -60,20 +61,14 @@ export const StepNodeContent = ({ step, indices }: Props) => {
       return <TextBubbleContent step={step} />
     }
     case BubbleStepType.MEDIA:
-      return (
-        <MediaInputContent step={step} />
-      )
+      return <MediaInputContent step={step} />
     case InputStepType.TEXT:
     case InputStepType.ASK_NAME:
     case InputStepType.EMAIL:
     case InputStepType.CPF:
     case InputStepType.DATE:
     case InputStepType.PHONE: {
-      return (
-        <InputContent
-          step={step} onUpdateStep={handleStepUpdate}
-        />
-      )
+      return <InputContent step={step} onUpdateStep={handleStepUpdate} />
     }
     case InputStepType.CHOICE: {
       return <InputItemsContent step={step} indices={indices} />
@@ -167,14 +162,10 @@ export const StepNodeContent = ({ step, indices }: Props) => {
       return <TextBubbleContent step={step} />
     }
     case OctaStepType.ASSIGN_TO_TEAM: {
-      return (
-        <AssignToTeamContent step={step} onUpdateStep={handleStepUpdate} />
-      )
+      return <AssignToTeamContent step={step} onUpdateStep={handleStepUpdate} />
     }
     case OctaStepType.CALL_OTHER_BOT: {
-      return (
-        <CallOtherBotContent step={step} options={step.options} />
-      )
+      return <CallOtherBotContent step={step} options={step.options} />
     }
     case OctaStepType.OFFICE_HOURS: {
       return <ItemNodesList step={step} indices={indices} isReadOnly />
@@ -193,6 +184,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     }
     case WOZStepType.MESSAGE: {
       return <WOZSuggestionContent step={step} />
+    }
+    case WOZStepType.INTERPRET_DATA_WITH_AI: {
+      return <WOZInterpretDataWithAIContent step={step} />
     }
     case WOZStepType.ASSIGN: {
       return <WOZAssignContent step={step} indices={indices} />
