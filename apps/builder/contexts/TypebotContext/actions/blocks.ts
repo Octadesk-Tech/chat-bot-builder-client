@@ -28,6 +28,13 @@ export type BlocksActions = {
   deleteBlock: (blockIndex: number) => void
 }
 
+const blockName = (typebot: WritableDraft<Typebot>) => {
+  const str = typebot.availableFor.includes('automated-tasks')
+    ? 'Ação #'
+    : 'Grupo #'
+  return `${str}${typebot?.blocks?.length || '1'}`
+}
+
 const blocksActions = (
   setTypebot: SetTypebot,
   setEmptyFields: SetEmptyFields
@@ -47,7 +54,7 @@ const blocksActions = (
         const newBlock: Block = {
           id,
           graphCoordinates,
-          title: `Grupo #${typebot?.blocks?.length || '1'}`,
+          title: blockName(typebot),
           steps: [],
           hasConnection: false,
         }
