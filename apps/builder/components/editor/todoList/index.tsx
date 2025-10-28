@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import {
   Flex,
@@ -26,7 +26,7 @@ import { colors } from 'libs/theme'
 
 export const ToDoList = () => {
   const { typebot, emptyFields } = useTypebot()
-
+  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const { setRightPanel } = useEditor()
 
   const handleCloseClick = () => {
@@ -36,11 +36,14 @@ export const ToDoList = () => {
   const groupsWithoutConnection = () =>
     typebot?.blocks?.filter((block) => !block.hasConnection)
 
-  const hasMoreThanOneBlock = () => (typebot?.blocks ? typebot.blocks.length : 0) > 1;
+  const hasMoreThanOneBlock = () =>
+    (typebot?.blocks ? typebot.blocks.length : 0) > 1
   const hasGroupsWithoutConnection = () => !!groupsWithoutConnection()?.length
 
   const showEmptyPendenciesList = () =>
-    !hasGroupsWithoutConnection() && hasMoreThanOneBlock() && emptyFields.length < 1
+    !hasGroupsWithoutConnection() &&
+    hasMoreThanOneBlock() &&
+    emptyFields.length < 1
 
   const groupsWithEmptyFields = () => {
     if (emptyFields.length === 0) return []
@@ -88,10 +91,18 @@ export const ToDoList = () => {
           <CloseButton onClick={handleCloseClick} />
 
           {!showEmptyPendenciesList() && (
-            <Description>
-              Antes de continuar, faça as correções necessárias clicando em um
-              dos itens com pendência abaixo.
-            </Description>
+            <Fragment>
+              <Description>
+                Antes de continuar, faça as correções necessárias clicando em um
+                dos itens com pendência abaixo.
+              </Description>
+              {isAutomatedTasksBot && (
+                <Description>
+                  Importante: Todos os fluxos precisam finalizar com "Envie uma
+                  Mensagem com IA"
+                </Description>
+              )}
+            </Fragment>
           )}
         </Flex>
 
@@ -233,17 +244,50 @@ export const ToDoList = () => {
                   ))}
                 </>
               )}
-                {!hasMoreThanOneBlock() && (
-                  <Text
-                    color="black"
-                    fontSize="14px"
-                    textAlign="center"
-                    fontFamily="Poppins"
-                    marginTop="24px"
+              {!hasMoreThanOneBlock() && (
+                <Text
+                  color="black"
+                  fontSize="14px"
+                  textAlign="center"
+                  fontFamily="Poppins"
+                  marginTop="24px"
+                >
+                  Seu bot Não possui blocos.
+                </Text>
+              )}
+
+              {groupsWithEmptyFields().length > 0 && (
+                <>
+                  <Flex
+                    w="full"
+                    justifyContent="space-between"
+                    alignItems="center"
                   >
-                    Seu bot Não possui blocos.
-                  </Text>
-                )}
+                    <Flex
+                      justifyContent="space-between"
+                      alignItems="center"
+                      gap="6px"
+                    >
+                      <ErrorIcon color="#d33003" />
+
+                      <Title sm>Fluxos não finalizados</Title>
+                    </Flex>
+
+                    <Tooltip
+                      hasArrow
+                      label="Toda tarefa precisa devolver uma resposta ao usuário. Use 'Envie mensagem com a IA' como a etapa final de cada caminho, mesmo que já o tenha utilizado antes no fluxo."
+                      bg="gray.700"
+                      color="white"
+                      width="232px"
+                    >
+                      <InfoOutlineIcon color="#5A6377" />
+                    </Tooltip>
+                  </Flex>
+                  {emptyFields?.map((item) => {
+                    return <EmptyFieldsItem key={item?.step?.id} item={item} />
+                  })}
+                </>
+              )}
             </Flex>
           </Flex>
         )}

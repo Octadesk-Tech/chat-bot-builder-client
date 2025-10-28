@@ -64,7 +64,9 @@ import {
   defaultWhatsAppOptionsListContent,
   defaultWhatsAppOptionsListOptions,
   ReturnType,
-  defaultChatReturnOptions
+  defaultChatReturnOptions,
+  defaultWOZInterpretDataWithAIOptions,
+  WOZInterpretDataWithAIOptions,
 } from 'models'
 import { stringify } from 'qs'
 import { duplicateWebhook } from 'services/webhook'
@@ -149,8 +151,7 @@ const generateExternalEventValue = (stepId: string, event: string): Item => ({
     subType: null,
     values: [event],
   },
-});
-
+})
 
 export const importTypebot = async (typebot: Typebot, userPlan: Plan) => {
   const { typebot: newTypebot, webhookIdsMapping } = duplicateTypebot(
@@ -264,11 +265,11 @@ const duplicateTypebot = (
       })),
       settings:
         typebot.settings.general.isBrandingEnabled === false &&
-          userPlan === Plan.FREE
+        userPlan === Plan.FREE
           ? {
-            ...typebot.settings,
-            general: { ...typebot.settings.general, isBrandingEnabled: true },
-          }
+              ...typebot.settings,
+              general: { ...typebot.settings.general, isBrandingEnabled: true },
+            }
           : typebot.settings,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
@@ -322,20 +323,22 @@ export const parseNewStep = (
   blockId: string
 ): DraggableStep => {
   const id = cuid()
-
   const options =
-    isOctaStepType(type) || isWOZStepType(type)
+    isOctaStepType(type) ||
+    (isWOZStepType(type) && type !== WOZStepType.INTERPRET_DATA_WITH_AI)
       ? parseOctaStepOptions(type)
       : stepTypeHasOption(type)
-        ? parseDefaultStepOptions(type)
-        : undefined
+      ? parseDefaultStepOptions(type)
+      : undefined
 
   return {
     id,
     blockId,
     type,
     content:
-      isBubbleStepType(type) || isOctaBubbleStepType(type)
+      isBubbleStepType(type) ||
+      isOctaBubbleStepType(type) ||
+      type === WOZStepType.INTERPRET_DATA_WITH_AI
         ? parseDefaultContent(type)
         : undefined,
     options,
@@ -415,7 +418,7 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.CHAT_RETURN,
           content: {
-            returnType: ReturnType.IS_RETURN
+            returnType: ReturnType.IS_RETURN,
           },
         },
         {
@@ -423,7 +426,7 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.CHAT_RETURN,
           content: {
-            returnType: ReturnType.IS_NOT_RETURN
+            returnType: ReturnType.IS_NOT_RETURN,
           },
         },
       ]
@@ -496,14 +499,14 @@ const parseDefaultItems = (
       return [
         generateExternalEventValue(stepId, '@EXTERNAL_EVENT_RECEIVED'),
         generateExternalEventValue(stepId, '@EXTERNAL_EVENT_TIMEOUT'),
-        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_ERROR')
+        generateExternalEventValue(stepId, '@EXTERNAL_EVENT_ERROR'),
       ]
   }
 }
 
 const parseDefaultContent = (
-  type: BubbleStepType | OctaBubbleStepType | OctaWabaStepType
-): BubbleStepContent | null => {
+  type: BubbleStepType | OctaBubbleStepType | OctaWabaStepType | WOZStepType
+): BubbleStepContent | WOZInterpretDataWithAIOptions | null => {
   switch (type) {
     case BubbleStepType.TEXT:
       return defaultTextBubbleContent
@@ -515,6 +518,8 @@ const parseDefaultContent = (
       return defaultEmbedBubbleContent
     case OctaBubbleStepType.END_CONVERSATION:
       return defaultEndConversationBubbleContent
+    case WOZStepType.INTERPRET_DATA_WITH_AI:
+      return defaultWOZInterpretDataWithAIOptions
     // case OctaWabaStepType.BUTTONS:
     //   return defaultRequestButtons
     default:
