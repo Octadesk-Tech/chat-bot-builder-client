@@ -221,8 +221,8 @@ export const ComparisonItem = ({
 
     if (myVariable?.token === '#status-do-contato') {
       const basicOptions = [
-        { key: 0, value: 'Lead', label: 'Lead' },
-        { key: 1, value: 'Cliente', label: 'Cliente' }
+        { key: 0, value: '724d3f8a-867c-4c82-ab7a-84342bfe147d', label: 'Lead' },
+        { key: 1, value: 'd6770ab0-251c-47b3-85c5-d0b66eae4812', label: 'Cliente' }
       ]
 
       return (
