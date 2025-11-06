@@ -8,6 +8,8 @@ import { Comparison, Variable, ComparisonOperators } from 'models'
 import { useTypebot } from 'contexts/TypebotContext'
 import { useEffect, useState } from 'react'
 import CustomFields from 'services/octadesk/customFields/customFields'
+import { basicOptions } from 'components/shared/Graph/Nodes/ItemNode/ItemNodeContent/contents/ConditionNodeContent'
+
 
 export const ComparisonItem = ({
   item,
@@ -185,6 +187,8 @@ export const ComparisonItem = ({
     onItemChange({ ...item, secondaryValue: undefined })
   }, [needSecondaryValue])
 
+
+
   const typeOfInputValue = () => {
     const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
       handleChangeValue(e.target.value)
@@ -214,10 +218,6 @@ export const ComparisonItem = ({
     }
 
     if (myVariable?.token === '#status-do-contato') {
-      const basicOptions = [
-        { key: 0, value: '724d3f8a-867c-4c82-ab7a-84342bfe147d', label: 'Lead' },
-        { key: 1, value: 'd6770ab0-251c-47b3-85c5-d0b66eae4812', label: 'Cliente' }
-      ]
 
       return (
         <Select
