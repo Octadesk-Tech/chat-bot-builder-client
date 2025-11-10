@@ -401,17 +401,16 @@ export const StepsSideBar = () => {
                   label={
                     <Box>
                       <Text mb="2">
-                        Use este componente para analisar e transformar dados de
-                        entrada (texto ou código) em informações úteis para a
-                        tarefa.
+                        Use este componente para traduzir dados brutos (JSON) em
+                        uma mensagem de texto em linguagem natural, pronta para
+                        ser usada no próximo passo do fluxo.
                       </Text>
 
                       <Box as="ul" pl="5" style={{ listStyleType: 'disc' }}>
                         <li>
-                          Ideal quando você precisa pegar um texto digitado pelo
-                          usuário ou um retorno técnico (ex.: JSON de um
-                          sistema) e convertê-lo em algo que faça sentido para o
-                          fluxo.
+                          Ideal para pegar o retorno técnico de uma integração
+                          (ex: um JSON) e criar um resumo amigável para
+                          responder a um cliente ou para continuar a tarefa.
                         </li>
                       </Box>
                     </Box>
