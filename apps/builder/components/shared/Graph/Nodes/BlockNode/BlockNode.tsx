@@ -198,7 +198,11 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
               _hover={{ shadow: 'lg' }}
               zIndex={focusedBlockId === block.id ? 10 : 1}
               className={
-                isAutomatedTasksBot && !hasWarning ? 'gradient-border-woz' : ''
+                isAutomatedTasksBot &&
+                !hasWarning &&
+                block.steps[0].type !== 'start'
+                  ? 'gradient-border-woz'
+                  : ''
               }
             >
               <Flex justifyContent="space-between" alignItems="center" gap="2">
