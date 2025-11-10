@@ -526,6 +526,30 @@ export const StepsSideBar = () => {
               <Flex>
                 <Text fontSize="sm" fontWeight="semibold" color="gray.600">
                   Superintegrações
+                  <Tooltip
+                    hasArrow
+                    label={
+                      <Box>
+                        <Text mb="2">
+                          Conecte sua tarefa a sistemas externos (ex.: CRM, ERP,
+                          API) para buscar ou enviar informações.
+                        </Text>
+
+                        <Box as="ul" pl="5" style={{ listStyleType: 'disc' }}>
+                          <li>
+                            Este é o ponto de integração: configure a chamada ao
+                            sistema e defina o que deve acontecer em caso de
+                            sucesso ou falha.
+                          </li>
+                        </Box>
+                      </Box>
+                    }
+                    bg="gray.700"
+                    color="white"
+                    width={'200px'}
+                  >
+                    <InfoIcon marginLeft={'10px'} color={'gray.300'} />
+                  </Tooltip>
                 </Text>
                 <Spacer />
               </Flex>
