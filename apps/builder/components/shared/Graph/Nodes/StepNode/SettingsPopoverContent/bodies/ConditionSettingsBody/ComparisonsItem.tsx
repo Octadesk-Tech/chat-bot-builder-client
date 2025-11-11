@@ -11,7 +11,6 @@ import CustomFields from 'services/octadesk/customFields/customFields'
 import { CustomFieldTypes } from 'enums/customFieldsEnum'
 import { basicOptions } from 'components/shared/Graph/Nodes/ItemNode/ItemNodeContent/contents/ConditionNodeContent'
 
-
 export const ComparisonItem = ({
   item,
   onItemChange,
