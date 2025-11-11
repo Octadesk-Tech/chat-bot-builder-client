@@ -13,9 +13,14 @@ import { byIdOrToken, isNotDefined } from 'utils'
 type Props = {
   item: ConditionItem
 }
+
+export enum ContactStatus {
+  LEAD = '724d3f8a-867c-4c82-ab7a-84342bfe147d',
+  CLIENT = 'd6770ab0-251c-47b3-85c5-d0b66eae4812',
+}
 export const basicOptions = [
-  { key: 0, value: '724d3f8a-867c-4c82-ab7a-84342bfe147d', label: 'Lead' },
-  { key: 1, value: 'd6770ab0-251c-47b3-85c5-d0b66eae4812', label: 'Cliente' }
+  { key: 0, value: ContactStatus.LEAD, label: 'Lead' },
+  { key: 1, value: ContactStatus.CLIENT, label: 'Cliente' }
 ]
 
 export const ConditionNodeContent = ({ item }: Props) => {
@@ -26,10 +31,10 @@ export const ConditionNodeContent = ({ item }: Props) => {
     comparison: Comparison
   ) => {
     if (variable?.token === '#status-do-contato') {
-      if (comparison.value === basicOptions[0].value) {
+      if (comparison.value === ContactStatus.LEAD) {
         return basicOptions[0].label
       }
-      if (comparison.value === basicOptions[1].value) {
+      if (comparison.value === ContactStatus.CLIENT) {
         return basicOptions[1].label
       }
       else {
