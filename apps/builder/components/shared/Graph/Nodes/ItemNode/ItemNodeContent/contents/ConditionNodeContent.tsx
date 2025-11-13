@@ -40,10 +40,10 @@ export const ConditionNodeContent = ({ item }: Props) => {
     if (variable?.token === '#status-do-contato') {
       if (comparison.value === basicOptions[0].value
       ) {
-        return basicOptions[0].value
+        return basicOptions[0].label
       }
       if (comparison.value === basicOptions[1].value) {
-        return basicOptions[1].value
+        return basicOptions[1].label
       }
       else {
         return comparison.value
