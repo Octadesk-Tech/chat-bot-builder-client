@@ -10,18 +10,25 @@ import {
 import React from 'react'
 import { byIdOrToken, isNotDefined } from 'utils'
 
+import { Persons } from 'services/octadesk/persons/persons'
+
 type Props = {
   item: ConditionItem
 }
 
-export enum ContactStatus {
-  LEAD = '724d3f8a-867c-4c82-ab7a-84342bfe147d',
-  CLIENT = 'd6770ab0-251c-47b3-85c5-d0b66eae4812',
-}
-export const basicOptions = [
-  { key: 0, value: ContactStatus.LEAD, label: 'Lead' },
-  { key: 1, value: ContactStatus.CLIENT, label: 'Cliente' }
-]
+type BasicOption = { key: number; value: string; label: string }
+
+export let basicOptions: BasicOption[] = []
+
+  ; (async () => {
+    const { getStatusContact } = Persons()
+    const ContactStatus = await getStatusContact()
+
+    basicOptions = [
+      { key: 0, value: ContactStatus.Lead, label: 'Lead' },
+      { key: 1, value: ContactStatus.Cliente, label: 'Cliente' }
+    ]
+  })()
 
 export const ConditionNodeContent = ({ item }: Props) => {
   const { typebot, customVariables } = useTypebot()
@@ -31,10 +38,11 @@ export const ConditionNodeContent = ({ item }: Props) => {
     comparison: Comparison
   ) => {
     if (variable?.token === '#status-do-contato') {
-      if (comparison.value === ContactStatus.LEAD) {
+      if (comparison.value === basicOptions[0].value
+      ) {
         return basicOptions[0].label
       }
-      if (comparison.value === ContactStatus.CLIENT) {
+      if (comparison.value === basicOptions[1].value) {
         return basicOptions[1].label
       }
       else {
