@@ -28,6 +28,7 @@ import CustomFields from 'services/octadesk/customFields/customFields'
 import { CustomFieldTypes, DomainType } from 'enums/customFieldsEnum'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ChatFieldTypeSelect } from './ChatFieldTypeSelect'
+import { mapCustomFieldTypeToString } from 'util/customFieldTypeMapper'
 
 type CreateChatFieldModalProps = {
   isOpen: boolean
@@ -108,7 +109,7 @@ export const CreateChatFieldModal = ({
         required: false,
         isSearchable: false,
         isShowAtClose: false,
-        alphabeticallyOrdered: false
+        alphabeticallyOrdered: false,
       }
       const { data: resData } = await CustomFields().createCustomField({
         ...defaultChatFieldData,
@@ -125,7 +126,7 @@ export const CreateChatFieldModal = ({
           variableId: resData.id,
           example: '',
           fieldId: resData.fieldId,
-          type: resData.type ?? 'string',
+          type: mapCustomFieldTypeToString(resData?.type),
           fixed: true,
           isShowInConversationDetails: resData.isShowInConversationDetails,
         }
@@ -177,11 +178,9 @@ export const CreateChatFieldModal = ({
                   setValue('type', newValue?.value || '')
                 }
               />
-              {
-                errors.type && (
-                  <FormErrorMessage>{errors.type.message}</FormErrorMessage>
-                )
-              }
+              {errors.type && (
+                <FormErrorMessage>{errors.type.message}</FormErrorMessage>
+              )}
             </FormControl>
             <FormControl isRequired isInvalid={!!errors.title}>
               <Box
@@ -203,16 +202,13 @@ export const CreateChatFieldModal = ({
                       replaceAllNonAlphanumericWithUnderscore(value)
                     )
                   },
-                })
-                }
+                })}
                 placeholder="Insira o título do campo..."
                 maxLength={30}
               />
-              {
-                errors.title && (
-                  <FormErrorMessage>{errors.title.message}</FormErrorMessage>
-                )
-              }
+              {errors.title && (
+                <FormErrorMessage>{errors.title.message}</FormErrorMessage>
+              )}
             </FormControl>
             <FormControl isRequired isInvalid={!!errors.fieldId}>
               <Box
@@ -231,16 +227,13 @@ export const CreateChatFieldModal = ({
                       'fieldId',
                       replaceAllNonAlphanumericWithUnderscore(e.target.value)
                     ),
-                })
-                }
+                })}
                 placeholder="Código do campo..."
                 maxLength={30}
               />
-              {
-                errors.fieldId && (
-                  <FormErrorMessage>{errors.fieldId.message}</FormErrorMessage>
-                )
-              }
+              {errors.fieldId && (
+                <FormErrorMessage>{errors.fieldId.message}</FormErrorMessage>
+              )}
             </FormControl>
             <FormControl isInvalid={!!errors.placeHolder}>
               <Box
@@ -250,25 +243,22 @@ export const CreateChatFieldModal = ({
                 alignItems="center"
               >
                 <FormLabel>Texto de dica do campo</FormLabel>
-                <Text fontSize="12px" >
+                <Text fontSize="12px">
                   {watch('placeHolder')?.length || 0}/30
                 </Text>
               </Box>
               <Input
                 {...register('placeHolder', {
                   onChange: (e) => setValue('placeHolder', e.target.value),
-                })
-                }
+                })}
                 placeholder="Insira o texto de dica do campo..."
                 maxLength={30}
               />
-              {
-                errors.placeHolder && (
-                  <FormErrorMessage>
-                    {errors.placeHolder.message}
-                  </FormErrorMessage>
-                )
-              }
+              {errors.placeHolder && (
+                <FormErrorMessage>
+                  {errors.placeHolder.message}
+                </FormErrorMessage>
+              )}
             </FormControl>
             <FormControl isInvalid={!!errors.hint}>
               <Box
@@ -283,16 +273,13 @@ export const CreateChatFieldModal = ({
               <Textarea
                 {...register('hint', {
                   onChange: (e) => setValue('hint', e.target.value),
-                })
-                }
+                })}
                 placeholder="Texto de ajuda do campo"
                 maxLength={240}
               />
-              {
-                errors.hint && (
-                  <FormErrorMessage>{errors.hint.message}</FormErrorMessage>
-                )
-              }
+              {errors.hint && (
+                <FormErrorMessage>{errors.hint.message}</FormErrorMessage>
+              )}
             </FormControl>
             <FormControl>
               <HStack spacing={3}>
