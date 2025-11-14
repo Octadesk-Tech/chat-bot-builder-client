@@ -2,13 +2,12 @@ import { getBaseClient } from '../http'
 import { loadParameterHeader } from '../helpers/headers'
 import { PersonsServicesInterface } from './types.persons'
 
-const getPersonsClient = () => getBaseClient('persons')
+const getPersonsClient = () => getBaseClient('personsService')
 
 export const Persons = (): PersonsServicesInterface => {
 
   const getStatusContact = async (): Promise<Record<string, string>> => {
     const client = await getPersonsClient()
-    client.defaults.baseURL = client.defaults.baseURL?.replace('/api', '') || ''
     const res = await client.get('contact-status', loadParameterHeader());
     const data = res.data;
 
