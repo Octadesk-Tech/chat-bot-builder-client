@@ -56,4 +56,23 @@
     mask-composite: exclude;
     pointer-events: none;
   }
+
+  .scrollbar-custom {
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: gray.300;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: gray.400;
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--chakra-colors-gray-300) transparent;
+  }
 }
