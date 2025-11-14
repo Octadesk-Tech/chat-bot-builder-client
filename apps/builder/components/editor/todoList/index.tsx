@@ -192,7 +192,7 @@ export const ToDoList = () => {
 
                     <Tooltip
                       hasArrow
-                      label="Uma ou mais etapas do seu bot estão com campos obrigatórios não preenchidos."
+                      label="Uma ou mais etapas do seu fluxo estão com campos obrigatórios não preenchidos."
                       bg="gray.700"
                       color="white"
                       width="232px"
@@ -230,7 +230,7 @@ export const ToDoList = () => {
 
                     <Tooltip
                       hasArrow
-                      label="Um ou mais grupos do seu bot estão sem conexões."
+                      label="Um ou mais grupos do seu fluxo estão sem conexões."
                       bg="gray.700"
                       color="white"
                       width="232px"
@@ -256,39 +256,6 @@ export const ToDoList = () => {
                     ? 'Sua tarefa está vazia.'
                     : 'Seu bot não possui blocos.'}
                 </Text>
-              )}
-
-              {groupsWithEmptyFields().length > 0 && (
-                <>
-                  <Flex
-                    w="full"
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
-                    <Flex
-                      justifyContent="space-between"
-                      alignItems="center"
-                      gap="6px"
-                    >
-                      <ErrorIcon color="#d33003" />
-
-                      <Title sm>Fluxos não finalizados</Title>
-                    </Flex>
-
-                    <Tooltip
-                      hasArrow
-                      label="Toda tarefa precisa devolver uma resposta ao usuário. Use 'Envie mensagem com a IA' como a etapa final de cada caminho, mesmo que já o tenha utilizado antes no fluxo."
-                      bg="gray.700"
-                      color="white"
-                      width="232px"
-                    >
-                      <InfoOutlineIcon color="#5A6377" />
-                    </Tooltip>
-                  </Flex>
-                  {emptyFields?.map((item) => {
-                    return <EmptyFieldsItem key={item?.step?.id} item={item} />
-                  })}
-                </>
               )}
             </Flex>
           </Flex>
