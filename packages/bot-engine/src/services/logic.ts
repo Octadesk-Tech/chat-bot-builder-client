@@ -59,6 +59,8 @@ export const executeLogic = async (
       return { nextEdgeId: await executeCode(step, context) }
     case LogicStepType.TYPEBOT_LINK:
       return await executeTypebotLink(step, context)
+    default:
+      return { nextEdgeId: undefined }
   }
 }
 
