@@ -7,8 +7,8 @@ import {
   LogicalOperator,
   Variable,
 } from 'models'
-import React from 'react'
 import { byIdOrToken, isNotDefined } from 'utils'
+import React, { useState, useEffect } from 'react'
 
 import { Persons } from 'services/octadesk/persons/persons'
 
@@ -18,36 +18,40 @@ type Props = {
 
 type BasicOption = { key: number; value: string; label: string }
 
-export let basicOptions: BasicOption[] = []
-
-  ; (async () => {
-    const { getStatusContact } = Persons()
-    const ContactStatus = await getStatusContact()
-
-    basicOptions = [
-      { key: 0, value: ContactStatus.Lead, label: 'Lead' },
-      { key: 1, value: ContactStatus.Cliente, label: 'Cliente' }
-    ]
-  })()
-
 export const ConditionNodeContent = ({ item }: Props) => {
   const { typebot, customVariables } = useTypebot()
+  const [basicOptions, setBasicOptions] = useState<BasicOption[]>([])
+
+  useEffect(() => {
+    const loadContactStatus = async () => {
+      try {
+        const { getStatusContact } = Persons()
+        const ContactStatus = await getStatusContact()
+
+        setBasicOptions([
+          { key: 0, value: ContactStatus.Lead, label: 'Lead' },
+          { key: 1, value: ContactStatus.Cliente, label: 'Cliente' },
+        ])
+      } catch (error) {
+        console.error('Erro ao carregar status de contato:', error)
+      }
+    }
+
+    loadContactStatus()
+  }, [])
 
   const getComparisonValue = (
     variable: Variable | undefined,
     comparison: Comparison
   ) => {
-    if (variable?.token === '#status-do-contato') {
-      if (comparison.value === basicOptions[0].value
-      ) {
+    if (variable?.token === '#status-do-contato' && basicOptions.length > 0) {
+      if (comparison.value === basicOptions[0].value) {
         return basicOptions[0].label
       }
       if (comparison.value === basicOptions[1].value) {
         return basicOptions[1].label
       }
-      else {
-        return comparison.value
-      }
+      return comparison.value
     }
 
     if (variable?.type !== 'select' || !variable) return comparison.value
