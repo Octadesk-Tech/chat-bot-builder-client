@@ -18,6 +18,7 @@ import { useInterpretDataWithAI } from 'hooks/InterpretDataWithAI/useInterpretDa
 import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
 import { WOZInterpretDataWithAI } from 'models'
+import { getDeepKeys } from 'services/integrations'
 
 type Props = {
   step: WOZInterpretDataWithAI
@@ -42,20 +43,8 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
     position: 'top-right',
     status: 'error',
   })
-  useEffect(() => {
-    console.log('step', step)
-  }, [step])
+
   const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  const variablesForTest = useMemo(() => {
-    const firstStep = whoIsConnectedOnMyBlock[0]?.steps[0]
-
-    if (firstStep && 'options' in firstStep) {
-      // @ts-ignore - variablesForTest é uma propriedade específica do webhook
-      return firstStep.options?.variablesForTest
-    }
-    return undefined
-  }, [whoIsConnectedOnMyBlock])
 
   const handleInstructionsChange = (value: string) => {
     onContentChange({
@@ -64,10 +53,7 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
     })
   }
 
-  const handleVariableSelected = (variable: {
-    token: string
-    name: string
-  }) => {
+  const handleVariableSelected = (variable: string) => {
     if (!textareaRef.current) return
 
     const textarea = textareaRef.current
@@ -77,7 +63,7 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
     const beforeCursor = currentValue.substring(0, currentCursorPos)
     const afterCursor = currentValue.substring(currentCursorPos)
 
-    const formattedVariable = `{{ ${variable.token.replace('#', '')} }}`
+    const formattedVariable = `{{ ${variable} }}`
     const newValue = beforeCursor + formattedVariable + afterCursor
     const newCursorPosition = currentCursorPos + formattedVariable.length
 
@@ -103,6 +89,11 @@ Use as variáveis: {{incident_count}}, {{date_range}}, {{service_name}}, {{incid
     return `Descreva o formato da mensagem que a IA deve gerar. Escreva o texto que desejar e clique nas {{variáveis}} disponíveis abaixo para incluir informações dinâmicas. <br /><br />
 Clique em 'Testar retorno' para ver como ficará na prática.`
   }, [])
+
+  const responseKeys = useMemo(
+    () => getDeepKeys(data?.response || {}),
+    [data?.response]
+  )
 
   const handleTestReturn = async () => {
     setIsTesting(true)
@@ -190,7 +181,7 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
           usado no próximo passo do fluxo.
         </Text>
 
-        <Stack direction="row" justifyContent="space-between" w="full" pr={14}>
+        <Stack direction="row" justifyContent="space-between" w="full">
           <Stack direction="row" alignItems="center" gap={2}>
             <Text fontWeight="bold">Instruções de retorno</Text>
             <Tooltip
@@ -210,7 +201,7 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
         </Stack>
 
         <VStack gap={4} w="full">
-          <Stack direction="row" alignItems="center" gap={2} w="full">
+          <Box position="relative" w="full">
             <Textarea
               ref={textareaRef}
               placeholder={placeholderInstructions}
@@ -219,16 +210,18 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
               minLength={1}
               value={step?.content?.systemMessage || ''}
               onChange={(e) => handleInstructionsChange(e.target.value)}
-              rows={5}
+              rows={10}
+              paddingRight="45px"
+              className="scrollbar-custom"
             />
 
-            {variablesForTest?.length > 0 && (
+            <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
               <VariablesMenu
-                variables={variablesForTest || []}
+                variables={responseKeys || []}
                 onVariableSelect={handleVariableSelected}
               />
-            )}
-          </Stack>
+            </Box>
+          </Box>
 
           {resultOfInterpretWithAi.length > 0 && (
             <Box
@@ -236,7 +229,7 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
               backgroundColor="purple.100"
               p={4}
               borderColor="purple.600"
-              borderLeftWidth="2px"
+              borderLeftWidth="3px"
             >
               <Text fontWeight="bold" fontSize="lg">
                 Teste de retorno:
@@ -248,7 +241,7 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
           )}
 
           <Button
-            disabled={isTesting}
+            disabled={isTesting || !step?.content?.systemMessage?.length}
             w="full"
             colorScheme="blue"
             onClick={handleTestReturn}
