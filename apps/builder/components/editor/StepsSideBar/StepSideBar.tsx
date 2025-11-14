@@ -31,7 +31,7 @@ import {
   StepType,
   WOZStepType,
 } from 'models'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { StepCard, StepCardOverlay } from './StepCard'
 import LearnAutomatedTasks from './LearnAutomatedTasks'
 
@@ -56,6 +56,11 @@ export const StepsSideBar = () => {
   const { typebot } = useTypebot()
 
   const { verifyFeatureToggle } = useUser()
+
+  const isAutomatedTasksBot = useMemo(
+    () => typebot?.availableFor?.includes('automated-tasks'),
+    [typebot]
+  )
 
   const handleMouseMove = (event: MouseEvent) => {
     if (!draggedStepType) return
@@ -267,7 +272,9 @@ export const StepsSideBar = () => {
         {/* Header fijo */}
         <HStack w="full" pt="2" px="4" pb="4">
           <Text fontSize="lg" fontWeight="bold" color="gray.600">
-            Etapas da conversa
+            {isAutomatedTasksBot
+              ? 'Etapas de configuração'
+              : 'Etapas da conversa'}
           </Text>
 
           <Spacer />
@@ -290,7 +297,6 @@ export const StepsSideBar = () => {
             </Tooltip>
           </Flex>
         </HStack>
-        {}
         <Stack
           flex="1"
           overflowY="auto"

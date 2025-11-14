@@ -252,7 +252,9 @@ export const ToDoList = () => {
                   fontFamily="Poppins"
                   marginTop="24px"
                 >
-                  Seu bot Não possui blocos.
+                  {isAutomatedTasksBot
+                    ? 'Sua tarefa está vazia.'
+                    : 'Seu bot não possui blocos.'}
                 </Text>
               )}
 
