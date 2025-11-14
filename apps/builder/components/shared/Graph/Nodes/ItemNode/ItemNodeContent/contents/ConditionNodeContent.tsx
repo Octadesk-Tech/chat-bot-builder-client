@@ -10,9 +10,25 @@ import {
 import React from 'react'
 import { byIdOrToken, isNotDefined } from 'utils'
 
+import { Persons } from 'services/octadesk/persons/persons'
+
 type Props = {
   item: ConditionItem
 }
+
+type BasicOption = { key: number; value: string; label: string }
+
+export let basicOptions: BasicOption[] = []
+
+  ; (async () => {
+    const { getStatusContact } = Persons()
+    const ContactStatus = await getStatusContact()
+
+    basicOptions = [
+      { key: 0, value: ContactStatus.Lead, label: 'Lead' },
+      { key: 1, value: ContactStatus.Cliente, label: 'Cliente' }
+    ]
+  })()
 
 export const ConditionNodeContent = ({ item }: Props) => {
   const { typebot, customVariables } = useTypebot()
@@ -22,7 +38,16 @@ export const ConditionNodeContent = ({ item }: Props) => {
     comparison: Comparison
   ) => {
     if (variable?.token === '#status-do-contato') {
-      return comparison.value
+      if (comparison.value === basicOptions[0].value
+      ) {
+        return basicOptions[0].label
+      }
+      if (comparison.value === basicOptions[1].value) {
+        return basicOptions[1].label
+      }
+      else {
+        return comparison.value
+      }
     }
 
     if (variable?.type !== 'select' || !variable) return comparison.value
