@@ -152,11 +152,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
   const hasWarning = !block.hasConnection && showWarning
   const showEmptyConnectionAlert = () => !block.hasConnection && showWarning
   const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
-  const aditionalInfoForAutomatedTasksBot =
-    '<br/>Importante: Todos os fluxos precisam finalizar com "Envie Mensagem com a IA"'
-  const emptyConnectionMessage = `Este bloco precisa se conectar e/ou receber uma conexão de outro bloco. ${
-    isAutomatedTasksBot ? aditionalInfoForAutomatedTasksBot : ''
-  }`
+  const emptyConnectionMessage = `Este bloco precisa se conectar e/ou receber uma conexão de outro bloco.`
 
   return (
     <ContextMenu<HTMLDivElement>
