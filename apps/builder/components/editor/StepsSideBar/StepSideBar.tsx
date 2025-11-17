@@ -133,7 +133,6 @@ export const StepsSideBar = () => {
   const AUTOMATED_TASKS_AVAILABLE_STEPS: StepType[] = [
     WOZStepType.MESSAGE,
     WOZStepType.INTERPRET_DATA_WITH_AI,
-    IntegrationStepType.WEBHOOK,
   ]
   const LIMITED_DOMAINS = ['person', 'ticket']
 
@@ -163,7 +162,10 @@ export const StepsSideBar = () => {
     }
 
     if (typebot.availableFor.includes('automated-tasks')) {
-      return AUTOMATED_TASKS_AVAILABLE_STEPS.includes(type)
+      return (
+        AUTOMATED_TASKS_AVAILABLE_STEPS.includes(type) ||
+        EVENT_AVAILABLE_STEPS.includes(type)
+      )
     }
 
     return !AUTOMATED_TASKS_AVAILABLE_STEPS.includes(type)
