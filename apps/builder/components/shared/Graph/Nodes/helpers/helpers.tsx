@@ -72,6 +72,19 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
       }
     }
 
+    if (OctaStepType.CONVERSATION_TAG === step.type) {
+      if (
+        !step?.options?.tags ||
+        step?.options?.tags.length === 0 ||
+        step?.options?.tags[0]?._id === ''
+      ) {
+        data.push({
+          message: undefined,
+          min: { value: 1 },
+        })
+      }
+    }
+
     if (OctaStepType.OFFICE_HOURS === step.type) {
       data.push({
         message: step?.options?.id,
