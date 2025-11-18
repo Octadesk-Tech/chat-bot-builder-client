@@ -8,37 +8,17 @@ import {
   Variable,
 } from 'models'
 import { byIdOrToken, isNotDefined } from 'utils'
-import React, { useState, useEffect } from 'react'
+import React from 'react'
+import { useContactStatus } from 'hooks/useContactStatus'
 
-import { Persons } from 'services/octadesk/persons/persons'
 
 type Props = {
   item: ConditionItem
 }
 
-type BasicOption = { key: number; value: string; label: string }
-
 export const ConditionNodeContent = ({ item }: Props) => {
   const { typebot, customVariables } = useTypebot()
-  const [basicOptions, setBasicOptions] = useState<BasicOption[]>([])
-
-  useEffect(() => {
-    const loadContactStatus = async () => {
-      try {
-        const { getStatusContact } = Persons()
-        const ContactStatus = await getStatusContact()
-
-        setBasicOptions([
-          { key: 0, value: ContactStatus.Lead, label: 'Lead' },
-          { key: 1, value: ContactStatus.Cliente, label: 'Cliente' },
-        ])
-      } catch (error) {
-        console.error('Erro ao carregar status de contato:', error)
-      }
-    }
-
-    loadContactStatus()
-  }, [])
+  const basicOptions = useContactStatus()
 
   const getComparisonValue = (
     variable: Variable | undefined,
