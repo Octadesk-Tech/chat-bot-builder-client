@@ -9,7 +9,7 @@ import { useTypebot } from 'contexts/TypebotContext'
 import { useEffect, useState } from 'react'
 import CustomFields from 'services/octadesk/customFields/customFields'
 import { CustomFieldTypes } from 'enums/customFieldsEnum'
-import { Persons } from 'services/octadesk/persons/persons'
+import { useContactStatus } from 'hooks/useContactStatus'
 
 export const ComparisonItem = ({
   item,
@@ -192,26 +192,7 @@ export const ComparisonItem = ({
     onItemChange({ ...item, secondaryValue: undefined })
   }, [needSecondaryValue])
 
-  type BasicOption = { key: number; value: string; label: string }
-  const [basicOptions, setBasicOptions] = useState<BasicOption[]>([])
-
-  useEffect(() => {
-    const loadContactStatus = async () => {
-      try {
-        const { getStatusContact } = Persons()
-        const ContactStatus = await getStatusContact()
-
-        setBasicOptions([
-          { key: 0, value: ContactStatus.Lead, label: 'Lead' },
-          { key: 1, value: ContactStatus.Cliente, label: 'Cliente' },
-        ])
-      } catch (error) {
-        console.error('Erro ao carregar status de contato:', error)
-      }
-    }
-
-    loadContactStatus()
-  }, [])
+  const basicOptions = useContactStatus()
 
   const typeOfInputValue = () => {
     const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
