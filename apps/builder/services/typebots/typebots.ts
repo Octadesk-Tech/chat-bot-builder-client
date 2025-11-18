@@ -64,7 +64,9 @@ import {
   defaultWhatsAppOptionsListContent,
   defaultWhatsAppOptionsListOptions,
   ReturnType,
-  defaultChatReturnOptions
+  defaultChatReturnOptions,
+  defaultWOZInterpretDataWithAIOptions,
+  WOZInterpretDataWithAIOptions,
 } from 'models'
 import { stringify } from 'qs'
 import { duplicateWebhook } from 'services/webhook'
@@ -321,9 +323,9 @@ export const parseNewStep = (
   blockId: string
 ): DraggableStep => {
   const id = cuid()
-
   const options =
-    isOctaStepType(type) || isWOZStepType(type)
+    isOctaStepType(type) ||
+    (isWOZStepType(type) && type !== WOZStepType.INTERPRET_DATA_WITH_AI)
       ? parseOctaStepOptions(type)
       : stepTypeHasOption(type)
       ? parseDefaultStepOptions(type)
@@ -334,7 +336,9 @@ export const parseNewStep = (
     blockId,
     type,
     content:
-      isBubbleStepType(type) || isOctaBubbleStepType(type)
+      isBubbleStepType(type) ||
+      isOctaBubbleStepType(type) ||
+      type === WOZStepType.INTERPRET_DATA_WITH_AI
         ? parseDefaultContent(type)
         : undefined,
     options,
@@ -414,7 +418,7 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.CHAT_RETURN,
           content: {
-            returnType: ReturnType.IS_RETURN
+            returnType: ReturnType.IS_RETURN,
           },
         },
         {
@@ -422,7 +426,7 @@ const parseDefaultItems = (
           stepId,
           type: ItemType.CHAT_RETURN,
           content: {
-            returnType: ReturnType.IS_NOT_RETURN
+            returnType: ReturnType.IS_NOT_RETURN,
           },
         },
       ]
@@ -501,8 +505,8 @@ const parseDefaultItems = (
 }
 
 const parseDefaultContent = (
-  type: BubbleStepType | OctaBubbleStepType | OctaWabaStepType
-): BubbleStepContent | null => {
+  type: BubbleStepType | OctaBubbleStepType | OctaWabaStepType | WOZStepType
+): BubbleStepContent | WOZInterpretDataWithAIOptions | null => {
   switch (type) {
     case BubbleStepType.TEXT:
       return defaultTextBubbleContent
@@ -514,6 +518,8 @@ const parseDefaultContent = (
       return defaultEmbedBubbleContent
     case OctaBubbleStepType.END_CONVERSATION:
       return defaultEndConversationBubbleContent
+    case WOZStepType.INTERPRET_DATA_WITH_AI:
+      return defaultWOZInterpretDataWithAIOptions
     // case OctaWabaStepType.BUTTONS:
     //   return defaultRequestButtons
     default:

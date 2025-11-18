@@ -1,5 +1,12 @@
-import { Badge, Flex, HStack, StackProps, Text, Tooltip } from '@chakra-ui/react'
-import { StepType, DraggableStepType } from 'models'
+import {
+  Badge,
+  Flex,
+  HStack,
+  StackProps,
+  Text,
+  Tooltip,
+} from '@chakra-ui/react'
+import { StepType, DraggableStepType, WOZStepType } from 'models'
 import { useStepDnd } from 'contexts/GraphDndContext'
 import React, { useEffect, useState } from 'react'
 import { StepIcon } from './StepIcon'
@@ -11,12 +18,12 @@ export const StepCard = ({
   onMouseDown,
   isDisabled = false,
   tooltip,
-  badge
+  badge,
 }: {
   type: DraggableStepType
   isDisabled?: boolean
   onMouseDown: (e: React.MouseEvent, type: DraggableStepType) => void
-  tooltip?: string,
+  tooltip?: string
   badge?: string
 }) => {
   const { draggedStepType } = useStepDnd()
@@ -28,8 +35,16 @@ export const StepCard = ({
 
   const handleMouseDown = (e: React.MouseEvent) => onMouseDown(e, type)
 
+  const shouldAddGradientBorder = [
+    WOZStepType.MESSAGE,
+    WOZStepType.INTERPRET_DATA_WITH_AI,
+  ].includes(type as WOZStepType)
+
   return (
-    <Tooltip label="Você precisa ter o Whatsapp Business para usar esse componente!" isDisabled={!isDisabled}>
+    <Tooltip
+      label="Você precisa ter o Whatsapp Business para usar esse componente!"
+      isDisabled={!isDisabled}
+    >
       <Flex pos="relative">
         <HStack
           borderWidth="1px"
@@ -45,13 +60,14 @@ export const StepCard = ({
           _hover={{ shadow: 'md' }}
           transition="box-shadow 200ms"
           pointerEvents={isDisabled ? 'none' : 'auto'}
+          className={shouldAddGradientBorder ? 'gradient-border-woz' : ''}
         >
           {!isMouseDown ? (
             <>
               <StepIcon type={type} />
-              <HStack style={{flex: 1}}>
+              <HStack style={{ flex: 1 }}>
                 <StepTypeLabel type={type} />
-                {tooltip && tooltip.length &&
+                {tooltip && tooltip.length && (
                   <Tooltip
                     hasArrow
                     label={tooltip}
@@ -61,9 +77,9 @@ export const StepCard = ({
                   >
                     <InfoIcon marginLeft={'10px'} color={'gray.300'} />
                   </Tooltip>
-                }
+                )}
               </HStack>
-              {badge && badge.length &&
+              {badge && badge.length && (
                 <Badge
                   variant="solid"
                   colorScheme="blue"
@@ -72,7 +88,7 @@ export const StepCard = ({
                 >
                   {badge}
                 </Badge>
-              }
+              )}
             </>
           ) : (
             <Text color="white" userSelect="none">
