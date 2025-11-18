@@ -20,11 +20,7 @@ const LearnAutomatedTasks = () => {
   const { isOpen: isOpenCard, onClose: onCloseCard } = useDisclosure({
     defaultIsOpen: true,
   })
-  const {
-    isOpen: isOpenTip,
-    onClose: onCloseTip,
-    onToggle: onToggleTip,
-  } = useDisclosure({
+  const { isOpen: isOpenTip, onClose: onCloseTip } = useDisclosure({
     defaultIsOpen: true,
   })
   const LEARN_KEY = 'learnAutomatedTasksCardClosed'
@@ -35,6 +31,10 @@ const LearnAutomatedTasks = () => {
   const handleCloseCard = () => {
     onCloseCard()
     setCookie(LEARN_KEY, 'true')
+  }
+
+  const onOpenTutorial = () => {
+    window.open('https://www.youtube.com/watch?v=M7qBD0oTzUk', '_blank')
   }
 
   const handleCloseTip = () => {
@@ -70,6 +70,7 @@ const LearnAutomatedTasks = () => {
         <Text>Veja como criar sua primeira tarefa automatizada!</Text>
         <Flex justifyContent="flex-end">
           <Button
+            onClick={onOpenTutorial}
             _hover={{
               backgroundColor: 'blue.500',
             }}
@@ -99,7 +100,7 @@ const LearnAutomatedTasks = () => {
         _hover={{
           backgroundColor: 'blue.600',
         }}
-        onClick={onToggleTip}
+        onClick={onOpenTutorial}
       />
       <ScaleFade in={isOpenTip} transition={fadeTransition}>
         <HStack
