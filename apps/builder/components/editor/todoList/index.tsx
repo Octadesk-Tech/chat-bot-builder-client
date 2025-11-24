@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Fragment } from 'react'
 
 import {
   Flex,
@@ -26,7 +26,7 @@ import { colors } from 'libs/theme'
 
 export const ToDoList = () => {
   const { typebot, emptyFields } = useTypebot()
-
+  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const { setRightPanel } = useEditor()
 
   const handleCloseClick = () => {
@@ -36,11 +36,14 @@ export const ToDoList = () => {
   const groupsWithoutConnection = () =>
     typebot?.blocks?.filter((block) => !block.hasConnection)
 
-  const hasMoreThanOneBlock = () => (typebot?.blocks ? typebot.blocks.length : 0) > 1;
+  const hasMoreThanOneBlock = () =>
+    (typebot?.blocks ? typebot.blocks.length : 0) > 1
   const hasGroupsWithoutConnection = () => !!groupsWithoutConnection()?.length
 
   const showEmptyPendenciesList = () =>
-    !hasGroupsWithoutConnection() && hasMoreThanOneBlock() && emptyFields.length < 1
+    !hasGroupsWithoutConnection() &&
+    hasMoreThanOneBlock() &&
+    emptyFields.length < 1
 
   const groupsWithEmptyFields = () => {
     if (emptyFields.length === 0) return []
@@ -88,10 +91,18 @@ export const ToDoList = () => {
           <CloseButton onClick={handleCloseClick} />
 
           {!showEmptyPendenciesList() && (
-            <Description>
-              Antes de continuar, faça as correções necessárias clicando em um
-              dos itens com pendência abaixo.
-            </Description>
+            <Fragment>
+              <Description>
+                Antes de continuar, faça as correções necessárias clicando em um
+                dos itens com pendência abaixo.
+              </Description>
+              {isAutomatedTasksBot && (
+                <Description>
+                  Importante: Todos os fluxos precisam finalizar com "Envie uma
+                  Mensagem com IA"
+                </Description>
+              )}
+            </Fragment>
           )}
         </Flex>
 
@@ -181,7 +192,7 @@ export const ToDoList = () => {
 
                     <Tooltip
                       hasArrow
-                      label="Uma ou mais etapas do seu bot estão com campos obrigatórios não preenchidos."
+                      label="Uma ou mais etapas do seu fluxo estão com campos obrigatórios não preenchidos."
                       bg="gray.700"
                       color="white"
                       width="232px"
@@ -219,7 +230,7 @@ export const ToDoList = () => {
 
                     <Tooltip
                       hasArrow
-                      label="Um ou mais grupos do seu bot estão sem conexões."
+                      label="Um ou mais grupos do seu fluxo estão sem conexões."
                       bg="gray.700"
                       color="white"
                       width="232px"
@@ -233,17 +244,19 @@ export const ToDoList = () => {
                   ))}
                 </>
               )}
-                {!hasMoreThanOneBlock() && (
-                  <Text
-                    color="black"
-                    fontSize="14px"
-                    textAlign="center"
-                    fontFamily="Poppins"
-                    marginTop="24px"
-                  >
-                    Seu bot Não possui blocos.
-                  </Text>
-                )}
+              {!hasMoreThanOneBlock() && (
+                <Text
+                  color="black"
+                  fontSize="14px"
+                  textAlign="center"
+                  fontFamily="Poppins"
+                  marginTop="24px"
+                >
+                  {isAutomatedTasksBot
+                    ? 'Sua tarefa está vazia.'
+                    : 'Seu bot não possui blocos.'}
+                </Text>
+              )}
             </Flex>
           </Flex>
         )}

@@ -21,6 +21,7 @@ import { setMultipleRefs } from 'services/utils'
 import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable'
 import { BlockFocusToolbar } from './BlockFocusToolbar'
 import { WarningTwoIcon } from '@chakra-ui/icons'
+import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
 
 type Props = {
   block: Block
@@ -139,7 +140,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
   const onDragStop = () => setIsMouseDown(false)
 
   const stackBorderColor = (isOpened: boolean): string => {
-    if (!block.hasConnection && showWarning) {
+    if (hasWarning) {
       return 'yellow.500'
     } else if (isConnecting || isOpened || isPreviewing || isFocused) {
       return 'blue.400'
@@ -148,7 +149,10 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
     return '#ffffff'
   }
 
+  const hasWarning = !block.hasConnection && showWarning
   const showEmptyConnectionAlert = () => !block.hasConnection && showWarning
+  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
+  const emptyConnectionMessage = `Este bloco precisa se conectar e/ou receber uma conexão de outro bloco.`
 
   return (
     <ContextMenu<HTMLDivElement>
@@ -189,6 +193,13 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
               shadow="md"
               _hover={{ shadow: 'lg' }}
               zIndex={focusedBlockId === block.id ? 10 : 1}
+              className={
+                isAutomatedTasksBot &&
+                !hasWarning &&
+                block.steps[0].type !== 'start'
+                  ? 'gradient-border-woz'
+                  : ''
+              }
             >
               <Flex justifyContent="space-between" alignItems="center" gap="2">
                 <Editable
@@ -211,7 +222,14 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                 </Editable>
 
                 {showEmptyConnectionAlert() && (
-                  <WarningTwoIcon color="#FAC300" />
+                  <OctaTooltip
+                    contentText={emptyConnectionMessage}
+                    tooltipPlacement={'auto'}
+                    popoverColor="#303243"
+                    textColor="#F4F4F5"
+                    duration={3000}
+                    element={<WarningTwoIcon color="#FAC300" />}
+                  />
                 )}
               </Flex>
 
