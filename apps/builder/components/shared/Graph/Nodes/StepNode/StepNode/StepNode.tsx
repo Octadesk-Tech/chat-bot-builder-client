@@ -50,7 +50,7 @@ import React, {
 } from 'react'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
-import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
+import { isOctaBubbleStep } from 'utils'
 import { TargetEndpoint } from '../../../Endpoints'
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint'
 import {
@@ -106,7 +106,7 @@ export const StepNode = ({
     openedStepId === step.id
   )
   const [isEditing, setIsEditing] = useState<boolean>(
-    (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
+    (isOctaBubbleStep(step)) &&
       step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
@@ -184,7 +184,7 @@ export const StepNode = ({
   const handleClick = (e: React.MouseEvent) => {
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
-    if (isTextBubbleStep(step) || isOctaBubbleStep(step)) setIsEditing(true)
+    if (isOctaBubbleStep(step)) setIsEditing(true)
     else if (!isWozSuggestionStep(step)) setIsModalOpen(true)
 
     setOpenedStepId(step.id)
@@ -222,7 +222,7 @@ export const StepNode = ({
     )
   }
 
-  return isEditing && (isTextBubbleStep(step) || isOctaBubbleStep(step)) ? (
+  return isEditing && (isOctaBubbleStep(step)) ? (
     <TextBubbleEditor
       initialValue={step.content.richText}
       onClose={handleCloseEditor}
