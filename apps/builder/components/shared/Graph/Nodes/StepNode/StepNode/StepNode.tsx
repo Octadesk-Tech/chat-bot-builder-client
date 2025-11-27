@@ -41,6 +41,7 @@ import {
 } from 'models'
 import { useRouter } from 'next/router'
 import React, { createContext, useEffect, useRef, useState } from 'react'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
 import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
@@ -154,6 +155,9 @@ export const StepNode = ({
         connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
+
+  useIframeOverlayEvent(isPopoverOpened, 'popover', step.id)
+  useIframeOverlayEvent(isModalOpen, 'modal', `step-settings-${step.id}`)
 
   const handleModalClose = () => {
     updateStep(indices, { ...step })
