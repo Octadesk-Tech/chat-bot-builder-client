@@ -16,6 +16,7 @@ import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
 import { colors } from 'libs/theme'
 import { StepType, WOZStepType } from 'models'
 import React from 'react'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 type Props = {
   isOpen: boolean
@@ -32,6 +33,9 @@ export const SettingsModal = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation()
   }
+
+  useIframeOverlayEvent(isOpen, 'modal', `settings-modal-${stepType}`)
+
   return (
     <Modal
       scrollBehavior="inside"
