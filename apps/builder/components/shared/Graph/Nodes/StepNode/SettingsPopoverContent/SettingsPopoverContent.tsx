@@ -291,8 +291,9 @@ export const StepSettings = ({
     case OctaWabaStepType.WHATSAPP_OPTIONS_LIST: {
       return (
         <WhatsAppOptionsListSettingsBody
-          options={step.options || { name: '' }}
+          options={step.options || {}}
           onOptionsChange={handleOptionsChange}
+          step={step}
         />
       )
     }
