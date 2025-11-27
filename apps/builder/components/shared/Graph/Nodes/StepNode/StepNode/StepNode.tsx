@@ -156,7 +156,6 @@ export const StepNode = ({
     )
   }, [connectingIds, step.blockId, step.id])
 
-  useIframeOverlayEvent(isPopoverOpened, 'popover', step.id)
   useIframeOverlayEvent(isModalOpen, 'modal', `step-settings-${step.id}`)
 
   const handleModalClose = () => {
