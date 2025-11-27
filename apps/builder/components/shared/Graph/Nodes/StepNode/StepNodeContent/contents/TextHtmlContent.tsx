@@ -9,6 +9,8 @@ type Props = {
   defaultPlaceholder?: string
   renderIfEmpty?: boolean
   fontSize?: string
+  fontWeight?: string
+  color?: string
 }
 
 export const TextHtmlContent = ({
@@ -16,6 +18,8 @@ export const TextHtmlContent = ({
   defaultPlaceholder,
   renderIfEmpty = true,
   fontSize,
+  fontWeight,
+  color,
 }: Props) => {
   const { typebot } = useTypebot()
   const sanitizedHtml = DOMPurify.sanitize(html, textBubbleEditorContentConfig)
@@ -35,6 +39,8 @@ export const TextHtmlContent = ({
             : `<p>${defaultPlaceholder || 'Configurar...'}</p>`,
       }}
       fontSize={fontSize}
+      fontWeight={fontWeight}
+      color={color}
     />
   )
 }

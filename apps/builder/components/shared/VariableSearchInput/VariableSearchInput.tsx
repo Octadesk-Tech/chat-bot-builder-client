@@ -64,7 +64,7 @@ export const VariableSearchInput = ({
   isApi = false,
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
-  onCreateModalOpenChange = () => {},
+  onCreateModalOpenChange = () => { },
   ...inputProps
 }: Props) => {
   const { onOpen, onClose } = useDisclosure()
@@ -102,7 +102,7 @@ export const VariableSearchInput = ({
   }
 
   const myVariable = (typebot?.variables.find((v) => {
-    return (v.id && v.id === initialVariableId) || v.token === initialVariableId
+    return (v.id && v.id === initialVariableId) || v.variableId === initialVariableId || v.token === initialVariableId
   }) ||
     (isSaveContext && !isApi && dontSave)) as Variable
 
@@ -181,6 +181,11 @@ export const VariableSearchInput = ({
   const { setIsPopoverOpened } = useContext(StepNodeContext)
 
   const onInputChange = (event: any, actionData: any): void => {
+    if (event === null) {
+      onSelectVariable({} as any)
+      return
+    }
+
     if (event) {
       if (event.key === 'no-variable') {
         onSelectVariable({} as any)
@@ -236,18 +241,18 @@ export const VariableSearchInput = ({
     onCreateModalOpenChange?.(false)
   }
 
+
   return (
     <Flex
       ref={boxRef}
-      w="full"
-      border={'1px'}
-      borderColor={'#e5e7eb'}
-      borderStyle={'solid'}
-      borderRadius={'6px'}
+      direction="column"
+      w="100%"
     >
       {screen === 'VIEWER' && (
         <Container data-screen={screen} ref={dropdownRef}>
-          {labelDefault || 'Selecione uma variável para salvar a resposta:'}
+          <Flex fontWeight="bold" fontSize="sm" mb="2">
+            {labelDefault || 'Salvar resposta em'}
+          </Flex>
           <div onWheelCapture={handleContentWheel}>
             <Select
               menuIsOpen={variablesSelectorIsOpen ? true : undefined}
@@ -262,6 +267,7 @@ export const VariableSearchInput = ({
               }
               menuPlacement="auto"
               menuPosition={menuPosition}
+              isClearable={true}
             />
           </div>
         </Container>

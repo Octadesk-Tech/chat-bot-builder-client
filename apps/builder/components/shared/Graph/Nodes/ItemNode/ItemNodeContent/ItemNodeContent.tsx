@@ -38,8 +38,6 @@ export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => 
       return (
         <WhatsAppOptionsNodeContent
           item={item}
-          isMouseOver={isMouseOver}
-          indices={indices}
         />
       )
     case ItemType.WHATSAPP_BUTTONS_LIST:
@@ -50,8 +48,8 @@ export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => 
           indices={indices}
         />
       )
-      case ItemType.CHAT_RETURN:
-        return <ChatReturnContent item={item} />
+    case ItemType.CHAT_RETURN:
+      return <ChatReturnContent item={item} />
     default:
       return <></>
   }
