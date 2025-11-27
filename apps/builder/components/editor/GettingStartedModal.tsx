@@ -21,6 +21,7 @@ import {
 } from '@chakra-ui/react'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 export const GettingStartedModal = () => {
   const { query } = useRouter()
@@ -30,6 +31,8 @@ export const GettingStartedModal = () => {
     if (query.isFirstBot) onOpen()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useIframeOverlayEvent(isOpen, 'modal', 'getting-started-modal')
 
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="xl">

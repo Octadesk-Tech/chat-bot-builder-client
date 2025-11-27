@@ -19,6 +19,7 @@ import {
 import { useEffect, useRef, useState } from 'react'
 import { createCustomDomain } from 'services/user'
 import { isEmpty } from 'utils'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 const hostnameRegex =
   /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])$/
@@ -64,6 +65,8 @@ export const CustomDomainModal = ({
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue])
+
+  useIframeOverlayEvent(isOpen, 'modal', 'custom-domain-modal')
 
   const onAddDomainClick = async () => {
     if (!hostnameRegex.test(inputValue)) return
