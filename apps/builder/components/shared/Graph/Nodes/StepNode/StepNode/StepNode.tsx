@@ -34,13 +34,20 @@ import {
   Step,
   TextBubbleContent,
   WOZAssignStep,
+  WOZSuggestionStep,
   WOZStepType,
   WebhookStep,
   WhatsAppButtonsListStep,
   WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useRef, useState } from 'react'
+import React, {
+  createContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
 import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
@@ -178,7 +185,7 @@ export const StepNode = ({
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
     if (isTextBubbleStep(step) || isOctaBubbleStep(step)) setIsEditing(true)
-    else setIsModalOpen(true)
+    else if (!isWozSuggestionStep(step)) setIsModalOpen(true)
 
     setOpenedStepId(step.id)
   }
@@ -210,7 +217,8 @@ export const StepNode = ({
       !isWhatsAppOptionsListStep(step) &&
       !isWhatsAppButtonsListStep(step) &&
       !isWozAssignStep(step) &&
-      !isChatReturn(step)
+      !isChatReturn(step) &&
+      !isWozSuggestionStep(step)
     )
   }
 
@@ -407,6 +415,10 @@ const isEndConversationStep = (
 ): step is Exclude<Step, BubbleStep> => {
   // hasStepRedirectNoneAvailable(step)
   return isOctaBubbleStep(step)
+}
+
+const isWozSuggestionStep = (step: Step): step is WOZSuggestionStep => {
+  return step.type === WOZStepType.MESSAGE
 }
 
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {

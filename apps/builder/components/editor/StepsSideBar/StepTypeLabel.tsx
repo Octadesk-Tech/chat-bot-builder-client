@@ -18,7 +18,9 @@ export const StepTypeLabel = ({ type }: Props) => {
     case BubbleStepType.TEXT:
       return <Text>Envie uma mensagem de texto</Text>
     case WOZStepType.MESSAGE:
-      return <Text>Envie uma sugestão WOZ</Text>
+      return <Text>Envie mensagem com a IA</Text>
+    case WOZStepType.INTERPRET_DATA_WITH_AI:
+      return <Text>Interpretar informações com a IA</Text>
     case WOZStepType.ASSIGN:
       return <Text>Direcione a conversa para o WOZ</Text>
     case InputStepType.TEXT:
@@ -105,7 +107,7 @@ export const StepTypeLabel = ({ type }: Props) => {
       return <Text>Reservar conversa para um grupo</Text>
     case OctaStepType.CONVERSATION_TAG:
       return <Text>Tagear conversa</Text>
-    case "start":
+    case 'start':
       return <Text>Início</Text>
     default:
       return <></>

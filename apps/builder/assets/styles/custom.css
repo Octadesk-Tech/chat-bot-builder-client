@@ -36,3 +36,43 @@
     transform: rotate(360deg);
   }
 }
+
+@layer utilities {
+  .gradient-border-woz {
+    position: relative;
+  }
+
+  .gradient-border-woz::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 1px;
+    border-radius: inherit;
+    background: linear-gradient(180deg, #1366c9 0%, #7b15c1 100%);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .scrollbar-custom {
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: gray.300;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-thumb:hover {
+      background: gray.400;
+    }
+
+    scrollbar-width: thin;
+    scrollbar-color: var(--chakra-colors-gray-300) transparent;
+  }
+}
