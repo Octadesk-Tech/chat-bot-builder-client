@@ -224,8 +224,9 @@ export const StepsSideBar = () => {
       workspace?.channel === 'whatsapp' &&
       verifyFeatureToggle('commerce-enabled')
   )
-  const wozSteps = Object.values(WOZStepType).filter((step) =>
-    shouldShowComponent(step)
+
+  const wozAssign = Object.values(WOZStepType).filter((step) =>
+    shouldShowComponent(step) && step === WOZStepType.ASSIGN
   )
 
   const wozInterpretDataWithAI = Object.values(WOZStepType).filter(
@@ -439,6 +440,22 @@ export const StepsSideBar = () => {
               </SimpleGrid>
             </Stack>
           )}
+
+          {wozAssign.length && (
+            <Stack>
+              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
+                WOZ
+              </Text>
+              <SimpleGrid columns={1} spacing="3">
+                <StepCard
+                  key={WOZStepType.ASSIGN}
+                  type={WOZStepType.ASSIGN}
+                  onMouseDown={handleMouseDown}
+                />
+              </SimpleGrid>
+            </Stack>
+          )}
+
           {inputSteps.length && (
             <Stack>
               <Text fontSize="sm" fontWeight="semibold" color="gray.600">
