@@ -9,7 +9,7 @@ import { useTypebot } from 'contexts/TypebotContext'
 import { useEffect, useState } from 'react'
 import CustomFields from 'services/octadesk/customFields/customFields'
 import { CustomFieldTypes } from 'enums/customFieldsEnum'
-import { basicOptions } from 'components/shared/Graph/Nodes/ItemNode/ItemNodeContent/contents/ConditionNodeContent'
+import { useContactStatus } from 'hooks/useContactStatus'
 
 export const ComparisonItem = ({
   item,
@@ -192,7 +192,7 @@ export const ComparisonItem = ({
     onItemChange({ ...item, secondaryValue: undefined })
   }, [needSecondaryValue])
 
-
+  const basicOptions = useContactStatus()
 
   const typeOfInputValue = () => {
     const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
