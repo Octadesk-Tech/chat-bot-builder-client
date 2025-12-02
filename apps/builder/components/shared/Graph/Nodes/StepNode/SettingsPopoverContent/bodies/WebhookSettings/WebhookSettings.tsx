@@ -74,6 +74,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
 
   const [variablesKeyDown, setVariablesKeyDown] = useState<KeyboardEvent>()
   const [accordionIndex, setAccordionIndex] = useState<number[]>([0, 1, 2, 3, 4, 5])
+
   const schema = z.object({
     url: z.string().url({ message: 'url inválida' }),
     pathPortion: z.string().min(1, { message: 'Campo obrigatório' }),
@@ -231,7 +232,6 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   const handleMethodChange = (method: HttpMethodsWebhook) => {
     if (step.options.method != method) clearOptions()
 
-    // Si se selecciona DELETE, abrir el AccordionItem de Body (índice 4)
     if (method === 'DELETE') {
       setAccordionIndex((prev) => {
         if (!prev.includes(4)) {
