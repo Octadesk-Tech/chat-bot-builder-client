@@ -20,6 +20,7 @@ import {
 import { Log } from 'model'
 import { useLogs } from 'services/typebots/logs'
 import { isDefined } from 'utils'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 type Props = {
   typebotId: string
@@ -28,8 +29,12 @@ type Props = {
 }
 export const LogsModal = ({ typebotId, resultId, onClose }: Props) => {
   const { isLoading, logs } = useLogs(typebotId, resultId)
+  const isOpen = isDefined(resultId)
+
+  useIframeOverlayEvent(isOpen, 'modal', 'logs-modal')
+
   return (
-    <Modal isOpen={isDefined(resultId)} onClose={onClose} size="xl">
+    <Modal isOpen={isOpen} onClose={onClose} size="xl">
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Logs</ModalHeader>
