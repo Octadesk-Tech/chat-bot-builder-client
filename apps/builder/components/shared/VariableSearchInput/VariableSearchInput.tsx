@@ -101,10 +101,12 @@ export const VariableSearchInput = ({
     domain: 'CHAT',
   }
 
-  const myVariable = (typebot?.variables.find((v) => {
+  const hasValidInitialId = initialVariableId && initialVariableId.trim() !== ''
+
+  const myVariable = (hasValidInitialId ? typebot?.variables.find((v) => {
     return (v.id && v.id === initialVariableId) || v.variableId === initialVariableId || v.token === initialVariableId
-  }) ||
-    (isSaveContext && !isApi && dontSave)) as Variable
+  }) : undefined) ||
+    (isSaveContext && !isApi && dontSave) as Variable
 
   const initial = {
     ACTIONS: {
