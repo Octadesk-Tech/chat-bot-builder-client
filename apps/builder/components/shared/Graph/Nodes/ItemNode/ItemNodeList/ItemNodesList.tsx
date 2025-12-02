@@ -45,12 +45,14 @@ type Props = {
   step: StepWithItems | WOZAssignStep
   indices: StepIndices
   isReadOnly?: boolean
+  hideConnection?: boolean
 }
 
 export const ItemNodesList = ({
   step,
   indices: { blockIndex, stepIndex },
   isReadOnly = false,
+  hideConnection = false,
 }: Props) => {
   const { typebot, createItem, detachItemFromStep } = useTypebot()
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
@@ -269,6 +271,7 @@ export const ItemNodesList = ({
                 indices={{ blockIndex, stepIndex, itemIndex: idx, itemsCount: step.items.length }}
                 onMouseDown={handleStepMouseDown(idx)}
                 isReadOnly={isReadOnly}
+                hideConnection={hideConnection}
               />
               {step.type !== WOZStepType.ASSIGN && (
                 <Flex

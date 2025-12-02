@@ -10,6 +10,7 @@ import {
   useOutsideClick,
   Flex,
   InputProps,
+  FormLabel,
 } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import Select from 'react-select'
@@ -31,6 +32,7 @@ type Props = {
   isSaveContext?: boolean
   isApi?: boolean
   menuPosition?: 'absolute' | 'fixed'
+  showBorder?: boolean
   variablesSelectorIsOpen?: boolean
   onCreateModalOpenChange?: (isOpen: boolean) => void
   handleOutsideClick?: () => void
@@ -64,6 +66,7 @@ export const VariableSearchInput = ({
   isApi = false,
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
+  showBorder = true,
   onCreateModalOpenChange = () => {},
   ...inputProps
 }: Props) => {
@@ -236,18 +239,28 @@ export const VariableSearchInput = ({
     onCreateModalOpenChange?.(false)
   }
 
+  const borderProps = showBorder ? {
+    border: '1px',
+    borderColor: '#e5e7eb',
+    borderStyle: 'solid',
+    borderRadius: '6px',
+  } : {}
+
   return (
     <Flex
       ref={boxRef}
       w="full"
-      border={'1px'}
-      borderColor={'#e5e7eb'}
-      borderStyle={'solid'}
-      borderRadius={'6px'}
+      {...borderProps}
     >
       {screen === 'VIEWER' && (
-        <Container data-screen={screen} ref={dropdownRef}>
-          {labelDefault || 'Selecione uma variável para salvar a resposta:'}
+        <Container
+          data-screen={screen}
+          ref={dropdownRef}
+          style={{ margin: showBorder ? '15px' : 0 }}
+        >
+          <FormLabel mb="0" htmlFor="variable">
+            {labelDefault || 'Selecione uma variável para salvar a resposta:'}
+          </FormLabel>
           <div onWheelCapture={handleContentWheel}>
             <Select
               menuIsOpen={variablesSelectorIsOpen ? true : undefined}
@@ -262,6 +275,7 @@ export const VariableSearchInput = ({
               }
               menuPlacement="auto"
               menuPosition={menuPosition}
+              id="variable"
             />
           </div>
         </Container>

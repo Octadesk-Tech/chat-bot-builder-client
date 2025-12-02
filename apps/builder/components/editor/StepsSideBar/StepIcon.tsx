@@ -4,7 +4,7 @@ import {
   AssignToIcon,
   CalendarIcon,
   CallBotIcon,
-  CheckSquareIcon,
+  CheckboxOutlineIcon,
   CodeIcon,
   CommerceIcon,
   ContactCardIcon,
@@ -70,7 +70,7 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
     case InputStepType.PHONE:
       return <PhoneIcon color="#256F42" {...props} />
     case InputStepType.CHOICE:
-      return <CheckSquareIcon color="#256F42" {...props} />
+      return <CheckboxOutlineIcon color="#256F42" {...props} />
     case InputStepType.PAYMENT:
       return <CreditCardIcon color="orange.500" {...props} />
     case InputStepType.ASK_NAME:
