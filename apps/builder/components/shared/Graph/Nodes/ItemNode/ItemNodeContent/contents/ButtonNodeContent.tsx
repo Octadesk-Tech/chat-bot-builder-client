@@ -6,7 +6,7 @@ import {
   IconButton,
   Flex,
 } from '@chakra-ui/react'
-import { PlusIcon, TrashIcon } from 'assets/icons'
+import { CloseIcon, PlusIcon, TrashIcon } from 'assets/icons'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
@@ -19,10 +19,12 @@ type Props = {
 }
 
 export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
+  const defaultPlaceholder = 'Insira o texto desta resposta...' 
+
   const { deleteItem, updateItem, createItem } = useTypebot()
   const [initialContent] = useState(item.content ?? '')
   const [itemValue, setItemValue] = useState(
-    item.content ?? 'Editar opção de resposta'
+    item.content ?? defaultPlaceholder
   )
   const editableRef = useRef<HTMLDivElement | null>(null)
 
@@ -30,7 +32,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
 
   useEffect(() => {
     if (itemValue !== item.content)
-      setItemValue(item.content ?? 'Editar opção de resposta')
+      setItemValue(item.content ?? defaultPlaceholder)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item])
 
@@ -49,7 +51,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (
       e.key === 'Escape' &&
-      itemValue === 'Editar opção de resposta' &&
+      itemValue === defaultPlaceholder &&
       hasMoreThanOneItem()
     )
       deleteItem(indices)
@@ -86,7 +88,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
         <EditablePreview
           w="full"
           color={
-            item.content !== 'Editar opção de resposta' ? 'inherit' : 'gray.500'
+            item.content !== defaultPlaceholder ? 'inherit' : 'gray.500'
           }
           cursor="pointer"
           px={4}

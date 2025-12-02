@@ -9,7 +9,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
-import { ChoiceInputOptions, TextBubbleContent, Variable } from 'models'
+import { ChoiceInputOptions, StepIndices, StepWithItems, TextBubbleContent, Variable } from 'models'
 import React from 'react'
 import { TextBubbleEditor } from '../../TextBubbleEditor'
 import { FooterMessage } from 'components/shared/buttons/UploadButton.style'
@@ -19,7 +19,9 @@ import { AssignToResponsibleSelect } from './AssignToTeam/AssignToResponsibleSel
 
 type ChoiceInputSettingsBodyProps = {
   options?: ChoiceInputOptions
+  indices: StepIndices
   onOptionsChange: (options: ChoiceInputOptions) => void
+  step: StepWithItems
 }
 
 const MAX_LENGHT_TEXT = 500
@@ -107,14 +109,12 @@ export const ChoiceInputSettingsBody = ({
         />
         )
       </Stack>
-      <FooterMessage>
-        Edite as opções que enviaremos com essa pergunta diretamente na árvore
-        ;)
-      </FooterMessage>
       <Stack>
         <VariableSearchInput
           initialVariableId={options?.variableId}
           onSelectVariable={handleVariableChange}
+          labelDefault="Salvar resposta em"
+          showBorder={false}
         />
       </Stack>
       {options?.useFallback &&
