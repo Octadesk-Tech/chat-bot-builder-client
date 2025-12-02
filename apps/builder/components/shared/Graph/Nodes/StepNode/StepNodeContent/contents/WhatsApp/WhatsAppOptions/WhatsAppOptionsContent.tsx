@@ -21,9 +21,7 @@ type Props = {
 const WhatsAppOptionsContent = ({ step, indices }: Props) => {
   const { updateStep } = useTypebot()
 
-  useEffect(() => {
-    if (!step.options) step.options = defaultWhatsAppOptionsListOptions
-  }, [step])
+  if (!step.options) step.options = defaultWhatsAppOptionsListOptions
 
   const isDefaultState = useMemo(() => {
     const hasListItems = step.options?.listItems?.some((item: any) =>
@@ -48,24 +46,24 @@ const WhatsAppOptionsContent = ({ step, indices }: Props) => {
 
   useEffect(() => {
     const listItems = step.options?.listItems
-    if (!listItems?.length) return
-
-    const hasRealContent = listItems.some((item: any) =>
-      item.label && item.label.trim() !== ''
-    )
-    if (!hasRealContent) return
-
     const currentItems = step.items || []
 
-    const needsUpdate =
-      listItems.length !== currentItems.length ||
-      listItems.some((listItem: any, idx: number) =>
-        currentItems[idx]?.content !== listItem.label
-      )
+    if (!listItems || listItems.length === 0) {
+      return
+    }
 
-    if (!needsUpdate) return
+    const validListItems = listItems.filter((item: any) =>
+      item.label && item.label.trim() !== ''
+    )
 
-    const updatedItems = listItems.map((listItem: any, index: number) => {
+    if (validListItems.length === 0) {
+      if (currentItems.length > 0) {
+        updateStep(indices, { items: [] as any })
+      }
+      return
+    }
+
+    const updatedItems = validListItems.map((listItem: any, index: number) => {
       const existingItem = currentItems.find((item: any) => item.id === listItem.id) || currentItems[index]
 
       return {
@@ -77,7 +75,15 @@ const WhatsAppOptionsContent = ({ step, indices }: Props) => {
       }
     })
 
-    updateStep(indices, { items: updatedItems as any })
+    const needsUpdate =
+      updatedItems.length !== currentItems.length ||
+      updatedItems.some((item: any, idx: number) =>
+        currentItems[idx]?.content !== item.content
+      )
+
+    if (needsUpdate) {
+      updateStep(indices, { items: updatedItems as any })
+    }
   }, [step.options?.listItems, step.items, step.id, indices, updateStep])
 
 
@@ -106,7 +112,10 @@ const WhatsAppOptionsContent = ({ step, indices }: Props) => {
       {/* Campo obrigatório listTitle */}
       <TextHtmlContent html={step?.options?.listTitle?.content?.html} color="#5A6377" />
 
-      <ItemNodesList step={step} indices={indices} />
+      {(step.options?.listItems?.some((item: any) => item.label?.trim()) ||
+        (!step.options?.listItems?.length && step.items?.some((item: any) => item.content?.trim()))) && (
+          <ItemNodesList step={step} indices={indices} />
+        )}
 
       {step?.options?.footer?.content?.plainText && step?.options?.footer?.content?.plainText.trim() !== '' && (
         <>
@@ -119,11 +128,15 @@ const WhatsAppOptionsContent = ({ step, indices }: Props) => {
           />
         </>
       )}
-      <OctaDivider />
-      <WithVariableContent
-        variableId={step?.options?.variableId}
-        property={step?.options?.property}
-      />
+      {(step?.options?.variableId?.trim() || step?.options?.property?.token?.trim()) && (
+        <>
+          <OctaDivider />
+          <WithVariableContent
+            variableId={step?.options?.variableId}
+            property={step?.options?.property}
+          />
+        </>
+      )}
     </Stack>
   )
 }

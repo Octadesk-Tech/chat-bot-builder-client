@@ -13,13 +13,13 @@ export const WithVariableContent = ({ variableId, property }: Props) => {
   const { typebot } = useTypebot()
   const { createChatField } = useWorkspace()
 
-  const [variableName, setVariableName] = useState<string>('...')
+  const [variableName, setVariableName] = useState<string>('')
 
   useEffect(() => {
     const hasValidVariableId = variableId && variableId.trim() !== ''
 
     if (!hasValidVariableId) {
-      setVariableName('...')
+      setVariableName('')
       return
     }
 
@@ -34,12 +34,16 @@ export const WithVariableContent = ({ variableId, property }: Props) => {
       } else if (variable) {
         setVariableName(variable.token)
       } else {
-        setVariableName('...')
+        setVariableName('')
       }
     } else {
-      setVariableName('...')
+      setVariableName('')
     }
   }, [typebot?.variables, variableId, property])
+
+  if (!variableName || variableName.trim() === '') {
+    return null
+  }
 
   return (
     <Flex alignItems="center" gap={2}>
