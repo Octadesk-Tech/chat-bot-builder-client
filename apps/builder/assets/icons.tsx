@@ -83,7 +83,7 @@ export const TextIcon = (props: any) => (
     value={{ color: props.color, className: 'global-class-name' }}
   >
     <div>
-      <MaterialDesign.MdOutlineChatBubble />
+      <MaterialDesign.MdChatBubbleOutline />
     </div>
   </IconContext.Provider>
 )
