@@ -102,6 +102,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
         height = 400
         break
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
+      case OctaWabaStepType.WHATSAPP_BUTTONS_LIST:
         height = 800
         break
       default:
@@ -322,8 +323,9 @@ export const StepSettings = ({
     case OctaWabaStepType.WHATSAPP_BUTTONS_LIST: {
       return (
         <WhatsAppButtonsListSettingsBody
-          options={step.options || { name: '' }}
+          options={step.options || {}}
           onOptionsChange={handleOptionsChange}
+          step={step}
         />
       )
     }

@@ -12,7 +12,7 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { WhatsAppOptionsListOptions, Variable, TextBubbleContent, WhatsAppOptionsListStep } from 'models'
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
 import { SlArrowDown, SlArrowUp } from 'react-icons/sl'
@@ -54,39 +54,11 @@ export const WhatsAppOptionsListSettingsBody = ({
     return []
   })
 
-  const initializedRef = useRef<string | null>(step?.id || null)
-
   const MAX_LENGHT_HEADER_AND_FOOTER = 60
   const MAX_LENGHT_BODY = 1024
   const MAX_LENGHT_LIST_TITLE = 20
   const MAX_LENGTH_OPTION_TEXT = 24
   const MAX_OPTIONS = 10
-
-  useEffect(() => {
-    if (initializedRef.current === step?.id) return
-    initializedRef.current = step?.id || null
-
-    if (options.listItems && options.listItems.length > 0) {
-      setLocalListItems(options.listItems)
-    } else if (step?.items && step.items.length > 0) {
-      const listItems = step.items.map((item: any) => ({
-        description: '',
-        id: item.id,
-        label: item.content || '',
-        selected: false,
-        value: item.content || '',
-      }))
-      setLocalListItems(listItems)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step?.id])
-
-  useEffect(() => {
-    if (initializedRef.current === step?.id) {
-      onOptionsChange({ ...options, listItems: localListItems })
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localListItems])
 
   const handleVariableChange = (variable?: Variable) => {
     if (!variable || (!variable.id && !variable.variableId)) {
@@ -226,7 +198,9 @@ export const WhatsAppOptionsListSettingsBody = ({
       value: '',
     }
 
-    setLocalListItems([...localListItems, newOption])
+    const updatedItems = [...localListItems, newOption]
+    setLocalListItems(updatedItems)
+    onOptionsChange({ ...options, listItems: updatedItems })
   }
 
   const handleUpdateOption = (index: number, value: string) => {
@@ -238,6 +212,7 @@ export const WhatsAppOptionsListSettingsBody = ({
     }
 
     setLocalListItems(updatedItems)
+    onOptionsChange({ ...options, listItems: updatedItems })
   }
 
   const handleRemoveOption = (index: number) => {
@@ -246,6 +221,7 @@ export const WhatsAppOptionsListSettingsBody = ({
     const updatedItems = localListItems.filter((_: any, i: number) => i !== index)
 
     setLocalListItems(updatedItems)
+    onOptionsChange({ ...options, listItems: updatedItems })
   }
 
   return (
