@@ -23,6 +23,7 @@ import { Plan } from 'model'
 import { useWorkspace } from 'contexts/WorkspaceContext'
 import { TypebotLogo } from 'assets/logos'
 import { CheckIcon } from 'assets/icons'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 export enum LimitReached {
   BRAND = 'Remove branding',
@@ -52,6 +53,8 @@ export const UpgradeModal = ({
       navigator.languages.find((l) => l.includes('fr')) ? 'eur' : 'usd'
     )
   }, [])
+
+  useIframeOverlayEvent(isOpen, 'modal', 'upgrade-modal')
 
   const handlePayClick = async () => {
     if (!user || !workspace) return
