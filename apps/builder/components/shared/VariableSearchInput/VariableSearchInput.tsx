@@ -262,7 +262,7 @@ export const VariableSearchInput = ({
     >
       {screen === 'VIEWER' && (
         <Container data-screen={screen} ref={dropdownRef}>
-          <Flex fontWeight="bold" fontSize="sm" mb="2">
+          <Flex fontWeight="bold" fontSize="xs" mb="2">
             {labelDefault || 'Salvar resposta em'}
           </Flex>
           <div onWheelCapture={handleContentWheel}>
