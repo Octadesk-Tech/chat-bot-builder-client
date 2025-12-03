@@ -16,8 +16,10 @@ import {
   OctaStepType,
   OctaWabaStepType,
   Step,
+  StepIndices,
   StepOptions,
   TextBubbleContent,
+  StepWithItems,
   TextBubbleStep,
   Webhook,
   WOZStepType,
@@ -53,6 +55,7 @@ import { TextSettingsBody } from './bodies/TextSettingsBody'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
+  indices: StepIndices
   onExpandClick: () => void
   onStepChange: (updates: Partial<Step>) => void
 }
@@ -147,9 +150,11 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
 
 export const StepSettings = ({
   step,
+  indices,
   onStepChange,
 }: {
   step: Step
+  indices: StepIndices
   webhook?: Webhook
   onStepChange: (step: Partial<Step>) => void
 }) => {
@@ -186,7 +191,9 @@ export const StepSettings = ({
     case InputStepType.CHOICE: {
       return (
         <ChoiceInputSettingsBody
+          step={step as StepWithItems}
           options={step.options}
+          indices={indices}
           onOptionsChange={handleOptionsChange}
         />
       )

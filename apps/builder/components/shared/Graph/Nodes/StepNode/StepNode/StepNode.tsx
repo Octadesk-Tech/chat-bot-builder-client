@@ -400,7 +400,7 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} onStepChange={handleStepUpdate} />
+              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
             </SettingsModal>
           </Popover>
         )}

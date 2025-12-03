@@ -10,6 +10,7 @@ import {
   useOutsideClick,
   Flex,
   InputProps,
+  FormLabel,
 } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import Select from 'react-select'
@@ -31,6 +32,7 @@ type Props = {
   isSaveContext?: boolean
   isApi?: boolean
   menuPosition?: 'absolute' | 'fixed'
+  showBorder?: boolean
   variablesSelectorIsOpen?: boolean
   onCreateModalOpenChange?: (isOpen: boolean) => void
   handleOutsideClick?: () => void
@@ -64,7 +66,8 @@ export const VariableSearchInput = ({
   isApi = false,
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
-  onCreateModalOpenChange = () => { },
+  showBorder = true,
+  onCreateModalOpenChange = () => {},
   ...inputProps
 }: Props) => {
   const { onOpen, onClose } = useDisclosure()
@@ -243,16 +246,23 @@ export const VariableSearchInput = ({
     onCreateModalOpenChange?.(false)
   }
 
+  const borderProps = showBorder ? {
+    border: '1px',
+    borderColor: '#e5e7eb',
+    borderStyle: 'solid',
+    borderRadius: '6px',
+  } : {}
 
   return (
     <Flex
       ref={boxRef}
       direction="column"
       w="100%"
+      {...borderProps}
     >
       {screen === 'VIEWER' && (
         <Container data-screen={screen} ref={dropdownRef}>
-          <Flex fontWeight="bold" fontSize="sm" mb="2">
+          <Flex fontWeight="bold" fontSize="xs" mb="2">
             {labelDefault || 'Salvar resposta em'}
           </Flex>
           <div onWheelCapture={handleContentWheel}>
@@ -269,6 +279,7 @@ export const VariableSearchInput = ({
               }
               menuPlacement="auto"
               menuPosition={menuPosition}
+              id="variable"
               isClearable={true}
             />
           </div>
