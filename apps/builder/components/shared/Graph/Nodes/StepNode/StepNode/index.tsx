@@ -1,3 +1,3 @@
-import { StepNode } from "./StepNode";
+import { StepNode, StepNodeContext } from "./StepNode";
 
-export { StepNode };
+export { StepNode, StepNodeContext };
