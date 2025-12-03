@@ -17,6 +17,7 @@ import {
   OctaWabaStepType,
   Step,
   StepOptions,
+  TextBubbleContent,
   TextBubbleStep,
   Webhook,
   WOZStepType,
@@ -46,6 +47,7 @@ import { RedirectSettings } from './bodies/RedirectSettings'
 import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
 import { ChatReturnBody } from './bodies/ChatReturnBody'
+import { TextSettingsBody } from './bodies/TextSettingsBody'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
@@ -148,7 +150,7 @@ export const StepSettings = ({
   webhook?: Webhook
   onStepChange: (step: Partial<Step>) => void
 }) => {
-  const handleContentChange = (content: MediaBubbleContent) => {
+  const handleContentChange = (content: MediaBubbleContent | TextBubbleContent) => {
     onStepChange({ content } as Partial<Step>)
   }
   const handleOptionsChange = (options: StepOptions) => {
@@ -161,6 +163,12 @@ export const StepSettings = ({
   }
 
   switch (step.type) {
+    case BubbleStepType.TEXT: {
+      return (
+        <TextSettingsBody step={step} onContentChange={handleContentChange} />
+      )
+    }
+
     case InputStepType.URL: {
       return (
         <UrlInputSettingsBody
