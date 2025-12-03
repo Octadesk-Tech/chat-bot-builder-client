@@ -5,7 +5,6 @@ import {
   Flex,
   FormLabel,
   Icon,
-  IconButton,
   Spacer,
   Stack,
   Text,
@@ -15,13 +14,11 @@ import { useTypebot } from 'contexts/TypebotContext'
 import { ChoiceInputOptions, ItemType, StepIndices, StepWithItems, TextBubbleContent, Variable } from 'models'
 import React from 'react'
 import { TextBubbleEditor } from '../../TextBubbleEditor'
-import { FooterMessage } from 'components/shared/buttons/UploadButton.style'
 import { SlArrowDown } from 'react-icons/sl'
 import { SlArrowUp } from 'react-icons/sl'
 import { AssignToResponsibleSelect } from './AssignToTeam/AssignToResponsibleSelect'
 import { ItemNodesList } from '../../../ItemNode/ItemNodeList'
 import { MdAdd } from 'react-icons/md'
-import { CloseIcon, DragVerticalIcon } from 'assets/icons'
 
 type ChoiceInputSettingsBodyProps = {
   options?: ChoiceInputOptions

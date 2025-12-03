@@ -10,7 +10,6 @@ import { PlusIcon, TrashIcon } from 'assets/icons'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
-import { isNotDefined } from 'utils'
 
 type Props = {
   item: ButtonItem
