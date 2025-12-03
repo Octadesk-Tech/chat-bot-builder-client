@@ -104,10 +104,12 @@ export const VariableSearchInput = ({
     domain: 'CHAT',
   }
 
-  const myVariable = (typebot?.variables.find((v) => {
-    return (v.id && v.id === initialVariableId) || v.token === initialVariableId
-  }) ||
-    (isSaveContext && !isApi && dontSave)) as Variable
+  const hasValidInitialId = initialVariableId && initialVariableId.trim() !== ''
+
+  const myVariable = (hasValidInitialId ? typebot?.variables.find((v) => {
+    return (v.id && v.id === initialVariableId) || v.variableId === initialVariableId || v.token === initialVariableId
+  }) : undefined) ||
+    (isSaveContext && !isApi && dontSave) as Variable
 
   const initial = {
     ACTIONS: {
@@ -184,6 +186,11 @@ export const VariableSearchInput = ({
   const { setIsPopoverOpened } = useContext(StepNodeContext)
 
   const onInputChange = (event: any, actionData: any): void => {
+    if (event === null) {
+      onSelectVariable({} as any)
+      return
+    }
+
     if (event) {
       if (event.key === 'no-variable') {
         onSelectVariable({} as any)
@@ -249,18 +256,15 @@ export const VariableSearchInput = ({
   return (
     <Flex
       ref={boxRef}
-      w="full"
+      direction="column"
+      w="100%"
       {...borderProps}
     >
       {screen === 'VIEWER' && (
-        <Container
-          data-screen={screen}
-          ref={dropdownRef}
-          style={{ margin: showBorder ? '15px' : 0 }}
-        >
-          <FormLabel mb="0" htmlFor="variable">
-            {labelDefault || 'Selecione uma variável para salvar a resposta:'}
-          </FormLabel>
+        <Container data-screen={screen} ref={dropdownRef}>
+          <Flex fontWeight="bold" fontSize="sm" mb="2">
+            {labelDefault || 'Salvar resposta em'}
+          </Flex>
           <div onWheelCapture={handleContentWheel}>
             <Select
               menuIsOpen={variablesSelectorIsOpen ? true : undefined}
@@ -276,6 +280,7 @@ export const VariableSearchInput = ({
               menuPlacement="auto"
               menuPosition={menuPosition}
               id="variable"
+              isClearable={true}
             />
           </div>
         </Container>

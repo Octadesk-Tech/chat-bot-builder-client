@@ -44,7 +44,7 @@ export const ItemNode = ({
   const isPreviewing = previewingEdge?.from.itemId === item.id
   const isConnectable = !(
     typebot?.blocks[indices.blockIndex].steps[
-      indices.stepIndex
+    indices.stepIndex
     ] as ChoiceInputStep
   )?.options?.isMultipleChoice
   const showConnection = typebot && isConnectable && !hideConnection
@@ -60,6 +60,16 @@ export const ItemNode = ({
 
   const handleMouseEnter = () => setIsMouseOver(true)
   const handleMouseLeave = () => setIsMouseOver(false)
+
+  const isWhatsAppOptionsList = item.type === ItemType.WHATSAPP_OPTIONS_LIST
+  const isWhatsAppButtonsList = item.type === ItemType.WHATSAPP_BUTTONS_LIST
+
+  const getHoverStyle = () => {
+    if (isReadOnly || isWhatsAppOptionsList || isWhatsAppButtonsList) {
+      return {}
+    }
+    return { shadow: 'md' }
+  }
 
   return (
     <ContextMenu<HTMLDivElement>
@@ -78,7 +88,7 @@ export const ItemNode = ({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             shadow="sm"
-            _hover={isReadOnly ? {} : { shadow: 'md' }}
+            _hover={getHoverStyle()}
             transition="box-shadow 200ms, border-color 200ms"
             rounded="md"
             borderWidth={isOpened || isPreviewing ? '2px' : '1px'}
