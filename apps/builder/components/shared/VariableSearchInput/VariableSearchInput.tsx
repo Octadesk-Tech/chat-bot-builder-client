@@ -10,6 +10,7 @@ import {
   useOutsideClick,
   Flex,
   InputProps,
+  FormLabel,
 } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import Select from 'react-select'
@@ -31,6 +32,7 @@ type Props = {
   isSaveContext?: boolean
   isApi?: boolean
   menuPosition?: 'absolute' | 'fixed'
+  showBorder?: boolean
   variablesSelectorIsOpen?: boolean
   onCreateModalOpenChange?: (isOpen: boolean) => void
   handleOutsideClick?: () => void
@@ -64,6 +66,7 @@ export const VariableSearchInput = ({
   isApi = false,
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
+  showBorder = true,
   onCreateModalOpenChange = () => {},
   ...inputProps
 }: Props) => {
@@ -101,10 +104,12 @@ export const VariableSearchInput = ({
     domain: 'CHAT',
   }
 
-  const myVariable = (typebot?.variables.find((v) => {
-    return (v.id && v.id === initialVariableId) || v.token === initialVariableId
-  }) ||
-    (isSaveContext && !isApi && dontSave)) as Variable
+  const hasValidInitialId = initialVariableId && initialVariableId.trim() !== ''
+
+  const myVariable = (hasValidInitialId ? typebot?.variables.find((v) => {
+    return (v.id && v.id === initialVariableId) || v.variableId === initialVariableId || v.token === initialVariableId
+  }) : undefined) ||
+    (isSaveContext && !isApi && dontSave) as Variable
 
   const initial = {
     ACTIONS: {
@@ -181,6 +186,11 @@ export const VariableSearchInput = ({
   const { setIsPopoverOpened } = useContext(StepNodeContext)
 
   const onInputChange = (event: any, actionData: any): void => {
+    if (event === null) {
+      onSelectVariable({} as any)
+      return
+    }
+
     if (event) {
       if (event.key === 'no-variable') {
         onSelectVariable({} as any)
@@ -236,18 +246,25 @@ export const VariableSearchInput = ({
     onCreateModalOpenChange?.(false)
   }
 
+  const borderProps = showBorder ? {
+    border: '1px',
+    borderColor: '#e5e7eb',
+    borderStyle: 'solid',
+    borderRadius: '6px',
+  } : {}
+
   return (
     <Flex
       ref={boxRef}
-      w="full"
-      border={'1px'}
-      borderColor={'#e5e7eb'}
-      borderStyle={'solid'}
-      borderRadius={'6px'}
+      direction="column"
+      w="100%"
+      {...borderProps}
     >
       {screen === 'VIEWER' && (
         <Container data-screen={screen} ref={dropdownRef}>
-          {labelDefault || 'Selecione uma variável para salvar a resposta:'}
+          <Flex fontWeight="bold" fontSize="xs" mb="2">
+            {labelDefault || 'Salvar resposta em'}
+          </Flex>
           <div onWheelCapture={handleContentWheel}>
             <Select
               menuIsOpen={variablesSelectorIsOpen ? true : undefined}
@@ -262,6 +279,8 @@ export const VariableSearchInput = ({
               }
               menuPlacement="auto"
               menuPosition={menuPosition}
+              id="variable"
+              isClearable={true}
             />
           </div>
         </Container>

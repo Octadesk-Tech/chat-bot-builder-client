@@ -13,9 +13,10 @@ type Props = {
     options: InputOptions
   },
   indices: StepIndices
+  isReadOnly?: boolean
 }
 
-const InputItemsContent = ({ step, indices }: Props) => {
+const InputItemsContent = ({ step, indices, isReadOnly = false }: Props) => {
   const { typebot } = useTypebot()
   return (
 
@@ -23,7 +24,7 @@ const InputItemsContent = ({ step, indices }: Props) => {
       <TextHtmlContent html={step.options.message?.html} />
 
       <OctaDivider />
-      <ItemNodesList step={step} indices={indices} />
+      <ItemNodesList step={step} indices={indices} isReadOnly={isReadOnly} />
       <WithVariableContent variableId={step.options?.variableId} property={step.options?.property} />
     </Stack>
   )
