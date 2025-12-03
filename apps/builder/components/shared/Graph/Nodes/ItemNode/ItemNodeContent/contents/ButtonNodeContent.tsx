@@ -6,7 +6,7 @@ import {
   IconButton,
   Flex,
 } from '@chakra-ui/react'
-import { CloseIcon, PlusIcon, TrashIcon } from 'assets/icons'
+import { PlusIcon, TrashIcon } from 'assets/icons'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
@@ -16,9 +16,10 @@ type Props = {
   item: ButtonItem
   indices: ItemIndices
   isMouseOver: boolean
+  withControlButtons?: boolean
 }
 
-export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
+export const ButtonNodeContent = ({ item, indices, isMouseOver, withControlButtons = false }: Props) => {
   const defaultPlaceholder = 'Insira o texto desta resposta...' 
 
   const { deleteItem, updateItem, createItem } = useTypebot()
@@ -77,7 +78,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
     <Flex justify="center" w="100%" pos="relative">
       <Editable
         ref={editableRef}
-        startWithEditView={isNotDefined(item.content)}
+        startWithEditView={false}
         value={itemValue}
         onChange={setItemValue}
         onSubmit={handleInputSubmit}
@@ -96,37 +97,39 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
         />
         <EditableInput px={4} py={2} readOnly={isReadOnly()} />
       </Editable>
-      <Fade
-        in={isMouseOver}
-        style={{
-          position: 'absolute',
-          bottom: '-15px',
-          zIndex: 3,
-          left: '90px',
-        }}
-        unmountOnExit
-      >
-        {canAddItemFn && (
-          <IconButton
-            aria-label="Add item"
-            icon={<PlusIcon />}
-            size="xs"
-            shadow="md"
-            colorScheme="gray"
-            onClick={handlePlusClick}
-          />
-        )}
-        {hasMoreThanOneItem() && !isReadOnly() && (
-          <IconButton
-            aria-label="Delete item"
-            icon={<TrashIcon />}
-            size="xs"
-            shadow="md"
-            colorScheme="gray"
-            onClick={handleDeleteClick}
-          />
-        )}
-      </Fade>
+      {withControlButtons && (
+        <Fade
+          in={isMouseOver}
+          style={{
+            position: 'absolute',
+            bottom: '-15px',
+            zIndex: 3,
+            left: '90px',
+          }}
+          unmountOnExit
+        >
+          {canAddItemFn && (
+            <IconButton
+              aria-label="Add item"
+              icon={<PlusIcon />}
+              size="xs"
+              shadow="md"
+              colorScheme="gray"
+              onClick={handlePlusClick}
+            />
+          )}
+          {hasMoreThanOneItem() && !isReadOnly() && (
+            <IconButton
+              aria-label="Delete item"
+              icon={<TrashIcon />}
+              size="xs"
+              shadow="md"
+              colorScheme="gray"
+              onClick={handleDeleteClick}
+            />
+          )}
+        </Fade>
+      )}
     </Flex>
   )
 }
