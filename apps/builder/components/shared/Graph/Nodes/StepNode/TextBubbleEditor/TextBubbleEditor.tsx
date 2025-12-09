@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react'
-import { Flex, Stack, useOutsideClick } from '@chakra-ui/react'
+import { Flex, Stack, useOutsideClick, Text } from '@chakra-ui/react'
 import {
   Plate,
   PlateEditor,
@@ -36,6 +36,7 @@ type TextBubbleEditorProps = {
   required?: boolean | { errorMsg?: string }
   menuPosition?: 'absolute' | 'fixed'
   wabaHeader?: boolean
+  placeholder?: string
 }
 
 export const TextBubbleEditor = ({
@@ -47,6 +48,7 @@ export const TextBubbleEditor = ({
   required,
   menuPosition = 'fixed',
   wabaHeader,
+  placeholder,
 }: TextBubbleEditorProps) => {
   const [value, setValue] = useState(initialValue)
   const [focus, setFocus] = useState(false)
@@ -71,7 +73,7 @@ export const TextBubbleEditor = ({
   )
   const withMaxLength = (editor: PlateEditor) => {
     editor.normalizeNode = (entry: [Node, Path]) => {
-      const [node, path] = entry
+      const [node] = entry
       const nodeText = Node.string(node)
       const currentLength = nodeText.length
       if (maxLength && currentLength > maxLength) {
@@ -173,8 +175,8 @@ export const TextBubbleEditor = ({
 
   const handleChangeEditorContent = (val: TElement[]) => {
     const clonedVal = JSON.parse(JSON.stringify(val))
-    const sanitizedVal = clonedVal.map((node) => {
-      node.children = node.children.map((child) => {
+    const sanitizedVal = clonedVal.map((node: any) => {
+      node.children = node.children.map((child: any) => {
         if (child?.text?.includes('{{') && child?.text?.includes('}}')) {
           const escapedHtml = child.text
             ?.replace(/{{/g, '&lcub;&lcub;')
@@ -198,7 +200,8 @@ export const TextBubbleEditor = ({
       })
       return node
     })
-    const plainText = sanitizedVal.map((node) => Node.string(node)).join(' ')
+
+    const plainText = sanitizedVal.map((node: TElement) => Node.string(node)).join(' ')
 
     if (maxLength && plainText.length > maxLength) {
       const truncatedText = plainText.slice(0, maxLength)
@@ -222,13 +225,7 @@ export const TextBubbleEditor = ({
   }
 
   const checkRequiredField = () => {
-    return (
-      required &&
-      value.length <= 1 &&
-      value[0]?.children.every((c) => {
-        return c?.text?.trim().length < 1
-      })
-    )
+    return (required && isEditorEmpty() && !focus)
   }
 
   const chooseBorderColor = () => {
@@ -239,6 +236,15 @@ export const TextBubbleEditor = ({
 
     return 'grey.400'
   }
+
+  const isEditorEmpty = () => {
+    return value.length <= 1 && 
+           value[0]?.children?.every((c) => {
+             const textChild = c as { text?: string }
+             return textChild?.text?.trim().length === 0
+           })
+  }
+
   return (
     <>
       <Stack
@@ -266,32 +272,46 @@ export const TextBubbleEditor = ({
           onEmojiSelected={handleEmoji}
           wabaHeader={wabaHeader}
         />
-        <Plate
-          id={randomEditorId}
-          editableProps={{
-            style: editorStyle,
-            autoFocus: true,
-            onFocus: () => {
-              if (editor.children.length === 0) return
-              selectEditor(editor, {
-                edge: 'end',
-              })
-            },
-            'aria-label': 'Text editor',
-            onBlur: () => {
-              rememberedSelection.current = editor.selection
-            },
-            onKeyDown: handleKeyDown,
-            onKeyUp: () => keyUpEditor(),
-          }}
-          initialValue={
-            initialValue.length === 0
-              ? [{ type: 'p', children: [{ text: '' }] }]
-              : initialValue
-          }
-          onChange={handleChangeEditorContent}
-          editor={withMaxLength(editor)}
-        />
+        <Flex pos="relative" flex="1">
+          <Plate
+            id={randomEditorId}
+            editableProps={{
+              style: editorStyle,
+              autoFocus: true,
+              onFocus: () => {
+                if (editor.children.length === 0) return
+                selectEditor(editor, {
+                  edge: 'end',
+                })
+              },
+              'aria-label': 'Text editor',
+              onBlur: () => {
+                rememberedSelection.current = editor.selection
+              },
+              onKeyDown: handleKeyDown,
+              onKeyUp: () => keyUpEditor(),
+            }}
+            initialValue={
+              initialValue.length === 0
+                ? [{ type: 'p', children: [{ text: '' }] }]
+                : initialValue
+            }
+            onChange={handleChangeEditorContent}
+            editor={withMaxLength(editor)}
+          />
+          {placeholder && isEditorEmpty() && !focus && (
+            <Text
+              pos="absolute"
+              top="1rem"
+              left="1rem"
+              color="gray.400"
+              pointerEvents="none"
+              userSelect="none"
+            >
+              {placeholder}
+            </Text>
+          )}
+        </Flex>
         {isVariableDropdownOpen && (
           <Flex
             pos="absolute"

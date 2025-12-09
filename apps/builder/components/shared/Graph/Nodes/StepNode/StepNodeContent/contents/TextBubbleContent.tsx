@@ -22,13 +22,13 @@ export const TextBubbleContent = ({ step }: Props) => {
     <Flex
       w="90%"
       flexDir={'column'}
-      opacity={step.content.html === '' ? '0.5' : '1'}
+      opacity={step.content.html ? '1' : '0.5'}
       className="slate-html-container"
       dangerouslySetInnerHTML={{
         __html:
-          sanitizedHtml === ''
-            ? `<p>Clique para editar...</p>`
-            : parseVariableHighlight(sanitizedHtml, typebot),
+          sanitizedHtml
+            ? parseVariableHighlight(sanitizedHtml, typebot)
+            : `<p>Clique para editar...</p>`,
       }}
     />
   )

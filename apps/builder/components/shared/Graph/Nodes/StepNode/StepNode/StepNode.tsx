@@ -41,9 +41,10 @@ import {
 } from 'models'
 import { useRouter } from 'next/router'
 import React, { createContext, useEffect, useRef, useState } from 'react'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
-import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
+import { isOctaBubbleStep } from 'utils'
 import { TargetEndpoint } from '../../../Endpoints'
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint'
 import {
@@ -100,8 +101,8 @@ export const StepNode = ({
     openedStepId === step.id
   )
   const [isEditing, setIsEditing] = useState<boolean>(
-    (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-    step.content.plainText === ''
+    (isOctaBubbleStep(step)) &&
+      step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -156,6 +157,8 @@ export const StepNode = ({
     )
   }, [connectingIds, step.blockId, step.id])
 
+  useIframeOverlayEvent(isModalOpen, 'modal', `step-settings-${step.id}`)
+
   const handleModalClose = () => {
     updateStep(indices, { ...step })
     onModalClose()
@@ -178,7 +181,7 @@ export const StepNode = ({
   const handleClick = (e: React.MouseEvent) => {
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
-    if (isTextBubbleStep(step) || isOctaBubbleStep(step)) setIsEditing(true)
+    if (isOctaBubbleStep(step)) setIsEditing(true)
     else setIsModalOpen(true)
 
     setOpenedStepId(step.id)
@@ -215,7 +218,7 @@ export const StepNode = ({
     )
   }
 
-  return isEditing && (isTextBubbleStep(step) || isOctaBubbleStep(step)) ? (
+  return isEditing && (isOctaBubbleStep(step)) ? (
     <TextBubbleEditor
       initialValue={step.content.richText}
       onClose={handleCloseEditor}
