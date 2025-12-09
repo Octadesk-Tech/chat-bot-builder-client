@@ -1,4 +1,4 @@
-import { chakra, Stack, Text } from '@chakra-ui/react'
+import { chakra, Flex, Text } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
 import { useTypebot } from 'contexts/TypebotContext'
 import { OctaProperty, Variable } from 'models'
@@ -13,38 +13,59 @@ export const WithVariableContent = ({ variableId, property }: Props) => {
   const { typebot } = useTypebot()
   const { createChatField } = useWorkspace()
 
-  const [variableName, setVariableName] = useState<string>()
+  const [variableName, setVariableName] = useState<string>('')
 
   useEffect(() => {
+    const hasValidVariableId = variableId && variableId.trim() !== ''
+
+    if (!hasValidVariableId) {
+      setVariableName('')
+      return
+    }
+
     if (typebot?.variables) {
       const variable = typebot.variables.find(
-        (variable) => variable.variableId === variableId
+        (v) => v.variableId === variableId || v.id === variableId || v.token === variableId
       )
 
-      if (!variable && property?.token) createChatField(property, variableId)
-
-      const variableName = variable?.token  || '...'
-      setVariableName(variableName)
-    }
-    return () => {
+      if (!variable && property?.token && property.token.trim() !== '') {
+        createChatField(property, variableId)
+        setVariableName(property.token)
+      } else if (variable) {
+        setVariableName(variable.token)
+      } else {
+        setVariableName('')
+      }
+    } else {
       setVariableName('')
     }
-  }, [typebot?.variables, variableId])
+  }, [typebot?.variables, variableId, property])
+
+  if (!variableName || variableName.trim() === '') {
+    return null
+  }
 
   return (
-    <Stack>
-      <Text>Salvar resposta em:</Text>
+    <Flex alignItems="center" gap={2}>
+      <Text color="#5A6377" fontWeight="medium" whiteSpace="nowrap">
+        Salvar resposta em
+      </Text>
       <chakra.span
-        w={'100%'}
-        gap={'8px'}
+        display="inline-block"
+        flex="1"
         bgColor="orange.400"
         color="white"
         rounded="md"
         py="0.5"
-        px="1"
+        px="1.5"
+        fontSize="sm"
+        fontWeight="medium"
+        overflow="hidden"
+        textOverflow="ellipsis"
+        whiteSpace="nowrap"
       >
         {variableName}
       </chakra.span>
-    </Stack>
+    </Flex>
   )
 }

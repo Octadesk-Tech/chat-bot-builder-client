@@ -334,7 +334,7 @@ export const TextBubbleEditor = ({
         )}
       </Stack>
       {checkRequiredField() && (
-        <Flex color="red.400" fontSize="sm" mt={2}>
+        <Flex color="red.400" fontSize="xs" mt={2}>
           {typeof required === 'object'
             ? required?.errorMsg
             : 'Este campo é obrigatório'}

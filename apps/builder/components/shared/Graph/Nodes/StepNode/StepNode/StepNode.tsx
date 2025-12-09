@@ -61,6 +61,7 @@ import { BlockStack } from './StepNode.style'
 
 type StepNodeContextProps = {
   setIsPopoverOpened?: (isPopoverOpened: boolean) => void
+  setIsModalOpen?: (isModalOpen: boolean) => void
 }
 
 export const StepNodeContext = createContext<StepNodeContextProps>({})
@@ -152,7 +153,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-        connectingIds?.target?.stepId === step.id
+      connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -225,7 +226,7 @@ export const StepNode = ({
       menuPosition="absolute"
     />
   ) : (
-    <StepNodeContext.Provider value={{ setIsPopoverOpened }}>
+    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
       >
@@ -396,7 +397,7 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} onStepChange={handleStepUpdate} />
+              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
             </SettingsModal>
           </Popover>
         )}

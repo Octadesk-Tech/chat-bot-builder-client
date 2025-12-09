@@ -22,6 +22,7 @@ type Props = {
   step: Step
   indices: ItemIndices
   isReadOnly: boolean
+  hideConnection?: boolean
   onMouseDown?: (
     stepNodePosition: { absolute: Coordinates; relative: Coordinates },
     item: ButtonItem
@@ -32,6 +33,7 @@ export const ItemNode = ({
   item,
   indices,
   isReadOnly,
+  hideConnection = false,
   onMouseDown,
   step,
 }: Props) => {
@@ -42,9 +44,10 @@ export const ItemNode = ({
   const isPreviewing = previewingEdge?.from.itemId === item.id
   const isConnectable = !(
     typebot?.blocks[indices.blockIndex].steps[
-      indices.stepIndex
+    indices.stepIndex
     ] as ChoiceInputStep
   )?.options?.isMultipleChoice
+  const showConnection = typebot && isConnectable && !hideConnection
   const onDrag = (position: NodePosition) => {
     if (!onMouseDown || item.type !== ItemType.BUTTON) return
     onMouseDown(position, item)
@@ -58,6 +61,16 @@ export const ItemNode = ({
   const handleMouseEnter = () => setIsMouseOver(true)
   const handleMouseLeave = () => setIsMouseOver(false)
 
+  const isWhatsAppOptionsList = item.type === ItemType.WHATSAPP_OPTIONS_LIST
+  const isWhatsAppButtonsList = item.type === ItemType.WHATSAPP_BUTTONS_LIST
+
+  const getHoverStyle = () => {
+    if (isReadOnly || isWhatsAppOptionsList || isWhatsAppButtonsList) {
+      return {}
+    }
+    return { shadow: 'md' }
+  }
+
   return (
     <ContextMenu<HTMLDivElement>
       readonly={item.readonly}
@@ -67,6 +80,7 @@ export const ItemNode = ({
         <Flex
           data-testid="item"
           pos="relative"
+          w="full"
           ref={setMultipleRefs([ref, itemRef])}
         >
           <Flex
@@ -74,7 +88,7 @@ export const ItemNode = ({
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             shadow="sm"
-            _hover={isReadOnly ? {} : { shadow: 'md' }}
+            _hover={getHoverStyle()}
             transition="box-shadow 200ms, border-color 200ms"
             rounded="md"
             borderWidth={isOpened || isPreviewing ? '2px' : '1px'}
@@ -90,7 +104,7 @@ export const ItemNode = ({
               isMouseOver={isMouseOver}
               indices={indices}
             />
-            {typebot && isConnectable && (
+            {showConnection && (
               <SourceEndpoint
                 source={{
                   blockId: typebot.blocks[indices.blockIndex].id,
