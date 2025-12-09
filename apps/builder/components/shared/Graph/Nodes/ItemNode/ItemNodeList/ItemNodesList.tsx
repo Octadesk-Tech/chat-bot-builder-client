@@ -291,18 +291,19 @@ export const ItemNodesList = ({
               width="100%"
             >
               <Flex alignItems="center">
-                {showControlButtons && (
-                  <IconButton
-                    icon={<DragVerticalIcon />}
-                    aria-label="Arrastar opções"
-                    cursor="grab"
-                    variant="ghost"
-                    colorScheme="gray"
-                    _hover={{ bg: 'transparent' }}
-                    _active={{ bg: 'transparent' }}
-                    size="md"
-                  />
-                )}
+                // TODO: Uncomment this when the drag and drop is implemented
+                //{showControlButtons && (
+                //  <IconButton
+                //    icon={<DragVerticalIcon />}
+                //    aria-label="Arrastar opções"
+                //    cursor="grab"
+                //    variant="ghost"
+                //    colorScheme="gray"
+                //    _hover={{ bg: 'transparent' }}
+                //    _active={{ bg: 'transparent' }}
+                //    size="md"
+                //  />
+                //)}
                 <Stack {...optionStyleWithControls}>
                   <ItemNode
                     item={item}
