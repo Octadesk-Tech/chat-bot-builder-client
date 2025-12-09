@@ -16,7 +16,7 @@ import { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
 import { SlArrowDown, SlArrowUp } from 'react-icons/sl'
-import { MdClose, MdDragIndicator, MdAdd } from 'react-icons/md'
+import { MdClose, MdAdd } from 'react-icons/md'
 import { AssignToResponsibleSelect } from '../../AssignToTeam/AssignToResponsibleSelect'
 import cuid from 'cuid'
 
@@ -337,16 +337,6 @@ export const WhatsAppOptionsListSettingsBody = ({
         <Stack spacing={3}>
           {(localListItems.length > 0 ? localListItems : [{ id: 'empty-1', label: '', value: '', description: '', selected: false }]).map((item: any, index: number) => (
             <Flex key={item.id} gap={2} alignItems="center">
-              {localListItems.length > 1 && (
-                <Icon
-                  as={MdDragIndicator}
-                  boxSize={5}
-                  color="#5A6377"
-                  cursor="grab"
-                  _active={{ cursor: 'grabbing' }}
-                />
-              )}
-
               <Box
                 bg="#F4F4F5"
                 p={3}
@@ -386,11 +376,12 @@ export const WhatsAppOptionsListSettingsBody = ({
             onClick={handleAddOption}
             variant="outline"
             size="md"
-            color="#1366C9"
-            borderColor="#1366C9"
+            color={localListItems.length >= MAX_OPTIONS ? 'gray.400' : '#1366C9'}
+            borderColor={localListItems.length >= MAX_OPTIONS ? 'gray.300' : '#1366C9'}
             borderWidth="2px"
             fontSize="sm"
-            _hover={{ bg: '#1366C9', color: 'white' }}
+            _hover={localListItems.length >= MAX_OPTIONS ? {} : { bg: '#1366C9', color: 'white' }}
+            _disabled={{ opacity: 1, cursor: 'not-allowed' }}
             isDisabled={localListItems.length >= MAX_OPTIONS}
           >
             Adicionar opção
