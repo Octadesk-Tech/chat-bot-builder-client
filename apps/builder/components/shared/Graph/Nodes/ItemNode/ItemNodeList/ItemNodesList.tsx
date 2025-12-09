@@ -5,6 +5,8 @@ import {
   AccordionItem,
   AccordionPanel,
   Flex,
+  Icon,
+  IconButton,
   Portal,
   Stack,
   Text,
@@ -40,19 +42,24 @@ import {
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
+import { CloseIcon, DragVerticalIcon } from 'assets/icons'
 
 type Props = {
   step: StepWithItems | WOZAssignStep
   indices: StepIndices
   isReadOnly?: boolean
+  hideConnection?: boolean
+  withControlButtons?: boolean
 }
 
 export const ItemNodesList = ({
   step,
   indices: { blockIndex, stepIndex },
   isReadOnly = false,
+  hideConnection = false,
+  withControlButtons = false,
 }: Props) => {
-  const { typebot, createItem, detachItemFromStep } = useTypebot()
+  const { typebot, createItem, detachItemFromStep, deleteItem } = useTypebot()
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
   const placeholderRefs = useRef<HTMLDivElement[]>([])
   const { graphPosition } = useGraph()
@@ -138,6 +145,10 @@ export const ItemNodesList = ({
 
   const stopPropagating = (e: React.MouseEvent) => e.stopPropagation()
 
+  const handleRemoveItemClick = (itemIndex: number) => {
+    deleteItem({ blockIndex, stepIndex, itemIndex })
+  }
+
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
       elem && (placeholderRefs.current[idx] = elem)
@@ -178,6 +189,17 @@ export const ItemNodesList = ({
       return 'Is not valid JSON'
     }
   }
+
+  const showControlButtons = withControlButtons && step.items.length > 1 && !isReadOnly
+
+  const optionStyleWithControls = withControlButtons ? {
+    borderWidth: '1px',
+    borderColor: 'gray.200',
+    borderRadius: 'md',
+    p: 4,
+    w: 'full',
+    bg: 'gray.100',
+  } : { w: 'full' }
 
 
   return (
@@ -263,14 +285,56 @@ export const ItemNodesList = ({
         step.items &&
         step.items.map((item, idx) => {
           return (
-            <Stack key={item.id} spacing={1}>
-              <ItemNode
-                item={item}
-                step={step}
-                indices={{ blockIndex, stepIndex, itemIndex: idx, itemsCount: step.items.length }}
-                onMouseDown={handleStepMouseDown(idx)}
-                isReadOnly={isReadOnly}
-              />
+            <Stack
+              key={item.id}
+              spacing={1}
+              width="100%"
+            >
+              <Flex alignItems="center">
+                // TODO: Uncomment this when the drag and drop is implemented
+                //{showControlButtons && (
+                //  <IconButton
+                //    icon={<DragVerticalIcon />}
+                //    aria-label="Arrastar opções"
+                //    cursor="grab"
+                //    variant="ghost"
+                //    colorScheme="gray"
+                //    _hover={{ bg: 'transparent' }}
+                //    _active={{ bg: 'transparent' }}
+                //    size="md"
+                //  />
+                //)}
+                <Stack {...optionStyleWithControls}>
+                  <ItemNode
+                    item={item}
+                    step={step}
+                    indices={{
+                      blockIndex,
+                      stepIndex,
+                      itemIndex: idx,
+                      itemsCount: step.items.length,
+                    }}
+                    onMouseDown={handleStepMouseDown(idx)}
+                    isReadOnly={isReadOnly}
+                    hideConnection={hideConnection}
+                  />
+                </Stack>
+                {showControlButtons && (
+                  <IconButton
+                    aria-label="Delete item"
+                    icon={<Icon as={CloseIcon} boxSize={5} />}
+                    onClick={() => handleRemoveItemClick(idx)}
+                    variant="outline"
+                    colorScheme="gray"
+                    color="gray.500"
+                    _hover={{ bg: 'transparent' }}
+                    _active={{ bg: 'transparent' }}
+                    fontSize="xs"
+                    size="sm"
+                    borderWidth="0"
+                  />
+                )}
+              </Flex>
               {step.type !== WOZStepType.ASSIGN && (
                 <Flex
                   ref={handlePushElementRef(idx + 1)}

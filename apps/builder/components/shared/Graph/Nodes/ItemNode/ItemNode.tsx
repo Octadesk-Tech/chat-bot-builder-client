@@ -22,6 +22,7 @@ type Props = {
   step: Step
   indices: ItemIndices
   isReadOnly: boolean
+  hideConnection?: boolean
   onMouseDown?: (
     stepNodePosition: { absolute: Coordinates; relative: Coordinates },
     item: ButtonItem
@@ -32,6 +33,7 @@ export const ItemNode = ({
   item,
   indices,
   isReadOnly,
+  hideConnection = false,
   onMouseDown,
   step,
 }: Props) => {
@@ -45,6 +47,7 @@ export const ItemNode = ({
     indices.stepIndex
     ] as ChoiceInputStep
   )?.options?.isMultipleChoice
+  const showConnection = typebot && isConnectable && !hideConnection
   const onDrag = (position: NodePosition) => {
     if (!onMouseDown || item.type !== ItemType.BUTTON) return
     onMouseDown(position, item)
@@ -77,6 +80,7 @@ export const ItemNode = ({
         <Flex
           data-testid="item"
           pos="relative"
+          w="full"
           ref={setMultipleRefs([ref, itemRef])}
         >
           <Flex
@@ -100,7 +104,7 @@ export const ItemNode = ({
               isMouseOver={isMouseOver}
               indices={indices}
             />
-            {typebot && isConnectable && (
+            {showConnection && (
               <SourceEndpoint
                 source={{
                   blockId: typebot.blocks[indices.blockIndex].id,
