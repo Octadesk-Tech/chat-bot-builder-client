@@ -1,9 +1,8 @@
-import React, { useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Flex, Stack, useOutsideClick, Text } from '@chakra-ui/react'
 import {
   Plate,
   PlateEditor,
-  selectEditor,
   serializeHtml,
   TEditor,
   TElement,
@@ -16,7 +15,6 @@ import {
   BaseSelection,
   createEditor,
   Node,
-  Path,
   Transforms,
 } from 'slate'
 import { ReactEditor } from 'slate-react'
@@ -50,7 +48,7 @@ export const TextBubbleEditor = ({
   wabaHeader,
   placeholder,
 }: TextBubbleEditorProps) => {
-  const [value, setValue] = useState(initialValue)
+  const initialValueRef = useRef(initialValue)
   const [focus, setFocus] = useState(false)
 
   const [isVariableDropdownOpen, setIsVariableDropdownOpen] = useState(false)
@@ -58,78 +56,46 @@ export const TextBubbleEditor = ({
   const rememberedSelection = useRef<BaseSelection | null>(null)
   const textEditorRef = useRef<HTMLDivElement>(null)
 
-  const randomEditorId = useMemo(
-    () => `${Math.random().toString()}${increment ? `-${increment}` : ''}`,
-    [increment]
-  )
+  const currentValueRef = useRef<TElement[]>(initialValueRef.current)
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
 
-  const editor = useMemo(
-    () =>
-      withPlate(createEditor() as TEditor<Value>, {
-        id: randomEditorId,
-        plugins: wabaHeader ? platePluginsWithoutBold : platePlugins,
-      }) as PlateEditor,
-    [randomEditorId, wabaHeader]
-  )
-  const withMaxLength = (editor: PlateEditor) => {
-    editor.normalizeNode = (entry: [Node, Path]) => {
-      const [node] = entry
-      const nodeText = Node.string(node)
-      const currentLength = nodeText.length
-      if (maxLength && currentLength > maxLength) {
-        const lengthUntilBeforeTheLastNode = editor.children.reduce(
-          (acc, curr, i) => {
-            if (i === editor.children.length - 1) return acc
-            return acc + Node.string(curr).length
-          },
-          0
-        )
-        const lastNode = editor.children[editor.children.length - 1]
+  const editorId = useRef(
+    `text-bubble-editor-${increment ?? ''}-${Date.now()}`
+  ).current
 
-        const newNodes = [
-          {
-            type: 'p',
-            children: [
-              {
-                text: Node.string(lastNode).slice(
-                  0,
-                  maxLength - lengthUntilBeforeTheLastNode
-                ),
-              },
-            ],
-          },
-        ]
-        Transforms.removeNodes(editor as BaseEditor, {
-          match: (n) => n === lastNode,
-        })
-        Transforms.insertNodes(editor as BaseEditor, newNodes)
+  const editor = useMemo(() => {
+    const plateEditor = withPlate(createEditor() as TEditor<Value>, {
+      id: editorId,
+      plugins: wabaHeader ? platePluginsWithoutBold : platePlugins,
+    }) as PlateEditor
 
-        return
-      }
-      if (wabaHeader) {
-        const lastNode = editor.children[editor.children.length - 1]
-        lastNode.children = [
-          {
-            text: lastNode.children
-              .map((children) => {
-                return children.text
-              })
-              .join(''),
-          },
-        ]
-      }
-    }
-    return editor
-  }
+    return plateEditor
+  }, [editorId, wabaHeader])
   const closeEditor = () => {
-    if (onClose) onClose(convertValueToStepContent(value))
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    const sanitizedVal = currentValueRef.current.map((node: TElement) => {
+      const sanitizedChildren = node.children?.map((child: any) => {
+        if (child?.text) {
+          return { ...child, text: sanitizeText(child.text) }
+        }
+        return child
+      })
+      return { ...node, children: sanitizedChildren }
+    })
+
+    if (onClose) onClose(convertValueToStepContent(sanitizedVal))
   }
 
-  const keyUpEditor = (v?: TElement[]) => {
-    if (onKeyUp) {
-      onKeyUp(convertValueToStepContent(v || value))
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current)
+      }
     }
-  }
+  }, [])
 
   useOutsideClick({
     ref: textEditorRef,
@@ -173,51 +139,52 @@ export const TextBubbleEditor = ({
     ReactEditor.focus(editor as unknown as ReactEditor)
   }
 
-  const handleChangeEditorContent = (val: TElement[]) => {
-    const clonedVal = JSON.parse(JSON.stringify(val))
-    const sanitizedVal = clonedVal.map((node: any) => {
-      node.children = node.children.map((child: any) => {
-        if (child?.text?.includes('{{') && child?.text?.includes('}}')) {
-          const escapedHtml = child.text
-            ?.replace(/{{/g, '&lcub;&lcub;')
-            ?.replace(/}}/g, '&rcub;&rcub;')
+  const sanitizeText = useCallback((text: string): string => {
+    if (!text) return text
 
-          const clean = DOMPurify.sanitize(escapedHtml, textBubbleEditorConfig)
+    const hasVariables = text.includes('{{') && text.includes('}}')
+    let processedText = text
 
-          const sanitizedText = clean
-            ?.replace(/&lcub;&lcub;/g, '{{')
-            ?.replace(/&rcub;&rcub;/g, '}}')
-
-          return { ...child, text: sanitizedText ?? '' }
-        }
-
-        if (child?.text) {
-          const clean = DOMPurify.sanitize(child.text, textBubbleEditorConfig)
-          return { ...child, text: clean ?? '' }
-        }
-
-        return { ...child }
-      })
-      return node
-    })
-
-    const plainText = sanitizedVal.map((node: TElement) => Node.string(node)).join(' ')
-
-    if (maxLength && plainText.length > maxLength) {
-      const truncatedText = plainText.slice(0, maxLength)
-      const newValue = [{ type: 'p', children: [{ text: truncatedText }] }]
-      setValue(newValue)
-      return
+    if (hasVariables) {
+      processedText = text
+        .replace(/{{/g, '&lcub;&lcub;')
+        .replace(/}}/g, '&rcub;&rcub;')
     }
 
-    const timeout = setTimeout(() => {
-      if (timeout) clearTimeout(timeout)
-      setValue(sanitizedVal)
-      keyUpEditor(sanitizedVal)
-    }, 250)
+    const clean = DOMPurify.sanitize(processedText, textBubbleEditorConfig)
 
-    setIsVariableDropdownOpen(false)
-  }
+    if (hasVariables) {
+      return clean
+        .replace(/&lcub;&lcub;/g, '{{')
+        .replace(/&rcub;&rcub;/g, '}}')
+    }
+
+    return clean
+  }, [])
+
+  const handleChangeEditorContent = useCallback((val: TElement[]) => {
+    currentValueRef.current = val
+    if (maxLength) {
+      const plainText = val.map((node: TElement) => Node.string(node)).join('')
+      if (plainText.length > maxLength) {
+        return
+      }
+    }
+
+    if (isVariableDropdownOpen) {
+      setIsVariableDropdownOpen(false)
+    }
+
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current)
+    }
+
+    debounceTimerRef.current = setTimeout(() => {
+      if (onKeyUp) {
+        onKeyUp(convertValueToStepContent(currentValueRef.current))
+      }
+    }, 500)
+  }, [maxLength, isVariableDropdownOpen, onKeyUp])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.shiftKey) return
@@ -238,11 +205,11 @@ export const TextBubbleEditor = ({
   }
 
   const isEditorEmpty = () => {
-    return value.length <= 1 && 
-           value[0]?.children?.every((c) => {
-             const textChild = c as { text?: string }
-             return textChild?.text?.trim().length === 0
-           })
+    const currentVal = currentValueRef.current
+    return currentVal.length <= 1 &&
+      currentVal[0]?.children?.every((c: { text?: string }) => {
+        return c?.text?.trim().length === 0
+      })
   }
 
   return (
@@ -272,24 +239,17 @@ export const TextBubbleEditor = ({
           onEmojiSelected={handleEmoji}
           wabaHeader={wabaHeader}
         />
-        <Flex pos="relative" flex="1">
+        <Flex pos="relative" flex="1" overflow="hidden" w="100%">
           <Plate
-            id={randomEditorId}
+            id={editorId}
             editableProps={{
               style: editorStyle,
               autoFocus: true,
-              onFocus: () => {
-                if (editor.children.length === 0) return
-                selectEditor(editor, {
-                  edge: 'end',
-                })
-              },
               'aria-label': 'Text editor',
               onBlur: () => {
                 rememberedSelection.current = editor.selection
               },
               onKeyDown: handleKeyDown,
-              onKeyUp: () => keyUpEditor(),
             }}
             initialValue={
               initialValue.length === 0
@@ -297,7 +257,7 @@ export const TextBubbleEditor = ({
                 : initialValue
             }
             onChange={handleChangeEditorContent}
-            editor={withMaxLength(editor)}
+            editor={editor}
           />
           {placeholder && isEditorEmpty() && !focus && (
             <Text
