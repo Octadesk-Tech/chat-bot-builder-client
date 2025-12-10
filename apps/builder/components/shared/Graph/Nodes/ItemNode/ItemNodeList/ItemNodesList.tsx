@@ -151,9 +151,9 @@ export const ItemNodesList = ({
 
   const chatReturn = {
     time: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.time,
-    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue 
+    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue
       === TimeTypeValue.HOUR ? 'horas' : 'minutos',
-    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError 
+    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError
   }
 
   const getWebhookDetails = () => {
@@ -187,6 +187,7 @@ export const ItemNodesList = ({
       maxW="full"
       onClick={stopPropagating}
       pointerEvents={isReadOnly ? 'none' : 'all'}
+      color="#5A6377"
     >
       {step.type === OctaStepType.OFFICE_HOURS && (
         <Stack paddingBottom={'10px'}>
@@ -247,14 +248,14 @@ export const ItemNodesList = ({
       )}
       {step.type === LogicStepType.CHAT_RETURN && (
         <ChatReturnContainer>
-          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ? 
-          (
-            <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
-          )
-          :
-          (
-            <Text noOfLines={0}>{'Configurar...'}</Text>
-          )
+          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ?
+            (
+              <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
+            )
+            :
+            (
+              <Text noOfLines={0}>{'Configurar...'}</Text>
+            )
           }
         </ChatReturnContainer>
       )}

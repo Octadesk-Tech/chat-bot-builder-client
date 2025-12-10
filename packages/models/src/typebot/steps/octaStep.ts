@@ -338,6 +338,7 @@ export type WhatsAppButtonsListOptions = BaseOctaOptions & {
   footer: {
     content?: TextBubbleContent
   }
+  buttonItems?: Array<{ id: string; text: string }>
   useFallback: boolean
   fallbackMessages: Array<TextBubbleContent>
   property: OctaProperty
@@ -451,20 +452,20 @@ export const defaultCallOtherBotOptions: CallOtherBotOptions = {
 
 const seeYa = 'Até mais!'
 export const defaultEndConversationBubbleContent: EndConversationBubbleContent =
-  {
-    html: `<div style="margin-left: 8px;">${seeYa}</div>`,
-    richText: [
-      {
-        children: [
-          {
-            text: seeYa,
-          },
-        ],
-        type: 'p',
-      },
-    ],
-    plainText: seeYa,
-  }
+{
+  html: `<div style="margin-left: 8px;">${seeYa}</div>`,
+  richText: [
+    {
+      children: [
+        {
+          text: seeYa,
+        },
+      ],
+      type: 'p',
+    },
+  ],
+  plainText: seeYa,
+}
 
 export const defaultCommerceOptions: CommerceOptions = {
   catalogId: '',
