@@ -44,7 +44,7 @@ import React, { createContext, useEffect, useRef, useState } from 'react'
 import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
-import { isOctaBubbleStep } from 'utils'
+import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
 import { TargetEndpoint } from '../../../Endpoints'
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint'
 import {
@@ -61,6 +61,7 @@ import { BlockStack } from './StepNode.style'
 
 type StepNodeContextProps = {
   setIsPopoverOpened?: (isPopoverOpened: boolean) => void
+  setIsModalOpen?: (isModalOpen: boolean) => void
 }
 
 export const StepNodeContext = createContext<StepNodeContextProps>({})
@@ -100,8 +101,8 @@ export const StepNode = ({
     openedStepId === step.id
   )
   const [isEditing, setIsEditing] = useState<boolean>(
-    (isOctaBubbleStep(step)) &&
-      step.content.plainText === ''
+    (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
+    step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -152,7 +153,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-        connectingIds?.target?.stepId === step.id
+      connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -225,7 +226,7 @@ export const StepNode = ({
       menuPosition="absolute"
     />
   ) : (
-    <StepNodeContext.Provider value={{ setIsPopoverOpened }}>
+    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
       >
