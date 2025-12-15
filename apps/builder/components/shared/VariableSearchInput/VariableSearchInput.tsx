@@ -67,7 +67,7 @@ export const VariableSearchInput = ({
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
   showBorder = true,
-  onCreateModalOpenChange = () => {},
+  onCreateModalOpenChange = () => { },
   ...inputProps
 }: Props) => {
   const { onOpen, onClose } = useDisclosure()
