@@ -44,7 +44,7 @@ import React, { createContext, useEffect, useRef, useState } from 'react'
 import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
-import { isOctaBubbleStep } from 'utils'
+import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
 import { TargetEndpoint } from '../../../Endpoints'
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint'
 import {
@@ -101,8 +101,8 @@ export const StepNode = ({
     openedStepId === step.id
   )
   const [isEditing, setIsEditing] = useState<boolean>(
-    (isOctaBubbleStep(step)) &&
-      step.content.plainText === ''
+    (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
+    step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 

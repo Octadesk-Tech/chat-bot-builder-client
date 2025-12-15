@@ -291,8 +291,8 @@ export const ItemNodesList = ({
               width="100%"
             >
               <Flex alignItems="center">
-                // TODO: Uncomment this when the drag and drop is implemented
-                //{showControlButtons && (
+                {/* TODO: Uncomment this when the drag and drop is implemented */}
+                {/*{showControlButtons && (
                 //  <IconButton
                 //    icon={<DragVerticalIcon />}
                 //    aria-label="Arrastar opções"
@@ -303,7 +303,7 @@ export const ItemNodesList = ({
                 //    _active={{ bg: 'transparent' }}
                 //    size="md"
                 //  />
-                //)}
+                */}
                 <Stack {...optionStyleWithControls}>
                   <ItemNode
                     item={item}
