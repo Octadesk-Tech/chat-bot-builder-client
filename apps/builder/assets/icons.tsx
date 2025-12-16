@@ -42,13 +42,6 @@ export const PlusIcon = (props: IconProps) => (
   </Icon>
 )
 
-export const CloseIcon = (props: IconProps) => (
-  <Icon viewBox="0 0 24 24" {...featherIconsBaseProps} {...props}>
-    <line x1="18" y1="6" x2="6" y2="18"></line>
-    <line x1="6" y1="6" x2="18" y2="18"></line>
-  </Icon>
-)
-
 export const FolderIcon = (props: IconProps) => (
   <Icon viewBox="0 0 24 24" {...featherIconsBaseProps} {...props}>
     <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
@@ -517,16 +510,6 @@ export const CheckSquareIcon = (props: any) => (
   </IconContext.Provider>
 )
 
-export const CheckboxOutlineIcon = (props: any) => (
-  <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name' }}
-  >
-    <div>
-      <MaterialDesign.MdOutlineCheckBox />
-    </div>
-  </IconContext.Provider>
-)
-
 export const WavingHandIcon = (props: any) => (
   <IconContext.Provider
     value={{ color: props.color, className: 'global-class-name' }}
@@ -654,16 +637,6 @@ export const GripIcon = (props: IconProps) => (
     <circle cx="19" cy="15" r="1"></circle>
     <circle cx="5" cy="15" r="1"></circle>
   </Icon>
-)
-
-export const DragVerticalIcon = (props: any) => (
-  <IconContext.Provider
-    value={{ color: props.color, className: 'global-class-name' }}
-  >
-    <div>
-      <MaterialDesign.MdOutlineDragIndicator />
-    </div>
-  </IconContext.Provider>
 )
 
 export const LockedIcon = (props: IconProps) => (

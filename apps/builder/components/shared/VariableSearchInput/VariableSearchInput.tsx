@@ -10,7 +10,6 @@ import {
   useOutsideClick,
   Flex,
   InputProps,
-  FormLabel,
 } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import Select from 'react-select'
@@ -67,7 +66,7 @@ export const VariableSearchInput = ({
   variablesSelectorIsOpen = false,
   menuPosition = 'fixed',
   showBorder = true,
-  onCreateModalOpenChange = () => { },
+  onCreateModalOpenChange = () => {},
   ...inputProps
 }: Props) => {
   const { onOpen, onClose } = useDisclosure()
