@@ -42,7 +42,7 @@ import {
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
-import { CloseIcon, DragVerticalIcon } from 'assets/icons'
+import { MdClose } from 'react-icons/md'
 
 type Props = {
   step: StepWithItems | WOZAssignStep
@@ -291,18 +291,6 @@ export const ItemNodesList = ({
               width="100%"
             >
               <Flex alignItems="center">
-                {showControlButtons && (
-                  <IconButton
-                    icon={<DragVerticalIcon />}
-                    aria-label="Arrastar opções"
-                    cursor="grab"
-                    variant="ghost"
-                    colorScheme="gray"
-                    _hover={{ bg: 'transparent' }}
-                    _active={{ bg: 'transparent' }}
-                    size="md"
-                  />
-                )}
                 <Stack {...optionStyleWithControls}>
                   <ItemNode
                     item={item}
@@ -321,7 +309,7 @@ export const ItemNodesList = ({
                 {showControlButtons && (
                   <IconButton
                     aria-label="Delete item"
-                    icon={<Icon as={CloseIcon} boxSize={5} />}
+                    icon={<Icon as={MdClose} boxSize={5} />}
                     onClick={() => handleRemoveItemClick(idx)}
                     variant="outline"
                     colorScheme="gray"
