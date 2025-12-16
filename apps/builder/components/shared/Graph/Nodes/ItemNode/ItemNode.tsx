@@ -64,11 +64,20 @@ export const ItemNode = ({
   const isWhatsAppOptionsList = item.type === ItemType.WHATSAPP_OPTIONS_LIST
   const isWhatsAppButtonsList = item.type === ItemType.WHATSAPP_BUTTONS_LIST
 
+  const isItemReadOnly = !!item.readonly
+
   const getHoverStyle = () => {
-    if (isReadOnly || isWhatsAppOptionsList || isWhatsAppButtonsList) {
+    if (isReadOnly || isWhatsAppOptionsList || isWhatsAppButtonsList || isItemReadOnly) {
       return {}
     }
     return { shadow: 'md' }
+  }
+
+  const getShadowStyle = () => {
+    if (isItemReadOnly) {
+      return 'none'
+    }
+    return 'sm'
   }
 
   return (
@@ -87,7 +96,7 @@ export const ItemNode = ({
             align="center"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            shadow="sm"
+            shadow={getShadowStyle()}
             _hover={getHoverStyle()}
             transition="box-shadow 200ms, border-color 200ms"
             rounded="md"

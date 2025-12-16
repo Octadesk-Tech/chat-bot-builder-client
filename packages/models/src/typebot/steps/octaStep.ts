@@ -274,6 +274,11 @@ export type WOZSuggestionOptions = BaseOctaOptions & {
 export type WOZAssignOptions = BaseOctaOptions & {
   virtualAgentId?: string
   limitAnswerNoContent: number
+  customContexts?: Array<{
+    id: string
+    label: string
+    readonly?: boolean
+  }>
 }
 
 export type WOZInterpretDataWithAIOptions = {
