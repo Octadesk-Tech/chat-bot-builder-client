@@ -5,12 +5,15 @@ import {
   Fade,
   IconButton,
   Flex,
+  Text,
 } from '@chakra-ui/react'
 import { PlusIcon, TrashIcon } from 'assets/icons'
+import { useGraph } from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { isNotDefined } from 'utils'
+import { StepNodeContext } from '../../../StepNode/StepNode/StepNode'
 
 type Props = {
   item: ButtonItem
@@ -19,7 +22,9 @@ type Props = {
 }
 
 export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
-  const { deleteItem, updateItem, createItem } = useTypebot()
+  const { deleteItem, updateItem, createItem, typebot } = useTypebot()
+  const { setOpenedStepId, setFocusedBlockId } = useGraph()
+  const { setIsModalOpen } = useContext(StepNodeContext)
   const [initialContent] = useState(item.content ?? '')
   const [itemValue, setItemValue] = useState(
     item.content ?? 'Editar opção de resposta'
@@ -71,6 +76,36 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
 
   const canAddItemFn = canAddItem && item.content !== 'Encerrar a conversa'
 
+  const handleReadOnlyClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (item.stepId && typebot) {
+      const blockId = typebot.blocks[indices.blockIndex]?.id
+      if (blockId) {
+        setFocusedBlockId(blockId)
+      }
+      setIsModalOpen?.(true)
+      setOpenedStepId(item.stepId)
+    }
+  }
+
+  if (isReadOnly()) {
+    return (
+      <Flex justify="center" w="100%" pos="relative">
+        <Text
+          w="full"
+          px={4}
+          py={2}
+          color="inherit"
+          cursor="pointer"
+          userSelect="none"
+          onClick={(e) => handleReadOnlyClick(e)}
+        >
+          {item.content}
+        </Text>
+      </Flex>
+    )
+  }
+
   return (
     <Flex justify="center" w="100%" pos="relative">
       <Editable
@@ -92,7 +127,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
           px={4}
           py={2}
         />
-        <EditableInput px={4} py={2} readOnly={isReadOnly()} />
+        <EditableInput px={4} py={2} />
       </Editable>
       <Fade
         in={isMouseOver}
@@ -109,17 +144,15 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
             aria-label="Add item"
             icon={<PlusIcon />}
             size="xs"
-            shadow="md"
             colorScheme="gray"
             onClick={handlePlusClick}
           />
         )}
-        {hasMoreThanOneItem() && !isReadOnly() && (
+        {canAddItem && hasMoreThanOneItem() && (
           <IconButton
             aria-label="Delete item"
             icon={<TrashIcon />}
             size="xs"
-            shadow="md"
             colorScheme="gray"
             onClick={handleDeleteClick}
           />
