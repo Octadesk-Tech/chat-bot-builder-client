@@ -2,7 +2,7 @@
  * Model Account
  *
  */
-export declare type Account = {
+export type Account = {
     id: string;
     userId: string;
     type: string;
@@ -23,7 +23,7 @@ export declare type Account = {
  * Model Session
  *
  */
-export declare type Session = {
+export type Session = {
     id: string;
     sessionToken: string;
     userId: string;
@@ -33,7 +33,7 @@ export declare type Session = {
  * Model User
  *
  */
-export declare type User = {
+export type User = {
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -51,7 +51,7 @@ export declare type User = {
  * Model Workspace
  *
  */
-export declare type Workspace = {
+export type Workspace = {
     id: string;
     name: string;
     icon: string | null;
@@ -63,7 +63,7 @@ export declare type Workspace = {
  * Model MemberInWorkspace
  *
  */
-export declare type MemberInWorkspace = {
+export type MemberInWorkspace = {
     userId: string;
     workspaceId: string;
     role: WorkspaceRole;
@@ -72,7 +72,7 @@ export declare type MemberInWorkspace = {
  * Model WorkspaceInvitation
  *
  */
-export declare type WorkspaceInvitation = {
+export type WorkspaceInvitation = {
     id: string;
     createdAt: Date;
     email: string;
@@ -83,7 +83,7 @@ export declare type WorkspaceInvitation = {
  * Model CustomDomain
  *
  */
-export declare type CustomDomain = {
+export type CustomDomain = {
     name: string;
     createdAt: Date;
     workspaceId: string | null;
@@ -92,7 +92,7 @@ export declare type CustomDomain = {
  * Model Credentials
  *
  */
-export declare type Credentials = {
+export type Credentials = {
     id: string;
     createdAt: Date;
     workspaceId: string | null;
@@ -105,7 +105,7 @@ export declare type Credentials = {
  * Model VerificationToken
  *
  */
-export declare type VerificationToken = {
+export type VerificationToken = {
     identifier: string;
     token: string;
     expires: Date;
@@ -114,7 +114,7 @@ export declare type VerificationToken = {
  * Model DashboardFolder
  *
  */
-export declare type DashboardFolder = {
+export type DashboardFolder = {
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -126,7 +126,7 @@ export declare type DashboardFolder = {
  * Model Typebot
  *
  */
-export declare type Typebot = {
+export type Typebot = {
     id: string;
     createdAt: Date;
     createdBy: string;
@@ -154,7 +154,7 @@ export declare type Typebot = {
  * Model Invitation
  *
  */
-export declare type Invitation = {
+export type Invitation = {
     createdAt: Date;
     email: string;
     typebotId: string;
@@ -164,7 +164,7 @@ export declare type Invitation = {
  * Model CollaboratorsOnTypebots
  *
  */
-export declare type CollaboratorsOnTypebots = {
+export type CollaboratorsOnTypebots = {
     userId: string;
     typebotId: string;
     type: CollaborationType;
@@ -173,7 +173,7 @@ export declare type CollaboratorsOnTypebots = {
  * Model PublicTypebot
  *
  */
-export declare type PublicTypebot = {
+export type PublicTypebot = {
     id: string;
     createdAt: Date;
     createdBy: string;
@@ -195,7 +195,7 @@ export declare type PublicTypebot = {
  * Model Result
  *
  */
-export declare type Result = {
+export type Result = {
     id: string;
     createdAt: Date;
     updatedAt: Date;
@@ -207,7 +207,7 @@ export declare type Result = {
  * Model Log
  *
  */
-export declare type Log = {
+export type Log = {
     id: string;
     createdAt: Date;
     resultId: string;
@@ -219,7 +219,7 @@ export declare type Log = {
  * Model Answer
  *
  */
-export declare type Answer = {
+export type Answer = {
     createdAt: Date;
     resultId: string;
     stepId: string;
@@ -231,7 +231,7 @@ export declare type Answer = {
  * Model Coupon
  *
  */
-export declare type Coupon = {
+export type Coupon = {
     userPropertiesToUpdate: {};
     code: string;
     dateRedeemed: Date | null;
@@ -240,7 +240,7 @@ export declare type Coupon = {
  * Model Webhook
  *
  */
-export declare type Webhook = {
+export type Webhook = {
     id: string;
     url: string | null;
     method: string;
@@ -256,7 +256,7 @@ export declare const GraphNavigation: {
     MOUSE: string;
     TRACKPAD: string;
 };
-export declare type GraphNavigation = (typeof GraphNavigation)[keyof typeof GraphNavigation];
+export type GraphNavigation = (typeof GraphNavigation)[keyof typeof GraphNavigation];
 export declare const Plan: {
     FREE: string;
     PRO: string;
@@ -264,16 +264,16 @@ export declare const Plan: {
     LIFETIME: string;
     OFFERED: string;
 };
-export declare type Plan = (typeof Plan)[keyof typeof Plan];
+export type Plan = (typeof Plan)[keyof typeof Plan];
 export declare const WorkspaceRole: {
     ADMIN: string;
     MEMBER: string;
     GUEST: string;
 };
-export declare type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole];
+export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole];
 export declare const CollaborationType: {
     READ: string;
     WRITE: string;
     FULL_ACCESS: string;
 };
-export declare type CollaborationType = (typeof CollaborationType)[keyof typeof CollaborationType];
+export type CollaborationType = (typeof CollaborationType)[keyof typeof CollaborationType];

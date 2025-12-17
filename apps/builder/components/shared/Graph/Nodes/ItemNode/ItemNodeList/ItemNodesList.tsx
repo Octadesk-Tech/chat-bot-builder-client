@@ -82,7 +82,7 @@ export const ItemNodesList = ({
       y: clientY - relativeCoordinates.y,
     })
   }
-  useEventListener('mousemove', handleGlobalMouseMove)
+  useEventListener(window, 'mousemove', handleGlobalMouseMove)
 
   useEffect(() => {
     if (mouseOverBlock?.id !== step.blockId)
@@ -96,9 +96,9 @@ export const ItemNodesList = ({
     setExpandedPlaceholderIndex(index)
   }
   useEventListener(
+    () => mouseOverBlock?.ref.current ?? null,
     'mousemove',
-    handleMouseMoveOnBlock,
-    mouseOverBlock?.ref.current
+    handleMouseMoveOnBlock
   )
 
   const handleMouseUpOnBlock = (e: MouseEvent) => {
@@ -114,9 +114,9 @@ export const ItemNodesList = ({
     })
   }
   useEventListener(
+    () => mouseOverBlock?.ref.current ?? null,
     'mouseup',
     handleMouseUpOnBlock,
-    mouseOverBlock?.ref.current,
     {
       capture: true,
     }

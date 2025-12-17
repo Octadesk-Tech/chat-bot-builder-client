@@ -62,7 +62,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
   const handleMouseWheel = (e: WheelEvent) => {
     e.stopPropagation()
   }
-  useEventListener('wheel', handleMouseWheel, ref.current)
+  useEventListener(() => ref.current, 'wheel', handleMouseWheel)
 
   const handleWidthPerComponent = (step: Step): number | undefined => {
     let width
