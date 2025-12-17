@@ -52,13 +52,13 @@ export const PreviewDrawer = () => {
     setWidth(width - e.movementX)
   }
 
-  useEventListener('mousemove', handleMouseMove)
+  useEventListener(window, 'mousemove', handleMouseMove)
 
   const handleMouseUp = () => {
     setIsResizing(false)
   }
 
-  useEventListener('mouseup', handleMouseUp)
+  useEventListener(window, 'mouseup', handleMouseUp)
 
   const handleCloseClick = () => {
     setPreviewingEdge(undefined)

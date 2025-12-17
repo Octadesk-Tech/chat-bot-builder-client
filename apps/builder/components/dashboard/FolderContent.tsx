@@ -125,7 +125,7 @@ export const FolderContent = ({ folder }: Props) => {
     setMouseOverFolderId(undefined)
     setDraggedTypebot(undefined)
   }
-  useEventListener('mouseup', handleMouseUp)
+  useEventListener(window, 'mouseup', handleMouseUp)
 
   const handleMouseDown =
     (typebot: TypebotInDashboard) => (e: React.MouseEvent) => {
@@ -153,7 +153,7 @@ export const FolderContent = ({ folder }: Props) => {
       y: clientY - relativeDraggablePosition.y,
     })
   }
-  useEventListener('mousemove', handleMouseMove)
+  useEventListener(window, 'mousemove', handleMouseMove)
 
   return (
     <Flex w="full" flex="1" justify="center">

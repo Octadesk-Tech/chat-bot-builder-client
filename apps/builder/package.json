@@ -18,9 +18,10 @@
   "dependencies": {
     "@chakra-ui/css-reset": "^2.0.0",
     "@chakra-ui/icons": "^2.0.19",
-    "@chakra-ui/react": "^2.0.0",
+    "@chakra-ui/react": "^2.8.1",
     "@chakra-ui/system": "^2.6.1",
     "@chakra-ui/tooltip": "^2.3.0",
+    "@dnd-kit/react": "^0.2.1",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@emotion/react": "^11.9.3",
@@ -33,6 +34,8 @@
     "@octadesk-tech/storage": "^1.1.2",
     "@sentry/nextjs": "^6.19.7",
     "@stripe/stripe-js": "^1.29.0",
+    "@tanstack/react-virtual": "^3.13.12",
+    "@types/dompurify": "3.0.5",
     "@types/object-hash": "^2.2.1",
     "@types/react-icons": "^3.0.0",
     "@types/react-input-mask": "^3.0.2",
@@ -54,6 +57,7 @@
     "cuid": "^2.1.8",
     "deep-object-diff": "^1.1.7",
     "dequal": "^2.0.2",
+    "dompurify": "^3.1.5",
     "emoji-mart": "^3.0.1",
     "focus-visible": "^5.2.0",
     "framer-motion": "^10.16.4",
@@ -79,10 +83,7 @@
     "qs": "^6.10.3",
     "react": "^18.2.0",
     "react-datepicker": "^4.16.0",
-    "@tanstack/react-virtual": "^3.13.12",
     "react-dom": "^18.2.0",
-    "dompurify": "^3.1.5",
-    "@types/dompurify": "3.0.5",
     "react-draggable": "^4.4.5",
     "react-icons": "^4.10.1",
     "react-input-mask": "^2.0.4",
@@ -124,7 +125,7 @@
     "dotenv": "^16.0.1",
     "eslint": "<8.0.0",
     "eslint-config-next": "12.1.6",
-    "msw": "^0.39.2",
+    "msw": "^1.3.2",
     "typescript": "^4.6.4"
   }
 }

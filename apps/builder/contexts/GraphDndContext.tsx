@@ -76,7 +76,7 @@ export const useDragDistance = ({
   const handleMouseUp = () => {
     if (mouseDownPosition) mouseDownPosition.current = undefined
   }
-  useEventListener('mouseup', handleMouseUp)
+  useEventListener(window, 'mouseup', handleMouseUp)
 
   const handleMouseDown = (e: MouseEvent) => {
 
@@ -95,7 +95,7 @@ export const useDragDistance = ({
       },
     }
   }
-  useEventListener('mousedown', handleMouseDown, ref.current)
+  useEventListener(() => ref.current, 'mousedown', handleMouseDown)
 
   const handleMouseMove = (e: MouseEvent) => {
     if (!mouseDownPosition.current) return
@@ -110,7 +110,7 @@ export const useDragDistance = ({
       onDrag(mouseDownPosition.current)
     }
   }
-  useEventListener('mousemove', handleMouseMove)
+  useEventListener(window, 'mousemove', handleMouseMove)
 }
 
 export const computeNearestPlaceholderIndex = (

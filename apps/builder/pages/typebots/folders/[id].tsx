@@ -1,11 +1,10 @@
 import React from 'react'
-import { Flex, Stack } from '@chakra-ui/layout'
+import { Flex, Stack, Spinner, useToast } from '@chakra-ui/react'
 import { DashboardHeader } from 'components/dashboard/DashboardHeader'
 import { Seo } from 'components/Seo'
 import { FolderContent } from 'components/dashboard/FolderContent'
 import { useRouter } from 'next/router'
 import { useFolderContent } from 'services/folders'
-import { Spinner, useToast } from '@chakra-ui/react'
 import { TypebotDndContext } from 'contexts/TypebotDndContext'
 
 const FolderPage = () => {
