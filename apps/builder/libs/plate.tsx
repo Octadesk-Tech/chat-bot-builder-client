@@ -12,6 +12,12 @@ export const editorStyle: React.CSSProperties = {
   padding: '1rem',
   backgroundColor: 'white',
   borderRadius: '0.25rem',
+  wordBreak: 'break-word',
+  overflowWrap: 'break-word',
+  whiteSpace: 'pre-wrap',
+  width: '100%',
+  minWidth: 0,
+  overflow: 'auto',
 }
 
 export const platePlugins = createPlugins(
