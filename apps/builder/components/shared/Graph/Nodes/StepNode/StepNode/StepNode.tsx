@@ -27,6 +27,7 @@ import {
   ExternalEventStep,
   IntegrationStepType,
   LogicStepType,
+  OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
@@ -182,8 +183,14 @@ export const StepNode = ({
   const handleClick = (e: React.MouseEvent) => {
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
-    if (isOctaBubbleStep(step)) setIsEditing(true)
-    else if (!isWozSuggestionStep(step)) setIsModalOpen(true)
+
+    if (step.type === OctaBubbleStepType.END_CONVERSATION) {
+      setIsModalOpen(true)
+    } else if (isOctaBubbleStep(step)) {
+      setIsEditing(true)
+    } else if (!isWozSuggestionStep(step)) {
+      setIsModalOpen(true)
+    }
 
     setOpenedStepId(step.id)
   }
