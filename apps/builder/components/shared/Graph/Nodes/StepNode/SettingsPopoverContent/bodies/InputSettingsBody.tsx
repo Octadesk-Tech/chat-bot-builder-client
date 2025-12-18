@@ -147,7 +147,9 @@ export const InputSettingBody = ({
         (step.options.fallbackMessages?.length ? (
           <>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
-              <Text fontWeight="bold" fontSize="sm">Se o cliente não responder com nenhuma das opções:</Text>
+              <Text fontWeight="bold" fontSize="sm">
+                Se o cliente não responder com nenhuma das opções:
+              </Text>
               <Button
                 background={'transparent'}
                 onClick={() => setIsCollapsed((v) => !v)}
