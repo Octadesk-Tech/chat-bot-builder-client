@@ -17,21 +17,31 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Box, HStack, IconButton, Stack, Flex, Icon } from '@chakra-ui/react';
 import { DragHandleIcon } from '@chakra-ui/icons';
-import { Item, ItemIndices, StepWithItems, Step } from 'models';
+import { Item, ItemIndices, StepWithItems, Step, ChoiceInputStep } from 'models';
 import { useTypebot } from 'contexts/TypebotContext';
 import { ItemNodeContent } from '../ItemNodeContent';
+import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint';
 import { MdClose } from 'react-icons/md';
 
 interface SortableItemProps {
   item: Item;
   indices: ItemIndices;
   step?: StepWithItems;
+  isReadOnly: boolean;
   showControlButtons: boolean;
   onRemoveItem: () => void;
   onUpdateItem: (value: string) => void;
 }
 
-const SortableItem = ({ item, indices, step, showControlButtons, onRemoveItem, onUpdateItem }: SortableItemProps) => {
+const SortableItem = ({ item, indices, step, isReadOnly, showControlButtons, onRemoveItem, onUpdateItem }: SortableItemProps) => {
+  const { typebot } = useTypebot();
+  
+  const isConnectable = !(
+    typebot?.blocks[indices.blockIndex].steps[
+      indices.stepIndex
+    ] as ChoiceInputStep
+  )?.options?.isMultipleChoice;
+  const showConnection = typebot && isConnectable && isReadOnly;
 
   const {
     attributes,
@@ -49,6 +59,14 @@ const SortableItem = ({ item, indices, step, showControlButtons, onRemoveItem, o
     zIndex: isDragging ? 999 : 'auto',
   };
 
+  const optionStyle = isReadOnly ? {} : {
+    borderWidth: "1px",
+    borderColor: "gray.200",
+    borderRadius: "md",
+    bg: "gray.100",
+    p: 4,
+  }
+
   const handleRemoveItemClick = () => {
     onRemoveItem();
   };
@@ -60,7 +78,7 @@ const SortableItem = ({ item, indices, step, showControlButtons, onRemoveItem, o
       w="100%"
       bg="white"
     >
-      <HStack spacing={3} align="flex-start" alignItems="center">
+      <HStack spacing={2} align="flex-start" alignItems="center">
         {showControlButtons && (
           <IconButton
             aria-label="Arrastar item"
@@ -77,20 +95,17 @@ const SortableItem = ({ item, indices, step, showControlButtons, onRemoveItem, o
         )}
 
         <Flex flex={1}
-          borderWidth="1px"
-          borderColor="gray.200"
-          borderRadius="md"
-          bg="gray.100"
-          p={4}
+          {...optionStyle}
           w="full"
         >
           <Flex
             align="center"
-            rounded="lg"
+            rounded="md"
             bgColor="white"
             borderWidth="1px"
             borderColor="gray.400"
             w="full"
+            pos="relative"
           >
             <ItemNodeContent
               item={item}
@@ -98,6 +113,18 @@ const SortableItem = ({ item, indices, step, showControlButtons, onRemoveItem, o
               step={step as Step}
               onUpdateItem={onUpdateItem}
             />
+            {showConnection && (
+              <SourceEndpoint
+                source={{
+                  blockId: typebot.blocks[indices.blockIndex].id,
+                  stepId: item.stepId,
+                  itemId: item.id,
+                }}
+                pos="absolute"
+                right="-44px"
+                pointerEvents="all"
+              />
+            )}
           </Flex>
         </Flex>
 
@@ -127,6 +154,7 @@ interface ItemDraggableListProps {
   handleUpdateItem?: (item: Item, itemIndex: number, value: string) => void;
   handleRemoveItem?: (item: Item, itemIndex: number) => void;
   handleReorderItem?: (oldIndex: number, newIndex: number) => void;
+  renderPlaceholder?: (index: number) => React.ReactNode;
 }
 
 export const ItemDraggableList = ({
@@ -137,6 +165,7 @@ export const ItemDraggableList = ({
   handleUpdateItem,
   handleRemoveItem,
   handleReorderItem,
+  renderPlaceholder,
 }: ItemDraggableListProps) => {
   const { blockIndex, stepIndex } = indices;
   const { reorderItem, deleteItem } = useTypebot();
@@ -216,22 +245,27 @@ export const ItemDraggableList = ({
           items={itemIds}
           strategy={verticalListSortingStrategy}
         >
-          <Stack spacing={3} w="full">
-            {validItemsWithIndices.map(({ item, originalIndex }) => (
-              <SortableItem
-                key={item.id}
-                item={item}
-                step={step}
-                indices={{
-                  blockIndex,
-                  stepIndex,
-                  itemIndex: originalIndex,
-                  itemsCount: items.length,
-                }}
-                showControlButtons={showControlButtons}
-                onRemoveItem={() => handleItemRemove(item, originalIndex)}
-                onUpdateItem={(value) => handleItemUpdate(item, originalIndex, value)}
-              />
+          <Stack spacing={1} w="full">
+            {validItemsWithIndices.map(({ item, originalIndex }, mapIndex) => (
+              <React.Fragment key={item.id}>
+                <SortableItem
+                  item={item}
+                  step={step}
+                  indices={{
+                    blockIndex,
+                    stepIndex,
+                    itemIndex: originalIndex,
+                    itemsCount: items.length,
+                  }}
+                  isReadOnly={isReadOnly}
+                  showControlButtons={showControlButtons}
+                  onRemoveItem={() => handleItemRemove(item, originalIndex)}
+                  onUpdateItem={(value) => handleItemUpdate(item, originalIndex, value)}
+                />
+                {renderPlaceholder && mapIndex < validItemsWithIndices.length - 1 && (
+                  <>{renderPlaceholder(originalIndex + 1)}</>
+                )}
+              </React.Fragment>
             ))}
           </Stack>
         </SortableContext>
