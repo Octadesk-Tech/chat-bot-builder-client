@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Box, HStack, IconButton, Stack, Flex, Icon } from '@chakra-ui/react';
 import { DragHandleIcon } from '@chakra-ui/icons';
-import { Item, ItemIndices, StepWithItems, Step, ChoiceInputStep } from 'models';
+import { Item, ItemIndices, StepWithItems, Step, ChoiceInputStep, WOZStepType } from 'models';
 import { useTypebot } from 'contexts/TypebotContext';
 import { ItemNodeContent } from '../ItemNodeContent';
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint';
@@ -211,7 +211,10 @@ export const ItemDraggableList = ({
   
   const itemIds = validItemsWithIndices.map(({ item }) => String(item.id));
 
-  const showControlButtons = items.length > 1 && !isReadOnly;
+  // TODO: Remove this once the WOZAssignStep is implemented
+  const isWozAssignStep = step.type === WOZStepType.ASSIGN;
+
+  const showControlButtons = items.length > 1 && !isReadOnly && !isWozAssignStep;
 
   const handleItemRemove = (item: Item, itemIndex: number) => {
     if (handleRemoveItem) {
@@ -257,7 +260,7 @@ export const ItemDraggableList = ({
                     itemIndex: originalIndex,
                     itemsCount: items.length,
                   }}
-                  isReadOnly={isReadOnly}
+                  isReadOnly={isReadOnly || isWozAssignStep}
                   showControlButtons={showControlButtons}
                   onRemoveItem={() => handleItemRemove(item, originalIndex)}
                   onUpdateItem={(value) => handleItemUpdate(item, originalIndex, value)}

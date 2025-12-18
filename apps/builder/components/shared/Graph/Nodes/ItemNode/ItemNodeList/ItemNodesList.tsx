@@ -11,7 +11,7 @@ import {
   useEventListener,
 } from '@chakra-ui/react'
 import { CodeEditor } from 'components/shared/CodeEditor'
-import { Coordinates, useGraph } from 'contexts/GraphContext'
+import { useGraph } from 'contexts/GraphContext'
 import {
   computeNearestPlaceholderIndex,
   useStepDnd,
@@ -45,16 +45,14 @@ type Props = {
   step: StepWithItems | WOZAssignStep
   indices: StepIndices
   isReadOnly?: boolean
-  hideConnection?: boolean
 }
 
 export const ItemNodesList = ({
   step,
   indices: { blockIndex, stepIndex },
   isReadOnly = false,
-  hideConnection = false,
 }: Props) => {
-  const { typebot, createItem, detachItemFromStep, deleteItem } = useTypebot()
+  const { typebot, createItem } = useTypebot()
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
   const placeholderRefs = useRef<HTMLDivElement[]>([])
   const { graphPosition } = useGraph()
@@ -70,7 +68,7 @@ export const ItemNodesList = ({
     x: 0,
     y: 0,
   })
-  const [relativeCoordinates, setRelativeCoordinates] = useState({ x: 0, y: 0 })
+  const [relativeCoordinates] = useState({ x: 0, y: 0 })
   const [expandedPlaceholderIndex, setExpandedPlaceholderIndex] = useState<
     number | undefined
   >()
@@ -123,20 +121,6 @@ export const ItemNodesList = ({
       capture: true,
     }
   )
-
-  const handleStepMouseDown =
-    (itemIndex: number) =>
-      (
-        { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
-        item: ButtonItem
-      ) => {
-        if (!typebot || isReadOnly) return
-        placeholderRefs.current.splice(itemIndex + 1, 1)
-        detachItemFromStep({ blockIndex, stepIndex, itemIndex })
-        setPosition(absolute)
-        setRelativeCoordinates(relative)
-        setDraggedItem(item)
-      }
 
   const stopPropagating = (e: React.MouseEvent) => e.stopPropagation()
 
