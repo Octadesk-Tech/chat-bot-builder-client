@@ -5,8 +5,6 @@ import {
   AccordionItem,
   AccordionPanel,
   Flex,
-  Icon,
-  IconButton,
   Portal,
   Stack,
   Text,
@@ -34,7 +32,6 @@ import {
 } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
 import { SourceEndpoint } from '../../../Endpoints'
-import { ItemNode } from '../ItemNode'
 import { ItemNodeOverlay } from '../ItemNodeOverlay'
 import {
   Container,
@@ -42,14 +39,13 @@ import {
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
-import { MdClose } from 'react-icons/md'
+import { ItemDraggableList } from '../ItemDraggable/ItemDraggableList'
 
 type Props = {
   step: StepWithItems | WOZAssignStep
   indices: StepIndices
   isReadOnly?: boolean
   hideConnection?: boolean
-  withControlButtons?: boolean
 }
 
 export const ItemNodesList = ({
@@ -57,7 +53,6 @@ export const ItemNodesList = ({
   indices: { blockIndex, stepIndex },
   isReadOnly = false,
   hideConnection = false,
-  withControlButtons = false,
 }: Props) => {
   const { typebot, createItem, detachItemFromStep, deleteItem } = useTypebot()
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
@@ -145,10 +140,6 @@ export const ItemNodesList = ({
 
   const stopPropagating = (e: React.MouseEvent) => e.stopPropagation()
 
-  const handleRemoveItemClick = (itemIndex: number) => {
-    deleteItem({ blockIndex, stepIndex, itemIndex })
-  }
-
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
       elem && (placeholderRefs.current[idx] = elem)
@@ -190,17 +181,7 @@ export const ItemNodesList = ({
     }
   }
 
-  const showControlButtons = withControlButtons && step.items.length > 1 && !isReadOnly
-
-  const optionStyleWithControls = withControlButtons ? {
-    borderWidth: '1px',
-    borderColor: 'gray.200',
-    borderRadius: 'md',
-    p: 4,
-    w: 'full',
-    bg: 'gray.100',
-  } : { w: 'full' }
-
+  const isStepWithItems = step && step.items
 
   return (
     <Stack
@@ -281,65 +262,32 @@ export const ItemNodesList = ({
           }
         </ChatReturnContainer>
       )}
-      {step &&
-        step.items &&
-        step.items.map((item, idx) => {
-          return (
-            <Stack
-              key={item.id}
-              spacing={1}
-              width="100%"
-            >
-              <Flex alignItems="center">
-                <Stack {...optionStyleWithControls}>
-                  <ItemNode
-                    item={item}
-                    step={step}
-                    indices={{
-                      blockIndex,
-                      stepIndex,
-                      itemIndex: idx,
-                      itemsCount: step.items.length,
-                    }}
-                    onMouseDown={handleStepMouseDown(idx)}
-                    isReadOnly={isReadOnly}
-                    hideConnection={hideConnection}
+      {isStepWithItems && (
+        <ItemDraggableList
+          items={step.items}
+          step={step as StepWithItems}
+          indices={{ blockIndex, stepIndex }}
+          isReadOnly={isReadOnly}
+          renderPlaceholder={
+            step.type !== WOZStepType.ASSIGN
+              ? (idx) => (
+                  <Flex
+                    ref={handlePushElementRef(idx)}
+                    h={
+                      showPlaceholders && expandedPlaceholderIndex === idx
+                        ? '50px'
+                        : '2px'
+                    }
+                    bgColor={'gray.300'}
+                    visibility={showPlaceholders ? 'visible' : 'hidden'}
+                    rounded="lg"
+                    transition={showPlaceholders ? 'height 200ms' : 'none'}
                   />
-                </Stack>
-                {showControlButtons && (
-                  <IconButton
-                    aria-label="Delete item"
-                    icon={<Icon as={MdClose} boxSize={5} />}
-                    onClick={() => handleRemoveItemClick(idx)}
-                    variant="outline"
-                    colorScheme="gray"
-                    color="gray.500"
-                    _hover={{ bg: 'transparent' }}
-                    _active={{ bg: 'transparent' }}
-                    fontSize="xs"
-                    size="sm"
-                    borderWidth="0"
-                  />
-                )}
-              </Flex>
-              {step.type !== WOZStepType.ASSIGN && (
-                <Flex
-                  ref={handlePushElementRef(idx + 1)}
-                  h={
-                    showPlaceholders && expandedPlaceholderIndex === idx + 1
-                      ? '50px'
-                      : '2px'
-                  }
-                  bgColor={'gray.300'}
-                  visibility={showPlaceholders ? 'visible' : 'hidden'}
-                  rounded="lg"
-                  transition={showPlaceholders ? 'height 200ms' : 'none'}
-                />
-              )}
-            </Stack>
-          )
-        })}
-
+                )
+              : undefined
+          }
+        />
+      )}
       {isLastStep &&
         step.type !== OctaStepType.OFFICE_HOURS &&
         step.type !== InputStepType.CHOICE &&
