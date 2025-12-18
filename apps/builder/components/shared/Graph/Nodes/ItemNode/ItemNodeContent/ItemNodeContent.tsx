@@ -12,18 +12,18 @@ type Props = {
   step?: Step
   item: Item
   indices: ItemIndices
-  isMouseOver: boolean
+  onUpdateItem?: (value: string) => void
 }
 
-export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => {
+export const ItemNodeContent = ({ item, indices, onUpdateItem }: Props) => {
 
   switch (item.type) {
     case ItemType.BUTTON:
       return (
         <ButtonNodeContent
           item={item}
-          isMouseOver={isMouseOver}
           indices={indices}
+          onUpdateItem={onUpdateItem}
         />
       )
     case ItemType.CONDITION:
@@ -38,12 +38,14 @@ export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => 
       return (
         <WhatsAppOptionsNodeContent
           item={item}
+          onUpdateItem={onUpdateItem}
         />
       )
     case ItemType.WHATSAPP_BUTTONS_LIST:
       return (
         <WhatsAppButtonsNodeContent
           item={item}
+          onUpdateItem={onUpdateItem}
         />
       )
     case ItemType.CHAT_RETURN:

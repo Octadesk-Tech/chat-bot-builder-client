@@ -310,6 +310,7 @@ export const StepSettings = ({
           options={step.options || {}}
           onOptionsChange={handleOptionsChange}
           step={step}
+          indices={indices}
         />
       )
     }
@@ -319,6 +320,7 @@ export const StepSettings = ({
           options={step.options || {}}
           onOptionsChange={handleOptionsChange}
           step={step}
+          indices={indices}
         />
       )
     }

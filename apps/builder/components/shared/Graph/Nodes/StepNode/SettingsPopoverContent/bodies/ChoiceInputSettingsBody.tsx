@@ -68,7 +68,7 @@ export const ChoiceInputSettingsBody = ({
   ) => {
     return (
       <Box>
-        <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="xs">
+        <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
           Mensagem para resposta inválida - Tentativa {index + 1}
         </FormLabel>
         <TextBubbleEditor
@@ -105,11 +105,11 @@ export const ChoiceInputSettingsBody = ({
     <Stack spacing={4}>
       <Stack>
         <Flex>
-          <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="xs">
+          <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
             Texto da pergunta
           </FormLabel>
           <Spacer />
-          <FormLabel mb="0" htmlFor="button" fontSize="xs">
+          <FormLabel mb="0" htmlFor="button" fontSize="sx">
             {options?.message?.plainText?.length ?? 0}/{MAX_LENGHT_TEXT}
           </FormLabel>
         </Flex>
@@ -124,25 +124,23 @@ export const ChoiceInputSettingsBody = ({
         )
       </Stack>
       <Stack>
-        <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="xs">
+        <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
           Opções de resposta
         </FormLabel>
         <ItemNodesList
           step={step}
           indices={indices}
           hideConnection={true}
-          withControlButtons={true}
         />
         <Button
           onClick={handleAddOptionAtEnd}
           variant="outline"
           colorScheme="blue"
-          fontSize="xs"
+          size="md"
+          fontSize="sm"
           borderWidth="2px"
           borderColor="#1366C9"
           color="#1366C9"
-          padding="12px 32px"
-          height="28px"
           alignSelf="center"
           _hover={{ bg: '#1366C9', color: 'white' }}
           leftIcon={<Icon as={MdAdd} boxSize={5} />}
@@ -155,14 +153,13 @@ export const ChoiceInputSettingsBody = ({
           initialVariableId={options?.variableId}
           onSelectVariable={handleVariableChange}
           labelDefault="Salvar resposta em"
-          showBorder={false}
         />
       </Stack>
       {options?.useFallback &&
         (options?.fallbackMessages?.length ? (
           <>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
-              <Text fontWeight="bold" fontSize="xs">Se o cliente não responder com nenhuma das opções:</Text>
+              <Text fontWeight="bold" fontSize="sm">Se o cliente não responder com nenhuma das opções:</Text>
               <Button
                 background={'transparent'}
                 onClick={() => setIsCollapsed((v) => !v)}
@@ -177,7 +174,7 @@ export const ChoiceInputSettingsBody = ({
                   fallbackMessageComponent(message, index)
                 )}
                 <Box>
-                  <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="xs">
+                  <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
                     Se o cliente errar 3 vezes seguidas, atribuir conversa para:
                   </FormLabel>
                   <AssignToResponsibleSelect

@@ -2,11 +2,8 @@ import {
   EditablePreview,
   EditableInput,
   Editable,
-  Fade,
-  IconButton,
   Flex,
 } from '@chakra-ui/react'
-import { PlusIcon, TrashIcon } from 'assets/icons'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
@@ -14,11 +11,10 @@ import React, { useEffect, useRef, useState } from 'react'
 type Props = {
   item: ButtonItem
   indices: ItemIndices
-  isMouseOver: boolean
-  withControlButtons?: boolean
+  onUpdateItem?: (value: string) => void
 }
 
-export const ButtonNodeContent = ({ item, indices, isMouseOver, withControlButtons = false }: Props) => {
+export const ButtonNodeContent = ({ item, indices, onUpdateItem }: Props) => {
   const defaultPlaceholder = 'Insira o texto desta resposta...' 
 
   const { deleteItem, updateItem, createItem } = useTypebot()
@@ -28,8 +24,6 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver, withControlButto
   )
   const editableRef = useRef<HTMLDivElement | null>(null)
 
-  const { canAddItem = true } = item
-
   useEffect(() => {
     if (itemValue !== item.content)
       setItemValue(item.content ?? defaultPlaceholder)
@@ -38,8 +32,13 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver, withControlButto
 
   const handleInputSubmit = () => {
     if (itemValue === '') deleteItem(indices)
-    else
-      updateItem(indices, { content: itemValue === '' ? undefined : itemValue })
+    else {
+      const newValue = itemValue === '' ? undefined : itemValue
+      updateItem(indices, { content: newValue })
+      if (onUpdateItem) {
+        onUpdateItem(newValue || '')
+      }
+    }
   }
 
   const hasMoreThanOneItem = () => indices.itemsCount && indices.itemsCount > 1
@@ -67,12 +66,6 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver, withControlButto
     )
   }
 
-  const handleDeleteClick = () => {
-    deleteItem(indices)
-  }
-
-  const canAddItemFn = canAddItem && item.content !== 'Encerrar a conversa'
-
   return (
     <Flex justify="center" w="100%" pos="relative">
       <Editable
@@ -94,41 +87,8 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver, withControlButto
           px={4}
           py={2}
         />
-        <EditableInput px={4} py={2} readOnly={isReadOnly()} />
+        <EditableInput px={4} py={2} readOnly={isReadOnly()} _focus={{ borderColor: 'gray.400' }} />
       </Editable>
-      {withControlButtons && (
-        <Fade
-          in={isMouseOver}
-          style={{
-            position: 'absolute',
-            bottom: '-15px',
-            zIndex: 3,
-            left: '90px',
-          }}
-          unmountOnExit
-        >
-          {canAddItemFn && (
-            <IconButton
-              aria-label="Add item"
-              icon={<PlusIcon />}
-              size="xs"
-              shadow="md"
-              colorScheme="gray"
-              onClick={handlePlusClick}
-            />
-          )}
-          {hasMoreThanOneItem() && !isReadOnly() && (
-            <IconButton
-              aria-label="Delete item"
-              icon={<TrashIcon />}
-              size="xs"
-              shadow="md"
-              colorScheme="gray"
-              onClick={handleDeleteClick}
-            />
-          )}
-        </Fade>
-      )}
     </Flex>
   )
 }
