@@ -34,14 +34,21 @@ import {
   Step,
   TextBubbleContent,
   WOZAssignStep,
+  WOZSuggestionStep,
   WOZStepType,
   WebhookStep,
   WhatsAppButtonsListStep,
   WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useRef, useState } from 'react'
 import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
+import React, {
+  createContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
 import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
@@ -102,7 +109,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-    step.content.plainText === ''
+      step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -153,7 +160,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-      connectingIds?.target?.stepId === step.id
+        connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -182,7 +189,7 @@ export const StepNode = ({
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
     if (isOctaBubbleStep(step)) setIsEditing(true)
-    else setIsModalOpen(true)
+    else if (!isWozSuggestionStep(step)) setIsModalOpen(true)
 
     setOpenedStepId(step.id)
   }
@@ -214,11 +221,12 @@ export const StepNode = ({
       !isWhatsAppOptionsListStep(step) &&
       !isWhatsAppButtonsListStep(step) &&
       !isWozAssignStep(step) &&
-      !isChatReturn(step)
+      !isChatReturn(step) &&
+      !isWozSuggestionStep(step)
     )
   }
 
-  return isEditing && (isOctaBubbleStep(step)) ? (
+  return isEditing && isOctaBubbleStep(step) ? (
     <TextBubbleEditor
       initialValue={step.content.richText}
       onClose={handleCloseEditor}
@@ -397,7 +405,11 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
+              <StepSettings
+                step={step}
+                indices={indices}
+                onStepChange={handleStepUpdate}
+              />
             </SettingsModal>
           </Popover>
         )}
@@ -411,6 +423,10 @@ const isEndConversationStep = (
 ): step is Exclude<Step, BubbleStep> => {
   // hasStepRedirectNoneAvailable(step)
   return isOctaBubbleStep(step)
+}
+
+const isWozSuggestionStep = (step: Step): step is WOZSuggestionStep => {
+  return step.type === WOZStepType.MESSAGE
 }
 
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
