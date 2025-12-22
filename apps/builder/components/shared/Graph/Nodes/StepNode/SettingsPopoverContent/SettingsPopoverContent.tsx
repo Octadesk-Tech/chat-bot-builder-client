@@ -9,10 +9,12 @@ import {
 import { ExpandIcon } from 'assets/icons'
 import {
   BubbleStepType,
+  EndConversationStep,
   InputStepType,
   IntegrationStepType,
   LogicStepType,
   MediaBubbleContent,
+  OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   Step,
@@ -23,12 +25,14 @@ import {
   TextBubbleStep,
   Webhook,
   WOZStepType,
+  WOZInterpretDataWithAIOptions,
 } from 'models'
 import { useRef } from 'react'
 import {
   AssignToTeamSettingsBody,
   CallOtherBotSettingsBody,
   ConversationTagBody,
+  EndConversationSettingsBody,
   PreReserveSettingsBody,
   UrlInputSettingsBody,
   WhatsAppButtonsListSettingsBody,
@@ -50,6 +54,7 @@ import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
 import { ChatReturnBody } from './bodies/ChatReturnBody'
 import { TextSettingsBody } from './bodies/TextSettingsBody'
+import { InterpretDataWithAI } from './bodies/InterpretDataWithAI/InterpretDataWithAI'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
@@ -74,6 +79,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
       case OctaStepType.OFFICE_HOURS:
       case OctaWabaStepType.COMMERCE:
+      case WOZStepType.ASSIGN:
         width = 450
         break
       case IntegrationStepType.WEBHOOK:
@@ -156,7 +162,12 @@ export const StepSettings = ({
   webhook?: Webhook
   onStepChange: (step: Partial<Step>) => void
 }) => {
-  const handleContentChange = (content: MediaBubbleContent | TextBubbleContent) => {
+  const handleContentChange = (
+    content:
+      | MediaBubbleContent
+      | WOZInterpretDataWithAIOptions
+      | TextBubbleContent
+  ) => {
     onStepChange({ content } as Partial<Step>)
   }
   const handleOptionsChange = (options: StepOptions) => {
@@ -172,6 +183,15 @@ export const StepSettings = ({
     case BubbleStepType.TEXT: {
       return (
         <TextSettingsBody step={step} onContentChange={handleContentChange} />
+      )
+    }
+
+    case OctaBubbleStepType.END_CONVERSATION: {
+      return (
+        <EndConversationSettingsBody
+          step={step as EndConversationStep}
+          onContentChange={handleContentChange}
+        />
       )
     }
 
@@ -267,11 +287,21 @@ export const StepSettings = ({
     case WOZStepType.ASSIGN: {
       return (
         <WOZAssignSettingBody
-          options={step.options}
-          onOptionsChange={handleOptionsChange}
+          step={step}
+          onStepChange={onStepChange}
         />
       )
     }
+
+    case WOZStepType.INTERPRET_DATA_WITH_AI: {
+      return (
+        <InterpretDataWithAI
+          step={step}
+          onContentChange={handleContentChange}
+        />
+      )
+    }
+
     case OctaStepType.CALL_OTHER_BOT: {
       return (
         <CallOtherBotSettingsBody
@@ -328,9 +358,7 @@ export const StepSettings = ({
       )
     }
     case IntegrationStepType.EXTERNAL_EVENT: {
-      return (
-        <ExternalEvent step={step} onOptionsChange={handleOptionsChange} />
-      )
+      return <ExternalEvent step={step} onOptionsChange={handleOptionsChange} />
     }
     case InputStepType.ASK_NAME:
     case InputStepType.EMAIL:

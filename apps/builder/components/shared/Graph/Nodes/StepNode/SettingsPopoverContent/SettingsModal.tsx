@@ -38,7 +38,6 @@ export const SettingsModal = ({
 
   return (
     <Modal
-      scrollBehavior="inside"
       isOpen={isOpen}
       onClose={onClose}
       size={stepType === WOZStepType.MESSAGE ? 'full' : 'xl'}
@@ -83,6 +82,7 @@ export const SettingsModal = ({
               background: colors.gray[300],
               borderRadius: '24px',
             },
+            overflow: 'visible',
           }}
           marginRight={0.5}
           {...props}

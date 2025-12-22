@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { StackProps, HStack, Button } from '@chakra-ui/react'
 import {
   MARK_BOLD,
@@ -37,13 +37,31 @@ export const ToolBar = ({
 }: Props) => {
   const [showPicker, setShowPicker] = useState(false)
   const { workspace } = useWorkspace()
+  const pickerRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        setShowPicker(false)
+      }
+    }
+
+    if (showPicker) {
+      document.addEventListener('click', handleClickOutside, true)
+    }
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+    }
+  }, [showPicker])
 
   const handleVariablesButtonMouseDown = (e: React.MouseEvent) => {
     e.preventDefault()
     onVariablesButtonClick(true)
   }
 
-  const handleEmojiIconClick = () => {
+  const handleEmojiIconClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setShowPicker((prevState) => !prevState)
   }
 
@@ -122,7 +140,7 @@ export const ToolBar = ({
           </span>
         </>
       )}
-      <span style={{ position: 'relative' }}>
+      <span style={{ position: 'relative' }} ref={pickerRef}>
         <span
           onClick={handleEmojiIconClick}
           style={{

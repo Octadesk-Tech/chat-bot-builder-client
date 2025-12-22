@@ -1,5 +1,5 @@
 import { Coordinates, useGraph } from 'contexts/GraphContext'
-import React, { useEffect, useLayoutEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import {
   getAnchorsPosition,
   computeEdgePath,
@@ -106,6 +106,20 @@ export const Edge = ({
   }
 
   const handleDeleteEdge = () => deleteEdge(edge.id)
+
+  useEffect(() => {
+    if (!isOpen) return
+
+    const handleGlobalContextMenu = () => {
+      onClose()
+    }
+
+    document.addEventListener('contextmenu', handleGlobalContextMenu, true)
+
+    return () => {
+      document.removeEventListener('contextmenu', handleGlobalContextMenu, true)
+    }
+  }, [isOpen, onClose])
 
   return (
     <>
