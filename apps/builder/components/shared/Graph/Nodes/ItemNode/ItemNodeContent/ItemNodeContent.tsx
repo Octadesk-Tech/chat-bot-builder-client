@@ -1,4 +1,4 @@
-import { Item, ItemIndices, ItemType, Step } from 'models'
+import { Block, Item, ItemIndices, ItemType, Step, WOZStepType } from 'models'
 import { ButtonNodeContent } from './contents/ButtonNodeContent'
 import { ConditionNodeContent } from './contents/ConditionNodeContent'
 import { ExternalEventNodeContent } from './contents/ExternalEventNodeContent'
@@ -13,9 +13,17 @@ type Props = {
   item: Item
   indices: ItemIndices
   isMouseOver: boolean
+  block: Block
 }
 
-export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => {
+export const ItemNodeContent = ({
+  item,
+  indices,
+  isMouseOver,
+  block,
+}: Props) => {
+  const withControlButtons =
+    !!block.steps.length && block.steps[0].type === WOZStepType.ASSIGN
 
   switch (item.type) {
     case ItemType.BUTTON:
@@ -24,6 +32,7 @@ export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => 
           item={item}
           isMouseOver={isMouseOver}
           indices={indices}
+          withControlButtons={withControlButtons}
         />
       )
     case ItemType.CONDITION:
@@ -35,17 +44,9 @@ export const ItemNodeContent = ({ item, indices, isMouseOver, step }: Props) => 
     case ItemType.EXTERNAL_EVENT:
       return <ExternalEventNodeContent item={item} />
     case ItemType.WHATSAPP_OPTIONS_LIST:
-      return (
-        <WhatsAppOptionsNodeContent
-          item={item}
-        />
-      )
+      return <WhatsAppOptionsNodeContent item={item} />
     case ItemType.WHATSAPP_BUTTONS_LIST:
-      return (
-        <WhatsAppButtonsNodeContent
-          item={item}
-        />
-      )
+      return <WhatsAppButtonsNodeContent item={item} />
     case ItemType.CHAT_RETURN:
       return <ChatReturnContent item={item} />
     default:

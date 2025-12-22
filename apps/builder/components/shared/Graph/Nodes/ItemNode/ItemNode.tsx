@@ -44,7 +44,7 @@ export const ItemNode = ({
   const isPreviewing = previewingEdge?.from.itemId === item.id
   const isConnectable = !(
     typebot?.blocks[indices.blockIndex].steps[
-    indices.stepIndex
+      indices.stepIndex
     ] as ChoiceInputStep
   )?.options?.isMultipleChoice
   const showConnection = typebot && isConnectable && !hideConnection
@@ -103,6 +103,7 @@ export const ItemNode = ({
               step={step}
               isMouseOver={isMouseOver}
               indices={indices}
+              block={typebot.blocks[indices.blockIndex]}
             />
             {showConnection && (
               <SourceEndpoint
