@@ -19,6 +19,7 @@ type Props = {
   item: ButtonItem
   indices: ItemIndices
   isMouseOver: boolean
+  withControlButtons?: boolean
 }
 
 export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
@@ -27,7 +28,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
   const { setIsModalOpen } = useContext(StepNodeContext)
   const [initialContent] = useState(item.content ?? '')
   const [itemValue, setItemValue] = useState(
-    item.content ?? 'Editar opção de resposta'
+    item.content ?? defaultPlaceholder
   )
   const editableRef = useRef<HTMLDivElement | null>(null)
 
@@ -35,7 +36,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
 
   useEffect(() => {
     if (itemValue !== item.content)
-      setItemValue(item.content ?? 'Editar opção de resposta')
+      setItemValue(item.content ?? defaultPlaceholder)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item])
 
@@ -54,7 +55,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (
       e.key === 'Escape' &&
-      itemValue === 'Editar opção de resposta' &&
+      itemValue === defaultPlaceholder &&
       hasMoreThanOneItem()
     )
       deleteItem(indices)
@@ -110,7 +111,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
     <Flex justify="center" w="100%" pos="relative">
       <Editable
         ref={editableRef}
-        startWithEditView={isNotDefined(item.content)}
+        startWithEditView={false}
         value={itemValue}
         onChange={setItemValue}
         onSubmit={handleInputSubmit}
@@ -121,7 +122,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
         <EditablePreview
           w="full"
           color={
-            item.content !== 'Editar opção de resposta' ? 'inherit' : 'gray.500'
+            item.content !== defaultPlaceholder ? 'inherit' : 'gray.500'
           }
           cursor="pointer"
           px={4}

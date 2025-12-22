@@ -203,9 +203,81 @@ export const WOZAssignSettingBody = ({
         onChange={handleChangeAttempts}
       />
 
+      <Stack>
+        <OctaDivider width="100%" />
+        <HStack justify="space-between">
+          <Text>Redirecionamento baseado no assunto da conversa</Text>
+          <Text
+            cursor={'pointer'}
+            onClick={() => changeViewMoreInfo('redirection')}
+            fontSize={'13px'}
+            align={'center'}
+            color={'purple.400'}
+          >
+            <span>Ver {isRedirectionInfo() ? 'menos' : 'mais'}</span>
+          </Text>
+        </HStack>
+        {isRedirectionInfo() && (
+          <Stack justify="space-between" color="gray.400" fontSize="sm">
+            <Text fontWeight="bold">
+              Contextos que sempre estarão disponíveis:
+            </Text>
+            <Text>
+              <Text as={'b'} fontWeight="bold">
+                Falar com Humano:
+              </Text>{' '}
+              O WOZ reconhecerá quando o usuário quer conversar com uma pessoa e
+              permite que você direcione a conversa para o time de atendimento
+              sem atritos.
+              <br />
+              <Text as={'b'} fontWeight="bold">
+                Encerrar a conversa:
+              </Text>{' '}
+              O WOZ identificará quando o cliente deseja finalizar a interação,
+              e direciona a conversa para essa etapa.
+            </Text>
+
+            <Divider />
+
+            <Text fontWeight="bold">
+              Exemplos de outro contextos que podem ser utilizados:
+            </Text>
+            <Text>
+              <Text as={'b'} fontWeight="bold">
+                Informações sobre compra:
+              </Text>{' '}
+              O WOZ entenderá que o cliente quer mais informações sobre um
+              pedido ou uma compra e segue o direcionamento da conversa conforme
+              configurado no bot. Seja encaminhando para puxar informações de
+              sistemas terceiros sobre o pedido ou seja encaminhando a conversa
+              para o time responsável.
+              <br />
+              <Text as={'b'} fontWeight="bold">
+                Reclamações e insatisfações:
+              </Text>{' '}
+              WOZ perceberá se o cliente demonstrar frustração ou usar palavras
+              negativas (ex.: "quero cancelar", "isso não resolve meu
+              problema"), e pode escalar a conversa para um atendente específico
+              ou oferecer soluções personalizadas.
+            </Text>
+
+            <Text
+              as="a"
+              href="https://help.octadesk.com/kb/article/como-configurar-o-woz-agente"
+              target="_blank"
+              rel="noreferrer"
+              color="purple.400"
+              align={'center'}
+            >
+              Saiba mais
+            </Text>
+          </Stack>
+        )}
+      </Stack>
+
       <Stack spacing={3}>
         <FormLabel mb="0" fontWeight="bold" fontSize={'sm'}>
-          Opções de resposta
+          Opções de assunto de conversa
         </FormLabel>
 
         <Stack spacing={3}>
@@ -280,78 +352,6 @@ export const WOZAssignSettingBody = ({
             Adicionar opção
           </Button>
         </Flex>
-      </Stack>
-
-      <Stack>
-        <OctaDivider width="100%" />
-        <HStack justify="space-between">
-          <Text>Redirecionamento baseado no assunto da conversa</Text>
-          <Text
-            cursor={'pointer'}
-            onClick={() => changeViewMoreInfo('redirection')}
-            fontSize={'13px'}
-            align={'center'}
-            color={'purple.400'}
-          >
-            <span>Ver {isRedirectionInfo() ? 'menos' : 'mais'}</span>
-          </Text>
-        </HStack>
-        {isRedirectionInfo() && (
-          <Stack justify="space-between" color="gray.400" fontSize="sm">
-            <Text fontWeight="bold">
-              Contextos que sempre estarão disponíveis:
-            </Text>
-            <Text>
-              <Text as={'b'} fontWeight="bold">
-                Falar com Humano:
-              </Text>{' '}
-              O WOZ reconhecerá quando o usuário quer conversar com uma pessoa e
-              permite que você direcione a conversa para o time de atendimento
-              sem atritos.
-              <br />
-              <Text as={'b'} fontWeight="bold">
-                Encerrar a conversa:
-              </Text>{' '}
-              O WOZ identificará quando o cliente deseja finalizar a interação,
-              e direciona a conversa para essa etapa.
-            </Text>
-
-            <Divider />
-
-            <Text fontWeight="bold">
-              Exemplos de outro contextos que podem ser utilizados:
-            </Text>
-            <Text>
-              <Text as={'b'} fontWeight="bold">
-                Informações sobre compra:
-              </Text>{' '}
-              O WOZ entenderá que o cliente quer mais informações sobre um
-              pedido ou uma compra e segue o direcionamento da conversa conforme
-              configurado no bot. Seja encaminhando para puxar informações de
-              sistemas terceiros sobre o pedido ou seja encaminhando a conversa
-              para o time responsável.
-              <br />
-              <Text as={'b'} fontWeight="bold">
-                Reclamações e insatisfações:
-              </Text>{' '}
-              WOZ perceberá se o cliente demonstrar frustração ou usar palavras
-              negativas (ex.: "quero cancelar", "isso não resolve meu
-              problema"), e pode escalar a conversa para um atendente específico
-              ou oferecer soluções personalizadas.
-            </Text>
-
-            <Text
-              as="a"
-              href="https://help.octadesk.com/kb/article/como-configurar-o-woz-agente"
-              target="_blank"
-              rel="noreferrer"
-              color="purple.400"
-              align={'center'}
-            >
-              Saiba mais
-            </Text>
-          </Stack>
-        )}
       </Stack>
     </Stack>
   )

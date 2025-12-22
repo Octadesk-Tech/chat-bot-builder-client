@@ -1,10 +1,9 @@
-import { IconProps } from '@chakra-ui/react'
+import { Icon, IconProps } from '@chakra-ui/react'
 import {
   AskNameIcon,
   AssignToIcon,
   CalendarIcon,
   CallBotIcon,
-  CheckSquareIcon,
   CodeIcon,
   CommerceIcon,
   ContactCardIcon,
@@ -28,6 +27,7 @@ import {
   WebhookIcon,
   ReturnArrow,
 } from 'assets/icons'
+import { MdOutlineCheckBox } from 'react-icons/md'
 import { colors } from 'libs/theme'
 import {
   BubbleStepType,
@@ -70,7 +70,7 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
     case InputStepType.PHONE:
       return <PhoneIcon color="#256F42" {...props} />
     case InputStepType.CHOICE:
-      return <CheckSquareIcon color="#256F42" {...props} />
+      return <Icon as={MdOutlineCheckBox} color="#256F42" {...props} />
     case InputStepType.PAYMENT:
       return <CreditCardIcon color="orange.500" {...props} />
     case InputStepType.ASK_NAME:

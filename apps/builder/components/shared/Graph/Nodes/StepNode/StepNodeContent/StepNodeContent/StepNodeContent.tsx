@@ -76,7 +76,7 @@ export const StepNodeContent = ({ step, indices }: Props) => {
       )
     }
     case InputStepType.CHOICE: {
-      return <InputItemsContent step={step} indices={indices} />
+      return <InputItemsContent step={step} indices={indices} isReadOnly={true} />
     }
     // case InputStepType.PAYMENT: {
     //   return <PaymentInputContent step={step} />
