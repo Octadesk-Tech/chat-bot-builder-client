@@ -27,6 +27,7 @@ import {
   ExternalEventStep,
   IntegrationStepType,
   LogicStepType,
+  OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
@@ -109,7 +110,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-      step.content.plainText === ''
+    step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -160,7 +161,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-        connectingIds?.target?.stepId === step.id
+      connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -188,8 +189,14 @@ export const StepNode = ({
   const handleClick = (e: React.MouseEvent) => {
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
-    if (isOctaBubbleStep(step)) setIsEditing(true)
-    else if (!isWozSuggestionStep(step)) setIsModalOpen(true)
+
+    if (step.type === OctaBubbleStepType.END_CONVERSATION) {
+      setIsModalOpen(true)
+    } else if (isOctaBubbleStep(step)) {
+      setIsEditing(true)
+    } else if (!isWozSuggestionStep(step)) {
+      setIsModalOpen(true)
+    }
 
     setOpenedStepId(step.id)
   }
@@ -435,6 +442,10 @@ const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
 
 const isWozAssignStep = (step: Step): step is WOZAssignStep => {
   return step.type === WOZStepType.ASSIGN
+}
+
+const isWozSuggestionStep = (step: Step): boolean => {
+  return step.type === WOZStepType.MESSAGE
 }
 
 const isCallOtherBotStep = (step: Step): step is CallOtherBotStep => {
