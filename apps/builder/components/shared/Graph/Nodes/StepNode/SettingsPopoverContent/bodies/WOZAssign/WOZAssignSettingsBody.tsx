@@ -315,7 +315,7 @@ export const WOZAssignSettingBody = ({
                 flex="1"
               >
                 <Input
-                  placeholder="Insira o texto desta resposta..."
+                  placeholder="Insira o assunto da conversa..."
                   value={item.label}
                   onChange={(e) => handleUpdateOption(index, e.target.value)}
                   maxLength={MAX_LENGTH_OPTION_TEXT}
