@@ -381,6 +381,7 @@ const parseDefaultItems = (
           type: ItemType.BUTTON,
           content: 'Falar com um humano',
           readonly: true,
+          canAddItem: false,
         },
       ]
 

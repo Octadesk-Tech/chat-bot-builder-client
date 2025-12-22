@@ -78,6 +78,8 @@ const graphContext = createContext<{
   isReadOnly: boolean
   focusedBlockId?: string
   setFocusedBlockId: Dispatch<SetStateAction<string | undefined>>
+  draggingBlockId?: string
+  setDraggingBlockId: Dispatch<SetStateAction<string | undefined>>
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
 }>({
@@ -104,6 +106,7 @@ export const GraphProvider = ({
     {}
   )
   const [focusedBlockId, setFocusedBlockId] = useState<string>()
+  const [draggingBlockId, setDraggingBlockId] = useState<string>()
   const { typebot } = useTypebot()
 
   useEffect(() => {
@@ -184,6 +187,8 @@ export const GraphProvider = ({
       isReadOnly,
       focusedBlockId,
       setFocusedBlockId,
+      draggingBlockId,
+      setDraggingBlockId,
     }),
     [
       graphPosition,
@@ -204,6 +209,8 @@ export const GraphProvider = ({
       isReadOnly,
       focusedBlockId,
       setFocusedBlockId,
+      draggingBlockId,
+      setDraggingBlockId,
     ]
   )
 
