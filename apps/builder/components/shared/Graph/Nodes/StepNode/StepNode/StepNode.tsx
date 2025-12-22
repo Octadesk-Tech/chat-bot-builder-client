@@ -434,10 +434,6 @@ const isWozAssignStep = (step: Step): step is WOZAssignStep => {
   return step.type === WOZStepType.ASSIGN
 }
 
-const isWozSuggestionStep = (step: Step): boolean => {
-  return step.type === WOZStepType.MESSAGE
-}
-
 const isCallOtherBotStep = (step: Step): step is CallOtherBotStep => {
   return step.type === OctaStepType.CALL_OTHER_BOT
 }
