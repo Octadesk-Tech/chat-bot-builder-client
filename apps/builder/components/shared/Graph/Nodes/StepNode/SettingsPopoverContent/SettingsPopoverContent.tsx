@@ -9,10 +9,12 @@ import {
 import { ExpandIcon } from 'assets/icons'
 import {
   BubbleStepType,
+  EndConversationStep,
   InputStepType,
   IntegrationStepType,
   LogicStepType,
   MediaBubbleContent,
+  OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   Step,
@@ -30,6 +32,7 @@ import {
   AssignToTeamSettingsBody,
   CallOtherBotSettingsBody,
   ConversationTagBody,
+  EndConversationSettingsBody,
   PreReserveSettingsBody,
   UrlInputSettingsBody,
   WhatsAppButtonsListSettingsBody,
@@ -177,6 +180,15 @@ export const StepSettings = ({
     case BubbleStepType.TEXT: {
       return (
         <TextSettingsBody step={step} onContentChange={handleContentChange} />
+      )
+    }
+
+    case OctaBubbleStepType.END_CONVERSATION: {
+      return (
+        <EndConversationSettingsBody
+          step={step as EndConversationStep}
+          onContentChange={handleContentChange}
+        />
       )
     }
 
