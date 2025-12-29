@@ -7,8 +7,10 @@ import {
   LogicalOperator,
   Variable,
 } from 'models'
-import React from 'react'
 import { byIdOrToken, isNotDefined } from 'utils'
+import React from 'react'
+import { useContactStatus } from 'hooks/useContactStatus'
+
 
 type Props = {
   item: ConditionItem
@@ -16,12 +18,19 @@ type Props = {
 
 export const ConditionNodeContent = ({ item }: Props) => {
   const { typebot, customVariables } = useTypebot()
+  const basicOptions = useContactStatus()
 
   const getComparisonValue = (
     variable: Variable | undefined,
     comparison: Comparison
   ) => {
-    if (variable?.token === '#status-do-contato') {
+    if (variable?.token === '#status-do-contato' && basicOptions.length > 0) {
+      if (comparison.value === basicOptions[0].value) {
+        return basicOptions[0].label
+      }
+      if (comparison.value === basicOptions[1].value) {
+        return basicOptions[1].label
+      }
       return comparison.value
     }
 

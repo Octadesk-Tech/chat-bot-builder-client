@@ -19,6 +19,7 @@ import React, { useEffect, useState } from 'react'
 import { parseTypebotToPublicTypebot } from 'services/publicTypebot'
 import { sendRequest } from 'utils'
 import { TemplateProps, templates } from './data'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 type Props = {
   isOpen: boolean
@@ -42,6 +43,8 @@ export const TemplatesModal = ({ isOpen, onClose, onTypebotChoose }: Props) => {
     fetchTemplate(templates[0])
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  useIframeOverlayEvent(isOpen, 'modal', 'templates-modal')
 
   const fetchTemplate = async (template: TemplateProps) => {
     setSelectedTemplate(template)

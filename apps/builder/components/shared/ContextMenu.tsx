@@ -46,6 +46,18 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
           setIsDeferredOpen(true)
         })
       })
+
+      const handleGlobalContextMenu = (e: MouseEvent) => {
+        if (targetRef.current && !targetRef.current.contains(e.target as Node)) {
+          setIsOpened(false)
+        }
+      }
+
+      document.addEventListener('contextmenu', handleGlobalContextMenu, true)
+
+      return () => {
+        document.removeEventListener('contextmenu', handleGlobalContextMenu, true)
+      }
     } else {
       setIsDeferredOpen(false)
       const timeout = setTimeout(() => {

@@ -16,7 +16,7 @@ type Props = {
 const MyComponent = memo(
   ({ answersCounts, onUnlockProPlanClick, graphContainerRef }: Props) => {
     const { typebot, hideEdges } = useTypebot()
-    const { graphPosition } = useGraph()
+    const { graphPosition, draggingBlockId, blocksCoordinates } = useGraph()
 
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
@@ -24,18 +24,41 @@ const MyComponent = memo(
       const containerWidth = graphContainerRef.current.offsetWidth
       const containerHeight = graphContainerRef.current.offsetHeight
 
-      return typebot.blocks.filter((block) => {
-        if (!block.graphCoordinates) return false
+      const baseVisible = typebot.blocks.filter((block) => {
+        const liveCoordinates =
+          blocksCoordinates[block.id] ?? block.graphCoordinates
+
+        if (!liveCoordinates) return false
 
         return isItemVisible(
-          block,
+          { ...block, graphCoordinates: liveCoordinates },
           graphPosition,
           containerWidth,
           containerHeight,
           typebot.blocks.length
         )
       })
-    }, [typebot?.blocks, graphPosition, graphContainerRef])
+
+      if (!draggingBlockId) return baseVisible
+
+      const draggingBlock = typebot.blocks.find(
+        (block) => block.id === draggingBlockId
+      )
+      if (!draggingBlock) return baseVisible
+
+      const alreadyVisible = baseVisible.some(
+        (block) => block.id === draggingBlockId
+      )
+      if (alreadyVisible) return baseVisible
+
+      return [...baseVisible, draggingBlock]
+    }, [
+      typebot?.blocks,
+      graphPosition,
+      graphContainerRef,
+      draggingBlockId,
+      blocksCoordinates,
+    ])
 
     const visibleItemsMap = useMemo(() => {
       const map = new Map<string, Block>()
