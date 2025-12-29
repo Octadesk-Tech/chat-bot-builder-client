@@ -12,8 +12,9 @@ import { useGraph } from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import { isNotDefined } from 'utils'
 import { StepNodeContext } from '../../../StepNode/StepNode/StepNode'
+
+const defaultPlaceholder = 'Clique para editar...'
 
 type Props = {
   item: ButtonItem
