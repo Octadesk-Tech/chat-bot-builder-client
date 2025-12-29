@@ -82,7 +82,8 @@ export const SettingsModal = ({
               background: colors.gray[300],
               borderRadius: '24px',
             },
-            overflow: 'visible',
+            overflowY: 'auto',
+            overflowX: 'visible',
           }}
           marginRight={0.5}
           {...props}
