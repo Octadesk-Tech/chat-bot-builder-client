@@ -74,6 +74,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
       case OctaStepType.OFFICE_HOURS:
       case OctaWabaStepType.COMMERCE:
+      case WOZStepType.ASSIGN:
         width = 450
         break
       case IntegrationStepType.WEBHOOK:
@@ -267,8 +268,8 @@ export const StepSettings = ({
     case WOZStepType.ASSIGN: {
       return (
         <WOZAssignSettingBody
-          options={step.options}
-          onOptionsChange={handleOptionsChange}
+          step={step}
+          onStepChange={onStepChange}
         />
       )
     }
