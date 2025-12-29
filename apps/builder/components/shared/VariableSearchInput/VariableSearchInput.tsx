@@ -10,7 +10,6 @@ import {
   useOutsideClick,
   Flex,
   InputProps,
-  FormLabel,
 } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import Select from 'react-select'
