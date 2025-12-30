@@ -1,4 +1,4 @@
-import { FlexProps } from '@chakra-ui/layout'
+import { FlexProps } from '@chakra-ui/react'
 import { CodeEditor } from 'components/shared/CodeEditor'
 import { useTypebot } from 'contexts/TypebotContext'
 import parserHtml from 'prettier/parser-html'

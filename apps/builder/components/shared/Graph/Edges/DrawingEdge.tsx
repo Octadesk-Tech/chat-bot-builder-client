@@ -1,4 +1,4 @@
-import { useEventListener } from '@chakra-ui/hooks'
+import { useEventListener } from '@chakra-ui/react'
 import assert from 'assert'
 import { useGraph, ConnectingIds } from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
@@ -81,8 +81,8 @@ export const DrawingEdge = () => {
     }
     setMousePosition(coordinates)
   }
-  useEventListener('mousemove', handleMouseMove)
-  useEventListener('mouseup', () => {
+  useEventListener(window, 'mousemove', handleMouseMove)
+  useEventListener(window, 'mouseup', () => {
     if (connectingIds?.target) createNewEdge(connectingIds)
     setConnectingIds(null)
   })

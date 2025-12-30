@@ -148,12 +148,12 @@ export const StepNodesList = ({
       elem && (placeholderRefs.current[idx] = elem)
     }
 
-  useEventListener('mousemove', handleMouseMoveGlobal)
-  useEventListener('mousemove', handleMouseMoveOnBlock, blockRef.current)
+  useEventListener(window, 'mousemove', handleMouseMoveGlobal)
+  useEventListener(() => blockRef.current, 'mousemove', handleMouseMoveOnBlock)
   useEventListener(
+    () => mouseOverBlock?.ref.current ?? null,
     'mouseup',
     handleMouseUpOnBlock,
-    mouseOverBlock?.ref.current,
     {
       capture: true,
     }

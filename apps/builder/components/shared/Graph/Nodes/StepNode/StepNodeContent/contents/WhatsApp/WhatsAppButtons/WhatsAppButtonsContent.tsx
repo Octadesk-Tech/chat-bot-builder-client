@@ -110,7 +110,7 @@ const WhatsApButtonsContent = ({ step, indices }: Props) => {
 
       {(step.options?.buttonItems?.some((item: any) => item.text?.trim()) ||
         (!step.options?.buttonItems?.length && step.items?.some((item: any) => item.content?.trim()))) && (
-          <ItemNodesList step={step} indices={indices} />
+          <ItemNodesList step={step} indices={indices} isReadOnly={true} />
         )}
 
       {step?.options?.footer?.content?.plainText && step?.options?.footer?.content?.plainText.trim() !== '' && (

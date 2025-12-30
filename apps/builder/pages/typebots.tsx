@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
 
-import { Stack, Text, VStack } from '@chakra-ui/layout'
-
 import { DashboardHeader } from 'components/dashboard/DashboardHeader'
 
 import { Seo } from 'components/Seo'
@@ -9,16 +7,19 @@ import { Seo } from 'components/Seo'
 import { TypebotDndContext } from 'contexts/TypebotDndContext'
 
 import {
+  Badge,
+  IconButton,
   Spinner,
-  TableContainer,
+  Stack,
   Table,
-  Thead,
-  Tr,
-  Th,
+  TableContainer,
   Tbody,
   Td,
-  IconButton,
-  Badge,
+  Text,
+  Th,
+  Thead,
+  Tr,
+  VStack,
 } from '@chakra-ui/react'
 
 import { NextPageContext } from 'next/types'

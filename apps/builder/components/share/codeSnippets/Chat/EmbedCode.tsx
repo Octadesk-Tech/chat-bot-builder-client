@@ -1,4 +1,4 @@
-import { FlexProps } from '@chakra-ui/layout'
+import { FlexProps } from '@chakra-ui/react'
 import prettier from 'prettier/standalone'
 import parserHtml from 'prettier/parser-html'
 import { BubbleParams } from 'typebot-js'

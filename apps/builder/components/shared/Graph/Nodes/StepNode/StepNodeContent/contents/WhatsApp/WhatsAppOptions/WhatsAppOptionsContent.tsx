@@ -114,7 +114,7 @@ const WhatsAppOptionsContent = ({ step, indices }: Props) => {
 
       {(step.options?.listItems?.some((item: any) => item.label?.trim()) ||
         (!step.options?.listItems?.length && step.items?.some((item: any) => item.content?.trim()))) && (
-          <ItemNodesList step={step} indices={indices} />
+          <ItemNodesList step={step} indices={indices} isReadOnly={true} />
         )}
 
       {step?.options?.footer?.content?.plainText && step?.options?.footer?.content?.plainText.trim() !== '' && (
