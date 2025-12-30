@@ -25,6 +25,7 @@ import {
   TextBubbleStep,
   Webhook,
   WOZStepType,
+  WOZInterpretDataWithAIOptions,
 } from 'models'
 import { useRef } from 'react'
 import {
@@ -52,6 +53,7 @@ import { RedirectSettings } from './bodies/RedirectSettings'
 import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
 import { ChatReturnBody } from './bodies/ChatReturnBody'
+import { InterpretDataWithAI } from './bodies/InterpretDataWithAI/InterpretDataWithAI'
 import { TextSettingsBody } from './bodies/TextSettingsBody'
 
 type Props = {
@@ -160,7 +162,12 @@ export const StepSettings = ({
   webhook?: Webhook
   onStepChange: (step: Partial<Step>) => void
 }) => {
-  const handleContentChange = (content: MediaBubbleContent | TextBubbleContent) => {
+  const handleContentChange = (
+    content:
+      | MediaBubbleContent
+      | TextBubbleContent
+      | WOZInterpretDataWithAIOptions
+  ) => {
     onStepChange({ content } as Partial<Step>)
   }
   const handleOptionsChange = (options: StepOptions) => {
@@ -278,13 +285,18 @@ export const StepSettings = ({
       )
     }
     case WOZStepType.ASSIGN: {
+      return <WOZAssignSettingBody step={step} onStepChange={onStepChange} />
+    }
+
+    case WOZStepType.INTERPRET_DATA_WITH_AI: {
       return (
-        <WOZAssignSettingBody
+        <InterpretDataWithAI
           step={step}
-          onStepChange={onStepChange}
+          onContentChange={handleContentChange}
         />
       )
     }
+
     case OctaStepType.CALL_OTHER_BOT: {
       return (
         <CallOtherBotSettingsBody
@@ -341,9 +353,7 @@ export const StepSettings = ({
       )
     }
     case IntegrationStepType.EXTERNAL_EVENT: {
-      return (
-        <ExternalEvent step={step} onOptionsChange={handleOptionsChange} />
-      )
+      return <ExternalEvent step={step} onOptionsChange={handleOptionsChange} />
     }
     case InputStepType.ASK_NAME:
     case InputStepType.EMAIL:

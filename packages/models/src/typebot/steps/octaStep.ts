@@ -14,7 +14,7 @@ export type OctaStep =
 
 export type OctaWabaStep = WhatsAppOptionsListStep | WhatsAppButtonsListStep
 
-export type WOZStep = WOZSuggestionStep | WOZAssignStep
+export type WOZStep = WOZSuggestionStep | WOZAssignStep | WOZInterpretDataWithAI
 
 // Bubble steps (editado na árvore)
 export type OctaBubbleStep = EndConversationStep
@@ -92,6 +92,11 @@ export type WOZAssignStep = StepBase & {
   type: WOZStepType.ASSIGN
   options: WOZAssignOptions
   items: []
+}
+
+export type WOZInterpretDataWithAI = StepBase & {
+  type: WOZStepType.INTERPRET_DATA_WITH_AI
+  content: WOZInterpretDataWithAIOptions
 }
 
 export type ConversationTagStep = StepBase & {
@@ -246,7 +251,7 @@ export type AssignToTeamOptions = BaseOctaOptions & {
   labels: {
     placeholder: { assignToTeam: string; connectionMessage: string }
     button: string
-  },
+  }
   showChatReturnOption: boolean
 }
 
@@ -274,6 +279,10 @@ export type WOZAssignOptions = BaseOctaOptions & {
     label: string
     readonly?: boolean
   }>
+}
+
+export type WOZInterpretDataWithAIOptions = {
+  systemMessage: string
 }
 
 export type CallOtherBotOptions = BaseOctaOptions & {
@@ -416,7 +425,7 @@ export const defaultAssignToTeamOptions: AssignToTeamOptions = {
   exceedLimit: false,
   subType: '',
   isAvailable: false,
-  showChatReturnOption: false
+  showChatReturnOption: false,
 }
 
 export const defaultPreReserveOptions: PreReserveOptions = {
@@ -447,6 +456,11 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
   virtualAgentId: undefined,
   limitAnswerNoContent: 3,
 }
+
+export const defaultWOZInterpretDataWithAIOptions: WOZInterpretDataWithAIOptions =
+  {
+    systemMessage: '',
+  }
 
 export const defaultCallOtherBotOptions: CallOtherBotOptions = {
   id: '',

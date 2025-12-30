@@ -35,6 +35,7 @@ import {
   Step,
   TextBubbleContent,
   WOZAssignStep,
+  WOZSuggestionStep,
   WOZStepType,
   WebhookStep,
   WhatsAppButtonsListStep,
@@ -103,7 +104,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-    step.content.plainText === ''
+      step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -154,7 +155,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-      connectingIds?.target?.stepId === step.id
+        connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -221,11 +222,12 @@ export const StepNode = ({
       !isWhatsAppOptionsListStep(step) &&
       !isWhatsAppButtonsListStep(step) &&
       !isWozAssignStep(step) &&
-      !isChatReturn(step)
+      !isChatReturn(step) &&
+      !isWozSuggestionStep(step)
     )
   }
 
-  return isEditing && (isOctaBubbleStep(step)) ? (
+  return isEditing && isOctaBubbleStep(step) ? (
     <TextBubbleEditor
       initialValue={step.content.richText}
       onClose={handleCloseEditor}
@@ -404,7 +406,11 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
+              <StepSettings
+                step={step}
+                indices={indices}
+                onStepChange={handleStepUpdate}
+              />
             </SettingsModal>
           </Popover>
         )}
