@@ -7,7 +7,6 @@ import {
   IconButton,
 } from '@chakra-ui/react'
 import { RedoIcon, UndoIcon } from 'assets/icons'
-import { TbRouteOff, TbRoute } from 'react-icons/tb'
 import React, {
   useRef,
   useMemo,
@@ -70,16 +69,17 @@ export const Graph = memo(
       canUndo,
       canRedo,
       setHideEdges,
-      hideEdges,
     } = useTypebot()
     const {
       setGraphPosition: setGlobalGraphPosition,
       graphPosition: globalGraphPosition,
       setOpenedStepId,
       updateBlockCoordinates,
+      blocksCoordinates,
       setPreviewingEdge,
       connectingIds,
       goToBegining,
+      draggingBlockId,
     } = useGraph()
 
     const [graphPosition, setGraphPosition] = useState(
@@ -119,6 +119,10 @@ export const Graph = memo(
       'top' | 'right' | 'bottom' | 'left' | undefined
     >()
 
+    const lastMousePosRef = useRef<{ x: number; y: number } | null>(null)
+    const dragOffsetRef = useRef<{ x: number; y: number } | null>(null)
+    const prevDraggingIdRef = useRef<string | undefined>(undefined)
+
     useAutoMoveBoard(autoMoveDirection, setGraphPosition)
 
     useEffect(() => {
@@ -146,6 +150,38 @@ export const Graph = memo(
         setIsMovingBoard(false)
       }, showEdgesTimeOut)
     }, [])
+
+    useEffect(() => {
+      if (!draggingBlockId || !lastMousePosRef.current) {
+        dragOffsetRef.current = null
+        prevDraggingIdRef.current = undefined
+        return
+      }
+
+      if (
+        prevDraggingIdRef.current === draggingBlockId &&
+        dragOffsetRef.current
+      )
+        return
+
+      const blockCoordinates =
+        blocksCoordinates[draggingBlockId] ??
+        typebot?.blocks.find((block) => block.id === draggingBlockId)
+          ?.graphCoordinates
+
+      if (!blockCoordinates) return
+
+      const mouseWorld = {
+        x: (lastMousePosRef.current.x - graphPosition.x) / graphPosition.scale,
+        y: (lastMousePosRef.current.y - graphPosition.y) / graphPosition.scale,
+      }
+
+      dragOffsetRef.current = {
+        x: mouseWorld.x - blockCoordinates.x,
+        y: mouseWorld.y - blockCoordinates.y,
+      }
+      prevDraggingIdRef.current = draggingBlockId
+    }, [blocksCoordinates, draggingBlockId, typebot?.blocks, graphPosition])
 
     useEffect(() => {
       editorContainerRef.current = document.getElementById(
@@ -219,15 +255,32 @@ export const Graph = memo(
             x: e.clientX,
             y: e.clientY,
           })
-        } else {
-          setGraphPosition({
-            ...graphPosition,
-            x: graphPosition.x - e.deltaX,
-            y: graphPosition.y - e.deltaY,
-          })
+          return
         }
+
+        setGraphPosition((prev) => {
+          const nextPosition = {
+            ...prev,
+            x: prev.x - e.deltaX,
+            y: prev.y - e.deltaY,
+          }
+
+          if (draggingBlockId && lastMousePosRef.current && dragOffsetRef.current) {
+            const mouseWorldAfter = {
+              x: (lastMousePosRef.current.x - nextPosition.x) / prev.scale,
+              y: (lastMousePosRef.current.y - nextPosition.y) / prev.scale,
+            }
+
+            updateBlockCoordinates(draggingBlockId, {
+              x: mouseWorldAfter.x - dragOffsetRef.current.x,
+              y: mouseWorldAfter.y - dragOffsetRef.current.y,
+            })
+          }
+
+          return nextPosition
+        })
       },
-      [graphPosition, zoom]
+      [draggingBlockId, updateBlockCoordinates, zoom]
     )
 
     const handleMouseUp = useCallback(
@@ -305,6 +358,20 @@ export const Graph = memo(
     }
 
     const handleMouseMove = (e: MouseEvent) => {
+      lastMousePosRef.current = { x: e.clientX, y: e.clientY }
+
+      if (draggingBlockId && dragOffsetRef.current) {
+        const mouseWorld = {
+          x: (e.clientX - graphPosition.x) / graphPosition.scale,
+          y: (e.clientY - graphPosition.y) / graphPosition.scale,
+        }
+
+        updateBlockCoordinates(draggingBlockId, {
+          x: mouseWorld.x - dragOffsetRef.current.x,
+          y: mouseWorld.y - dragOffsetRef.current.y,
+        })
+      }
+
       if (!connectingIds)
         return autoMoveDirection ? setAutoMoveDirection(undefined) : undefined
 
@@ -398,7 +465,7 @@ export const Graph = memo(
             position="absolute"
             style={{
               transform,
-              transition: '0.1s',
+              transition: draggingBlockId ? '0s' : '0.1s',
             }}
             willChange="transform"
             transformOrigin="0px 0px 0px"

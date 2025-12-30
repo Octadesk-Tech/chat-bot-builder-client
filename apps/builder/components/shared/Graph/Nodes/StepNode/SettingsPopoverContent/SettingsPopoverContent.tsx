@@ -9,10 +9,12 @@ import {
 import { ExpandIcon } from 'assets/icons'
 import {
   BubbleStepType,
+  EndConversationStep,
   InputStepType,
   IntegrationStepType,
   LogicStepType,
   MediaBubbleContent,
+  OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   Step,
@@ -29,6 +31,7 @@ import {
   AssignToTeamSettingsBody,
   CallOtherBotSettingsBody,
   ConversationTagBody,
+  EndConversationSettingsBody,
   PreReserveSettingsBody,
   UrlInputSettingsBody,
   WhatsAppButtonsListSettingsBody,
@@ -74,6 +77,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
       case OctaStepType.OFFICE_HOURS:
       case OctaWabaStepType.COMMERCE:
+      case WOZStepType.ASSIGN:
         width = 450
         break
       case IntegrationStepType.WEBHOOK:
@@ -175,6 +179,15 @@ export const StepSettings = ({
       )
     }
 
+    case OctaBubbleStepType.END_CONVERSATION: {
+      return (
+        <EndConversationSettingsBody
+          step={step as EndConversationStep}
+          onContentChange={handleContentChange}
+        />
+      )
+    }
+
     case InputStepType.URL: {
       return (
         <UrlInputSettingsBody
@@ -267,8 +280,8 @@ export const StepSettings = ({
     case WOZStepType.ASSIGN: {
       return (
         <WOZAssignSettingBody
-          options={step.options}
-          onOptionsChange={handleOptionsChange}
+          step={step}
+          onStepChange={onStepChange}
         />
       )
     }

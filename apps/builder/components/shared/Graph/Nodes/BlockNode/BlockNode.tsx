@@ -38,6 +38,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
     focusedBlockId,
     setFocusedBlockId,
     graphPosition,
+    setDraggingBlockId,
   } = useGraph()
 
   const { typebot, updateBlock, deleteBlock, duplicateBlock } = useTypebot()
@@ -127,7 +128,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   const onDragStart = () => {
     setFocusedBlockId(block.id)
-
+    setDraggingBlockId(block.id)
     setIsMouseDown(true)
   }
 
@@ -136,7 +137,10 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
     ref: blockRef,
   })
 
-  const onDragStop = () => setIsMouseDown(false)
+  const onDragStop = () => {
+    setIsMouseDown(false)
+    setDraggingBlockId(undefined)
+  }
 
   const stackBorderColor = (isOpened: boolean): string => {
     if (!block.hasConnection && showWarning) {
