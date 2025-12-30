@@ -281,6 +281,7 @@ export const StepSettings = ({
       return (
         <WOZAssignSettingBody
           step={step}
+          indices={indices}
           onStepChange={onStepChange}
         />
       )

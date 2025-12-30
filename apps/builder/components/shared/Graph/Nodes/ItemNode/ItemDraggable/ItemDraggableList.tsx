@@ -17,7 +17,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Box, HStack, IconButton, Stack, Flex, Icon } from '@chakra-ui/react';
 import { DragHandleIcon } from '@chakra-ui/icons';
-import { Item, ItemIndices, StepWithItems, Step, ChoiceInputStep, WOZStepType } from 'models';
+import { Item, ItemIndices, StepWithItems, Step, ChoiceInputStep } from 'models';
 import { useTypebot } from 'contexts/TypebotContext';
 import { ItemNodeContent } from '../ItemNodeContent';
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint';
@@ -31,9 +31,25 @@ interface SortableItemProps {
   showControlButtons: boolean;
   onRemoveItem: () => void;
   onUpdateItem: (value: string) => void;
+  renderItemContent?: (params: {
+    item: Item
+    indices: ItemIndices
+    step?: StepWithItems
+    onUpdateItem: (value: string) => void
+    isReadOnly: boolean
+  }) => React.ReactNode;
 }
 
-const SortableItem = ({ item, indices, step, isReadOnly, showControlButtons, onRemoveItem, onUpdateItem }: SortableItemProps) => {
+const SortableItem = ({
+  item,
+  indices,
+  step,
+  isReadOnly,
+  showControlButtons,
+  onRemoveItem,
+  onUpdateItem,
+  renderItemContent,
+}: SortableItemProps) => {
   const { typebot } = useTypebot();
   
   const isConnectable = !(
@@ -107,23 +123,29 @@ const SortableItem = ({ item, indices, step, isReadOnly, showControlButtons, onR
             w="full"
             pos="relative"
           >
-            <ItemNodeContent
-              item={item}
-              indices={indices}
-              step={step as Step}
-              onUpdateItem={onUpdateItem}
-            />
-            {showConnection && (
-              <SourceEndpoint
-                source={{
-                  blockId: typebot.blocks[indices.blockIndex].id,
-                  stepId: item.stepId,
-                  itemId: item.id,
-                }}
-                pos="absolute"
-                right="-44px"
-                pointerEvents="all"
-              />
+            {renderItemContent ? (
+              <>{renderItemContent({ item, indices, step, onUpdateItem, isReadOnly })}</>
+            ) : (
+              <>
+                <ItemNodeContent
+                  item={item}
+                  indices={indices}
+                  step={step as Step}
+                  onUpdateItem={onUpdateItem}
+                />
+                {showConnection && (
+                  <SourceEndpoint
+                    source={{
+                      blockId: typebot.blocks[indices.blockIndex].id,
+                      stepId: item.stepId,
+                      itemId: item.id,
+                    }}
+                    pos="absolute"
+                    right="-44px"
+                    pointerEvents="all"
+                  />
+                )}
+              </>
             )}
           </Flex>
         </Flex>
@@ -155,6 +177,13 @@ interface ItemDraggableListProps {
   handleRemoveItem?: (item: Item, itemIndex: number) => void;
   handleReorderItem?: (oldIndex: number, newIndex: number) => void;
   renderPlaceholder?: (index: number) => React.ReactNode;
+  renderItemContent?: (params: {
+    item: Item
+    indices: ItemIndices
+    step?: StepWithItems
+    onUpdateItem: (value: string) => void
+    isReadOnly: boolean
+  }) => React.ReactNode;
 }
 
 export const ItemDraggableList = ({
@@ -166,6 +195,7 @@ export const ItemDraggableList = ({
   handleRemoveItem,
   handleReorderItem,
   renderPlaceholder,
+  renderItemContent,
 }: ItemDraggableListProps) => {
   const { blockIndex, stepIndex } = indices;
   const { reorderItem, deleteItem } = useTypebot();
@@ -211,10 +241,7 @@ export const ItemDraggableList = ({
   
   const itemIds = validItemsWithIndices.map(({ item }) => String(item.id));
 
-  // TODO: Remove this once the WOZAssignStep is implemented
-  const isWozAssignStep = step.type === WOZStepType.ASSIGN;
-
-  const showControlButtons = items.length > 1 && !isReadOnly && !isWozAssignStep;
+  const showControlButtons = items.length > 1 && !isReadOnly;
 
   const handleItemRemove = (item: Item, itemIndex: number) => {
     if (handleRemoveItem) {
@@ -260,10 +287,11 @@ export const ItemDraggableList = ({
                     itemIndex: originalIndex,
                     itemsCount: items.length,
                   }}
-                  isReadOnly={isReadOnly || isWozAssignStep}
+                  isReadOnly={isReadOnly}
                   showControlButtons={showControlButtons}
                   onRemoveItem={() => handleItemRemove(item, originalIndex)}
                   onUpdateItem={(value) => handleItemUpdate(item, originalIndex, value)}
+                  renderItemContent={renderItemContent}
                 />
                 {renderPlaceholder && mapIndex < validItemsWithIndices.length - 1 && (
                   <>{renderPlaceholder(originalIndex + 1)}</>

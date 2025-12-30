@@ -73,7 +73,6 @@ export const StepNode = ({
   isConnectable,
   indices,
   onMouseDown,
-  isStartBlock,
   unreachableNode,
 }: {
   step: Step
@@ -415,7 +414,11 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
+              <StepSettings
+                step={step}
+                indices={indices}
+                onStepChange={handleStepUpdate}
+              />
             </SettingsModal>
           </Popover>
         )}
