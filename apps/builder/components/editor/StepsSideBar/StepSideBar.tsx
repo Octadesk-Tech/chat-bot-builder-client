@@ -67,7 +67,7 @@ export const StepsSideBar = () => {
     })
   }
 
-  useEventListener('mousemove', handleMouseMove)
+  useEventListener(window, 'mousemove', handleMouseMove)
 
   const handleMouseDown = (e: React.MouseEvent, type: DraggableStepType) => {
     const element = e.currentTarget as HTMLDivElement
@@ -95,7 +95,7 @@ export const StepsSideBar = () => {
       y: 0,
     })
   }
-  useEventListener('mouseup', handleMouseUp)
+  useEventListener(window, 'mouseup', handleMouseUp)
 
   const handleLockClick = () => setIsLocked(!isLocked)
 

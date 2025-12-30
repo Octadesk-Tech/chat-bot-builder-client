@@ -4,7 +4,6 @@ import { Stack } from '@chakra-ui/react'
 import { WithVariableContent } from '../WithVariableContent'
 import { ItemNodesList } from 'components/shared/Graph/Nodes/ItemNode'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
-import { useTypebot } from 'contexts/TypebotContext'
 import { TextHtmlContent } from '../TextHtmlContent'
 
 type Props = {
@@ -17,7 +16,6 @@ type Props = {
 }
 
 const InputItemsContent = ({ step, indices, isReadOnly = false }: Props) => {
-  const { typebot } = useTypebot()
   return (
 
     <Stack>

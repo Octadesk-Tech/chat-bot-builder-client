@@ -1,14 +1,23 @@
-import { Flex, Text } from '@chakra-ui/react'
+import { Flex, Input } from '@chakra-ui/react'
 import { Item } from 'models'
 import React, { useContext } from 'react'
-import { StepNodeContext } from 'components/shared/Graph/Nodes/StepNode/StepNode'
+import { StepNodeContext } from 'components/shared/Graph/Nodes/StepNode/StepNode/StepNode'
 
 type Props = {
   item: Item
+  onUpdateItem?: (value: string) => void
 }
 
-export const WhatsAppOptionsNodeContent = ({ item }: Props) => {
+const MAX_LENGTH_OPTION_TEXT = 24
+
+export const WhatsAppOptionsNodeContent = ({ item, onUpdateItem }: Props) => {
   const { setIsModalOpen } = useContext(StepNodeContext)
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (onUpdateItem) {
+      onUpdateItem(e.target.value || '')
+    }
+  }
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -17,18 +26,25 @@ export const WhatsAppOptionsNodeContent = ({ item }: Props) => {
     }
   }
 
+  const contentValue = typeof item.content === 'string' 
+    ? item.content 
+    : (item as any)?.label || (item.content as any)?.label || (item.content as any)?.value || ''
+
   return (
     <Flex justify="center" w="100%" pos="relative">
-      <Text
-        w="full"
-        color={item.content ? 'inherit' : 'gray.500'}
-        px={4}
-        py={2}
-        cursor="pointer"
+      <Input
+        placeholder="Insira o texto desta resposta..."
+        value={contentValue}
+        onChange={handleChange}
         onClick={handleClick}
-      >
-        {item.content || 'Editar opção'}
-      </Text>
+        maxLength={MAX_LENGTH_OPTION_TEXT}
+        bg="white"
+        size="md"
+        focusBorderColor="blue.400"
+        border="none"
+        w="full"
+        _focus={{ boxShadow: 'none' }}
+      />
     </Flex>
   )
 }

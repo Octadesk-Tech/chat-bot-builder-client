@@ -18,6 +18,7 @@ import { useGraph } from 'contexts/GraphContext'
 import { NodePosition, useDragDistance } from 'contexts/GraphDndContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ActionsTypeEmptyFields } from 'hooks/EmptyFields/useEmptyFields'
+import { useRefreshGraphConnections } from 'hooks/useRefreshGraphConnections'
 import { colors } from 'libs/theme'
 import {
   AssignToTeamStep,
@@ -72,7 +73,6 @@ export const StepNode = ({
   isConnectable,
   indices,
   onMouseDown,
-  isStartBlock,
   unreachableNode,
 }: {
   step: Step
@@ -91,6 +91,7 @@ export const StepNode = ({
     previewingEdge,
   } = useGraph()
   const { updateStep, emptyFields, setEmptyFields, typebot } = useTypebot()
+  const { refreshConnections, cleanup } = useRefreshGraphConnections()
   const [isConnecting, setIsConnecting] = useState(false)
 
   const availableOnlyForEvent =
@@ -160,8 +161,17 @@ export const StepNode = ({
 
   useIframeOverlayEvent(isModalOpen, 'modal', `step-settings-${step.id}`)
 
+  useEffect(() => {
+    return () => {
+      cleanup()
+    }
+  }, [cleanup])
+
   const handleModalClose = () => {
     updateStep(indices, { ...step })
+    
+    refreshConnections(step)
+    
     onModalClose()
     setIsModalOpen(false)
     setIsEditing(false)
@@ -404,7 +414,11 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
+              <StepSettings
+                step={step}
+                indices={indices}
+                onStepChange={handleStepUpdate}
+              />
             </SettingsModal>
           </Popover>
         )}

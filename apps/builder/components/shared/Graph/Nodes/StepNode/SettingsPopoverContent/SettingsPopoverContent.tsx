@@ -68,7 +68,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
   const handleMouseWheel = (e: WheelEvent) => {
     e.stopPropagation()
   }
-  useEventListener('wheel', handleMouseWheel, ref.current)
+  useEventListener(() => ref.current, 'wheel', handleMouseWheel)
 
   const handleWidthPerComponent = (step: Step): number | undefined => {
     let width
@@ -281,6 +281,7 @@ export const StepSettings = ({
       return (
         <WOZAssignSettingBody
           step={step}
+          indices={indices}
           onStepChange={onStepChange}
         />
       )
@@ -323,6 +324,7 @@ export const StepSettings = ({
           options={step.options || {}}
           onOptionsChange={handleOptionsChange}
           step={step}
+          indices={indices}
         />
       )
     }
@@ -332,6 +334,7 @@ export const StepSettings = ({
           options={step.options || {}}
           onOptionsChange={handleOptionsChange}
           step={step}
+          indices={indices}
         />
       )
     }

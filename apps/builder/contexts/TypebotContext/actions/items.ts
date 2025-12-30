@@ -13,6 +13,7 @@ import { cleanUpEdgeDraft } from './edges'
 
 import cuid from 'cuid'
 import { byId, stepHasItems } from 'utils'
+import { updateBlocksHasConnections } from 'helpers/block-connections'
 
 export type ItemsActions = {
   createItem: (
@@ -22,6 +23,11 @@ export type ItemsActions = {
   updateItem: (indices: ItemIndices, updates: Partial<Omit<Item, 'id'>>) => void
   detachItemFromStep: (indices: ItemIndices) => void
   deleteItem: (indices: ItemIndices) => void
+  reorderItem: (
+    { blockIndex, stepIndex }: { blockIndex: number; stepIndex: number },
+    oldIndex: number,
+    newIndex: number
+  ) => void
 }
 
 const itemsAction = (setTypebot: SetTypebot): ItemsActions => ({
@@ -91,6 +97,46 @@ const itemsAction = (setTypebot: SetTypebot): ItemsActions => ({
         const removingItem = step.items[itemIndex]
         step.items.splice(itemIndex, 1)
         cleanUpEdgeDraft(typebot, removingItem.id)
+      })
+    ),
+  reorderItem: (
+    { blockIndex, stepIndex }: { blockIndex: number; stepIndex: number },
+    oldIndex: number,
+    newIndex: number
+  ) =>
+    setTypebot((typebot) =>
+      produce(typebot, (typebot) => {
+        const step = typebot.blocks[blockIndex].steps[
+          stepIndex
+        ] as StepWithItems
+        
+        if (!step.items || !Array.isArray(step.items)) {
+          return
+        }
+        
+        if (
+          oldIndex < 0 ||
+          newIndex < 0 ||
+          oldIndex >= step.items.length ||
+          newIndex >= step.items.length
+        ) {
+          return
+        }
+        
+        const itemToMove = step.items[oldIndex]
+        if (!itemToMove || itemToMove == null) {
+          return
+        }
+        
+        const [movedItem] = step.items.splice(oldIndex, 1)
+        
+        if (!movedItem || movedItem == null) {
+          return
+        }
+        
+        step.items.splice(newIndex, 0, movedItem)
+        
+        typebot.blocks = updateBlocksHasConnections(typebot)
       })
     ),
 })
