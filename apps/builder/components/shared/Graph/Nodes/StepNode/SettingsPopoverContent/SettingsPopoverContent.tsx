@@ -53,8 +53,8 @@ import { RedirectSettings } from './bodies/RedirectSettings'
 import { TypebotLinkSettingsForm } from './bodies/TypebotLinkSettingsForm'
 import { WebhookSettings } from './bodies/WebhookSettings'
 import { ChatReturnBody } from './bodies/ChatReturnBody'
-import { TextSettingsBody } from './bodies/TextSettingsBody'
 import { InterpretDataWithAI } from './bodies/InterpretDataWithAI/InterpretDataWithAI'
+import { TextSettingsBody } from './bodies/TextSettingsBody'
 
 type Props = {
   step: Exclude<Step, TextBubbleStep>
@@ -165,8 +165,8 @@ export const StepSettings = ({
   const handleContentChange = (
     content:
       | MediaBubbleContent
-      | WOZInterpretDataWithAIOptions
       | TextBubbleContent
+      | WOZInterpretDataWithAIOptions
   ) => {
     onStepChange({ content } as Partial<Step>)
   }
@@ -285,12 +285,7 @@ export const StepSettings = ({
       )
     }
     case WOZStepType.ASSIGN: {
-      return (
-        <WOZAssignSettingBody
-          step={step}
-          onStepChange={onStepChange}
-        />
-      )
+      return <WOZAssignSettingBody step={step} onStepChange={onStepChange} />
     }
 
     case WOZStepType.INTERPRET_DATA_WITH_AI: {

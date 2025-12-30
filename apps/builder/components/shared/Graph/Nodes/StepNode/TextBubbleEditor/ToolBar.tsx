@@ -43,7 +43,10 @@ export const ToolBar = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+      if (
+        pickerRef.current &&
+        !pickerRef.current.contains(event.target as Node)
+      ) {
         setShowPicker(false)
       }
     }
@@ -149,7 +152,7 @@ export const ToolBar = ({
           </span>
         </>
       )}
-      <span style={{ position: 'relative' }}>
+      <span style={{ position: 'relative' }} ref={pickerRef}>
         <span
           ref={emojiButtonRef}
           onClick={handleEmojiIconClick}

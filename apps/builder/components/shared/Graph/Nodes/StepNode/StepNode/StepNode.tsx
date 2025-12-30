@@ -42,14 +42,8 @@ import {
   WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
+import React, { createContext, useEffect, useRef, useState } from 'react'
 import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
-import React, {
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
 import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
@@ -110,7 +104,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-    step.content.plainText === ''
+      step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -161,7 +155,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-      connectingIds?.target?.stepId === step.id
+        connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -432,16 +426,16 @@ const isEndConversationStep = (
   return isOctaBubbleStep(step)
 }
 
-const isWozSuggestionStep = (step: Step): step is WOZSuggestionStep => {
-  return step.type === WOZStepType.MESSAGE
-}
-
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
   return step.type === OctaStepType.ASSIGN_TO_TEAM
 }
 
 const isWozAssignStep = (step: Step): step is WOZAssignStep => {
   return step.type === WOZStepType.ASSIGN
+}
+
+const isWozSuggestionStep = (step: Step): boolean => {
+  return step.type === WOZStepType.MESSAGE
 }
 
 const isCallOtherBotStep = (step: Step): step is CallOtherBotStep => {
