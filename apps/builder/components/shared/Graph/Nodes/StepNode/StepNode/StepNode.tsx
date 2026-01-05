@@ -104,7 +104,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-    step.content.plainText === ''
+      step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -155,7 +155,7 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-      connectingIds?.target?.stepId === step.id
+        connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
 
@@ -227,7 +227,7 @@ export const StepNode = ({
     )
   }
 
-  return isEditing && (isOctaBubbleStep(step)) ? (
+  return isEditing && isOctaBubbleStep(step) ? (
     <TextBubbleEditor
       initialValue={step.content.richText}
       onClose={handleCloseEditor}
@@ -406,7 +406,11 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
+              <StepSettings
+                step={step}
+                indices={indices}
+                onStepChange={handleStepUpdate}
+              />
             </SettingsModal>
           </Popover>
         )}
@@ -422,16 +426,16 @@ const isEndConversationStep = (
   return isOctaBubbleStep(step)
 }
 
-const isWozSuggestionStep = (step: Step): step is WOZSuggestionStep => {
-  return step.type === WOZStepType.MESSAGE
-}
-
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
   return step.type === OctaStepType.ASSIGN_TO_TEAM
 }
 
 const isWozAssignStep = (step: Step): step is WOZAssignStep => {
   return step.type === WOZStepType.ASSIGN
+}
+
+const isWozSuggestionStep = (step: Step): boolean => {
+  return step.type === WOZStepType.MESSAGE
 }
 
 const isCallOtherBotStep = (step: Step): step is CallOtherBotStep => {

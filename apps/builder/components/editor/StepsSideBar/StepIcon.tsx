@@ -24,7 +24,6 @@ import {
   TextIcon,
   WandIcon,
   WavingHandIcon,
-  WebhookIcon,
   ReturnArrow,
   AIIcon,
   InterpretDataWithAIIcon,
