@@ -149,7 +149,7 @@ export const ToolBar = ({
           </span>
         </>
       )}
-      <span style={{ position: 'relative' }}>
+      <span style={{ position: 'relative' }} ref={pickerRef}>
         <span
           ref={emojiButtonRef}
           onClick={handleEmojiIconClick}

@@ -147,7 +147,9 @@ export const InputSettingBody = ({
         (step.options.fallbackMessages?.length ? (
           <>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
-              <Text>Se o cliente não responder com nenhuma das opções:</Text>
+              <Text fontWeight="bold" fontSize="sm">
+                Se o cliente não responder com nenhuma das opções:
+              </Text>
               <Button
                 background={'transparent'}
                 onClick={() => setIsCollapsed((v) => !v)}
@@ -161,7 +163,7 @@ export const InputSettingBody = ({
                   fallbackMessageComponent(message, index)
                 )}
                 <Box>
-                  <FormLabel mb="0" htmlFor="placeholder">
+                  <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
                     Se o cliente errar 3 vezes seguidas, atribuir conversa para:
                   </FormLabel>
                   <AssignToResponsibleSelect

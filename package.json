@@ -16,11 +16,13 @@
     "build": "yarn docker:up && turbo run build",
     "test:builder": "cd apps/builder && yarn test",
     "lint": "turbo run lint",
-    "db:migrate": "yarn workspace db migration:deploy"
+    "db:migrate": "yarn workspace db migration:deploy",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "@types/pako": "^2.0.3",
-    "turbo": "^1.2.9"
+    "patch-package": "^6.5.1",
+    "turbo": "^1.11.0"
   },
   "packageManager": "yarn@1.22.17",
   "dependencies": {

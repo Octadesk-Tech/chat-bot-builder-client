@@ -12,16 +12,23 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
-import { WOZAssignStep, Step, ItemType } from 'models'
+import { Item, StepWithItems, WOZAssignStep, Step, ItemType, StepIndices } from 'models'
 import { useState, useRef, useEffect } from 'react'
-import { MdAdd, MdClose } from 'react-icons/md'
+import { MdAdd } from 'react-icons/md'
 import { WozAssignSelect } from './WozAssignSelect'
 import WozQtdAttemptsSelect from './WozQtdAttemptsSelect'
 import cuid from 'cuid'
+import { ItemDraggableList } from 'components/shared/Graph/Nodes/ItemNode/ItemDraggable/ItemDraggableList'
 
 type Props = {
   step: WOZAssignStep
+  indices: StepIndices
   onStepChange: (step: Partial<Step>) => void
+}
+
+type CustomContext = {
+  id: string
+  label: string
 }
 
 const DEFAULT_OPTIONS = [
@@ -33,6 +40,7 @@ const MAX_LENGTH_OPTION_TEXT = 100
 
 export const WOZAssignSettingBody = ({
   step,
+  indices,
   onStepChange,
 }: Props) => {
   const [viewMoreInfo, setViewMoreInfo] = useState('')
@@ -51,19 +59,20 @@ export const WOZAssignSettingBody = ({
 
   const getInitialItems = () => {
     if (step.items && step.items.length > 2) {
-      return step.items.slice(2).map((item: any) => ({
+      const customItemsFromStep = (step.items as unknown as Array<{ id: string; content?: string }>).slice(2)
+      return customItemsFromStep.map((item) => ({
         id: item.id,
         label: item.content || '',
         readonly: false,
       }))
     }
     if (step.options?.customContexts && step.options.customContexts.length > 0) {
-      return [...step.options.customContexts]
+      return [...step.options.customContexts] as CustomContext[]
     }
     return []
   }
 
-  const [localListItems, setLocalListItems] = useState<any[]>(() => getInitialItems())
+  const [localListItems, setLocalListItems] = useState<CustomContext[]>(() => getInitialItems())
   const localListItemsRef = useRef(localListItems)
   localListItemsRef.current = localListItems
 
@@ -123,19 +132,19 @@ export const WOZAssignSettingBody = ({
     return viewMoreInfo === 'redirection'
   }
 
-  const handleWozAssignSelect = (e: any) => {
+  const handleWozAssignSelect = (e: { profile?: string }) => {
     onStepChange({
       options: { ...stepRef.current?.options, virtualAgentId: e.profile }
     } as Partial<Step>)
   }
 
-  const handleChangeAttempts = (e: any) => {
+  const handleChangeAttempts = (e: number) => {
     onStepChange({
       options: { ...stepRef.current?.options, limitAnswerNoContent: e }
     } as Partial<Step>)
   }
 
-  const updateStepAndOptions = (customItems: any[]) => {
+  const updateStepAndOptions = (customItems: CustomContext[]) => {
     const defaultItems = getDefaultItems()
     const filteredCustomItems = customItems.filter((item) => item.label && item.label.trim() !== '')
 
@@ -166,9 +175,7 @@ export const WOZAssignSettingBody = ({
 
     const updatedItems = [...localListItems, newOption]
     setLocalListItems(updatedItems)
-    onStepChange({
-      options: { ...stepRef.current?.options, customContexts: updatedItems }
-    } as Partial<Step>)
+    updateStepAndOptions(updatedItems)
   }
 
   const handleUpdateOption = (index: number, value: string) => {
@@ -183,7 +190,16 @@ export const WOZAssignSettingBody = ({
   }
 
   const handleRemoveOption = (index: number) => {
-    const updatedItems = localListItems.filter((_: any, i: number) => i !== index)
+    const updatedItems = localListItems.filter((_: CustomContext, i: number) => i !== index)
+
+    setLocalListItems(updatedItems)
+    updateStepAndOptions(updatedItems)
+  }
+
+  const handleReorderOption = (oldIndex: number, newIndex: number) => {
+    const updatedItems = [...localListItems]
+    const [movedItem] = updatedItems.splice(oldIndex, 1)
+    updatedItems.splice(newIndex, 0, movedItem)
 
     setLocalListItems(updatedItems)
     updateStepAndOptions(updatedItems)
@@ -304,37 +320,29 @@ export const WOZAssignSettingBody = ({
             </Flex>
           ))}
 
-          {localListItems.map((item: any, index: number) => (
-            <Flex key={item.id} gap={2} alignItems="center">
-              <Box
-                bg="#F4F4F5"
-                p={3}
-                borderRadius="md"
-                border="1px solid"
-                borderColor="#E3E4E8"
-                flex="1"
-              >
-                <Input
-                  placeholder="Insira o assunto da conversa..."
-                  value={item.label}
-                  onChange={(e) => handleUpdateOption(index, e.target.value)}
-                  maxLength={MAX_LENGTH_OPTION_TEXT}
-                  bg="white"
-                  size="md"
-                  focusBorderColor="none"
-                />
-              </Box>
-
-              <IconButton
-                aria-label="Remover opção"
-                icon={<Icon as={MdClose} boxSize={5} />}
-                size="sm"
-                variant="ghost"
-                onClick={() => handleRemoveOption(index)}
-                _hover={{ bg: 'transparent', color: 'red.500' }}
+          <ItemDraggableList
+            items={localListItems as unknown as Item[]}
+            step={step as unknown as StepWithItems}
+            indices={indices}
+            isReadOnly={false}
+            handleUpdateItem={(_, itemIndex, value) => handleUpdateOption(itemIndex, value)}
+            handleRemoveItem={(_, itemIndex) => handleRemoveOption(itemIndex)}
+            handleReorderItem={handleReorderOption}
+            renderItemContent={({ item, onUpdateItem }) => (
+              <Input
+                placeholder="Insira o assunto da conversa..."
+                value={(item as unknown as CustomContext)?.label || ''}
+                onChange={(e) => onUpdateItem(e.target.value || '')}
+                maxLength={MAX_LENGTH_OPTION_TEXT}
+                bg="white"
+                size="md"
+                focusBorderColor="none"
+                border="none"
+                w="full"
+                _focus={{ boxShadow: 'none' }}
               />
-            </Flex>
-          ))}
+            )}
+          />
         </Stack>
 
         <Flex justify="center">

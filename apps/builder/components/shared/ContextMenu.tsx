@@ -68,6 +68,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
   }, [isOpened])
 
   useEventListener(
+    () => targetRef.current,
     'contextmenu',
     (e) => {
       if (props.isDisabled) return
@@ -79,8 +80,7 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
       } else {
         setIsOpened(false)
       }
-    },
-    targetRef.current
+    }
   )
 
   const onCloseHandler = useCallback(() => {

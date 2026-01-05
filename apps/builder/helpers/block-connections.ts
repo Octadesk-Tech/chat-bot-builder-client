@@ -11,6 +11,7 @@ import {
   OctaWabaStepType,
   Step,
 } from 'models'
+import { stepHasItems } from 'utils'
 
 const finalSteps: string[] = [
   OctaBubbleStepType.END_CONVERSATION,
@@ -24,33 +25,30 @@ const validIfHasConnection = (
 ) => !!edges.find((edge) => edge[side].blockId === blockId)
 
 const areAllItemsConnected = (step: Step): boolean => {
-  let result = false
-  const areAllChoicesConnected =
-    step?.items?.every((item) => !!item.outgoingEdgeId) ?? false
-  if (!!areAllChoicesConnected) {
-    result = true
-  }
-  return result
+  if (!stepHasItems(step)) return false
+  const validItems = step.items.filter((item) => item != null)
+  if (validItems.length === 0) return false
+  return validItems.every((item) => !!item.outgoingEdgeId)
 }
 
 const hasAllEdgeCaseTrue = (step: Step, block: Block): boolean => {
-  let result = true
   const isThereNextStep = !!block.steps[block.steps.indexOf(step) + 1]
   const hasEdgeCaseTrue = isThereNextStep || !!step.outgoingEdgeId
-  const hasEdgeCaseFalse =
-    step.items?.every((item) => !!item.outgoingEdgeId) ?? false
-  if (!hasEdgeCaseTrue || !hasEdgeCaseFalse) {
-    result = false
-  }
-  return result
+  const hasEdgeCaseFalse = stepHasItems(step)
+    ? (() => {
+        const validItems = step.items.filter((item) => item != null)
+        if (validItems.length === 0) return false
+        return validItems.every((item) => !!item.outgoingEdgeId)
+      })()
+    : false
+  return hasEdgeCaseTrue && hasEdgeCaseFalse
 }
 
 const checkOutgoingEdgeOnAssignToTeam = (step: Step): boolean => {
-  let result = true
-  if (step.options?.isAvailable) {
-    result = !!step.outgoingEdgeId
+  if ('options' in step && step.options && 'isAvailable' in step.options && step.options.isAvailable) {
+    return !!step.outgoingEdgeId
   }
-  return result
+  return true
 }
 
 export const updateBlocksHasConnections = ({
@@ -133,7 +131,10 @@ export const updateBlocksHasConnections = ({
       const isLastStepFinalStep =
         finalSteps.includes(lastStep?.type) ||
         (lastStep.type === OctaStepType.ASSIGN_TO_TEAM &&
-          !lastStep?.options?.isAvailable)
+          'options' in lastStep &&
+          lastStep.options &&
+          'isAvailable' in lastStep.options &&
+          !lastStep.options.isAvailable)
 
       if (!(hasToConnection && hasFromConnection) && !isLastStepFinalStep) {
         block.hasConnection = false

@@ -2,38 +2,28 @@ import {
   EditablePreview,
   EditableInput,
   Editable,
-  Fade,
-  IconButton,
   Flex,
-  Text,
 } from '@chakra-ui/react'
-import { PlusIcon, TrashIcon } from 'assets/icons'
-import { useGraph } from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
-import React, { useContext, useEffect, useRef, useState } from 'react'
-import { StepNodeContext } from '../../../StepNode/StepNode/StepNode'
+import React, { useEffect, useRef, useState } from 'react'
 
-const defaultPlaceholder = 'Clique para editar...'
 
 type Props = {
   item: ButtonItem
   indices: ItemIndices
-  isMouseOver: boolean
-  withControlButtons?: boolean
+  onUpdateItem?: (value: string) => void
 }
 
-export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
-  const { deleteItem, updateItem, createItem, typebot } = useTypebot()
-  const { setOpenedStepId, setFocusedBlockId } = useGraph()
-  const { setIsModalOpen } = useContext(StepNodeContext)
+export const ButtonNodeContent = ({ item, indices, onUpdateItem }: Props) => {
+  const defaultPlaceholder = 'Insira o texto desta resposta...' 
+
+  const { deleteItem, updateItem, createItem } = useTypebot()
   const [initialContent] = useState(item.content ?? '')
   const [itemValue, setItemValue] = useState(
     item.content ?? defaultPlaceholder
   )
   const editableRef = useRef<HTMLDivElement | null>(null)
-
-  const { canAddItem = true } = item
 
   useEffect(() => {
     if (itemValue !== item.content)
@@ -43,8 +33,13 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
 
   const handleInputSubmit = () => {
     if (itemValue === '') deleteItem(indices)
-    else
-      updateItem(indices, { content: itemValue === '' ? undefined : itemValue })
+    else {
+      const newValue = itemValue === '' ? undefined : itemValue
+      updateItem(indices, { content: newValue })
+      if (onUpdateItem) {
+        onUpdateItem(newValue || '')
+      }
+    }
   }
 
   const hasMoreThanOneItem = () => indices.itemsCount && indices.itemsCount > 1
@@ -72,42 +67,6 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
     )
   }
 
-  const handleDeleteClick = () => {
-    deleteItem(indices)
-  }
-
-  const canAddItemFn = canAddItem && item.content !== 'Encerrar a conversa'
-
-  const handleReadOnlyClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    if (item.stepId && typebot) {
-      const blockId = typebot.blocks[indices.blockIndex]?.id
-      if (blockId) {
-        setFocusedBlockId(blockId)
-      }
-      setIsModalOpen?.(true)
-      setOpenedStepId(item.stepId)
-    }
-  }
-
-  if (isReadOnly()) {
-    return (
-      <Flex justify="center" w="100%" pos="relative">
-        <Text
-          w="full"
-          px={4}
-          py={2}
-          color="inherit"
-          cursor="pointer"
-          userSelect="none"
-          onClick={(e) => handleReadOnlyClick(e)}
-        >
-          {item.content}
-        </Text>
-      </Flex>
-    )
-  }
-
   return (
     <Flex justify="center" w="100%" pos="relative">
       <Editable
@@ -129,37 +88,8 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
           px={4}
           py={2}
         />
-        <EditableInput px={4} py={2} />
+        <EditableInput px={4} py={2} readOnly={isReadOnly()} _focus={{ borderColor: 'gray.400' }} />
       </Editable>
-      <Fade
-        in={isMouseOver}
-        style={{
-          position: 'absolute',
-          bottom: '-15px',
-          zIndex: 3,
-          left: '90px',
-        }}
-        unmountOnExit
-      >
-        {canAddItemFn && (
-          <IconButton
-            aria-label="Add item"
-            icon={<PlusIcon />}
-            size="xs"
-            colorScheme="gray"
-            onClick={handlePlusClick}
-          />
-        )}
-        {canAddItem && hasMoreThanOneItem() && (
-          <IconButton
-            aria-label="Delete item"
-            icon={<TrashIcon />}
-            size="xs"
-            colorScheme="gray"
-            onClick={handleDeleteClick}
-          />
-        )}
-      </Fade>
     </Flex>
   )
 }

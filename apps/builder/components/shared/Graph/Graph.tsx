@@ -388,22 +388,22 @@ export const Graph = memo(
       setAutoMoveDirection(undefined)
     }
 
-    useEventListener('wheel', handleMouseWheel, graphContainerRef.current)
+    useEventListener(() => graphContainerRef.current, 'wheel', handleMouseWheel)
 
     useEventListener(
+      () => graphContainerRef.current,
       'mousedown',
       handleCaptureMouseDown,
-      graphContainerRef.current,
       {
         capture: true,
       }
     )
 
-    useEventListener('mouseup', handleMouseUp, graphContainerRef.current)
+    useEventListener(() => graphContainerRef.current, 'mouseup', handleMouseUp)
 
-    useEventListener('click', handleClick, editorContainerRef.current)
+    useEventListener(() => editorContainerRef.current, 'click', handleClick)
 
-    useEventListener('mousemove', handleMouseMove)
+    useEventListener(window, 'mousemove', handleMouseMove)
 
     const draggingStep = draggedStep || draggedStepType
 

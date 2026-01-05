@@ -45,7 +45,7 @@ const WOZAssignContent = ({ step, indices }: Props) => {
         Redirecionamento baseado no assunto da conversa:
       </Text>
 
-      <ItemNodesList step={step} indices={indices} />
+      <ItemNodesList step={step} indices={indices} isReadOnly={true} />
 
       <OctaDivider />
       <Text fontSize={'13px'} align={'center'} color={'purple.400'}>
