@@ -1,3 +1,5 @@
 import WOZAssignContent from './WOZAssignContent'
 
-export { WOZAssignContent }
+export {
+  WOZAssignContent
+}

@@ -73,6 +73,8 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   })
 
   const [variablesKeyDown, setVariablesKeyDown] = useState<KeyboardEvent>()
+  const [accordionIndex, setAccordionIndex] = useState<number[]>([0, 1, 2, 3, 4, 5])
+
   const schema = z.object({
     url: z.string().url({ message: 'url inválida' }),
     pathPortion: z.string().min(1, { message: 'Campo obrigatório' }),
@@ -229,6 +231,15 @@ export const WebhookSettings = React.memo(function WebhookSettings({
 
   const handleMethodChange = (method: HttpMethodsWebhook) => {
     if (step.options.method != method) clearOptions()
+
+    if (method === 'DELETE') {
+      setAccordionIndex((prev) => {
+        if (!prev.includes(4)) {
+          return [...prev, 4]
+        }
+        return prev
+      })
+    }
 
     onOptionsChange({
       ...step.options,
@@ -464,7 +475,12 @@ export const WebhookSettings = React.memo(function WebhookSettings({
             {getHttpMethodDescription(step.options.method)}
           </Text>
         </HStack>
-        <Accordion allowToggle allowMultiple defaultIndex={[0, 1, 2, 3, 4]}>
+        <Accordion
+          allowToggle
+          allowMultiple
+          index={accordionIndex}
+          onChange={(index) => setAccordionIndex(index as number[])}
+        >
           <AccordionItem>
             <AccordionButton justifyContent="space-between">
               URL
@@ -555,7 +571,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
               />
             </AccordionPanel>
           </AccordionItem>
-          {['POST', 'PUT', 'PATCH'].includes(step.options?.method) && (
+          {['POST', 'PUT', 'PATCH', 'DELETE'].includes(step.options?.method) && (
             <AccordionItem>
               <AccordionButton justifyContent="space-between">
                 Body

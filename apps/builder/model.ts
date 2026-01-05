@@ -160,7 +160,6 @@ export type Typebot = {
   workspaceId: string | null
   domain: string | null
   availableFor: string[]
-  hasPendingIssues: boolean
 }
 
 /**

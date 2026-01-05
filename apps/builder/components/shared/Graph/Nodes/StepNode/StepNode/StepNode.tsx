@@ -27,6 +27,7 @@ import {
   ExternalEventStep,
   IntegrationStepType,
   LogicStepType,
+  OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
   OfficeHourStep,
@@ -34,20 +35,14 @@ import {
   Step,
   TextBubbleContent,
   WOZAssignStep,
-  WOZSuggestionStep,
   WOZStepType,
   WebhookStep,
   WhatsAppButtonsListStep,
   WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
-import React, {
-  createContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import React, { createContext, useEffect, useRef, useState } from 'react'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
 import { isOctaBubbleStep, isTextBubbleStep } from 'utils'
@@ -67,6 +62,7 @@ import { BlockStack } from './StepNode.style'
 
 type StepNodeContextProps = {
   setIsPopoverOpened?: (isPopoverOpened: boolean) => void
+  setIsModalOpen?: (isModalOpen: boolean) => void
 }
 
 export const StepNodeContext = createContext<StepNodeContextProps>({})
@@ -107,7 +103,7 @@ export const StepNode = ({
   )
   const [isEditing, setIsEditing] = useState<boolean>(
     (isTextBubbleStep(step) || isOctaBubbleStep(step)) &&
-      step.content.plainText === ''
+    step.content.plainText === ''
   )
   const stepRef = useRef<HTMLDivElement | null>(null)
 
@@ -158,9 +154,11 @@ export const StepNode = ({
   useEffect(() => {
     setIsConnecting(
       connectingIds?.target?.blockId === step.blockId &&
-        connectingIds?.target?.stepId === step.id
+      connectingIds?.target?.stepId === step.id
     )
   }, [connectingIds, step.blockId, step.id])
+
+  useIframeOverlayEvent(isModalOpen, 'modal', `step-settings-${step.id}`)
 
   const handleModalClose = () => {
     updateStep(indices, { ...step })
@@ -184,8 +182,14 @@ export const StepNode = ({
   const handleClick = (e: React.MouseEvent) => {
     setFocusedBlockId(step.blockId)
     e.stopPropagation()
-    if (isTextBubbleStep(step) || isOctaBubbleStep(step)) setIsEditing(true)
-    else if (!isWozSuggestionStep(step)) setIsModalOpen(true)
+
+    if (step.type === OctaBubbleStepType.END_CONVERSATION) {
+      setIsModalOpen(true)
+    } else if (isOctaBubbleStep(step)) {
+      setIsEditing(true)
+    } else if (!isWozSuggestionStep(step)) {
+      setIsModalOpen(true)
+    }
 
     setOpenedStepId(step.id)
   }
@@ -217,12 +221,11 @@ export const StepNode = ({
       !isWhatsAppOptionsListStep(step) &&
       !isWhatsAppButtonsListStep(step) &&
       !isWozAssignStep(step) &&
-      !isChatReturn(step) &&
-      !isWozSuggestionStep(step)
+      !isChatReturn(step)
     )
   }
 
-  return isEditing && (isTextBubbleStep(step) || isOctaBubbleStep(step)) ? (
+  return isEditing && (isOctaBubbleStep(step)) ? (
     <TextBubbleEditor
       initialValue={step.content.richText}
       onClose={handleCloseEditor}
@@ -230,7 +233,7 @@ export const StepNode = ({
       menuPosition="absolute"
     />
   ) : (
-    <StepNodeContext.Provider value={{ setIsPopoverOpened }}>
+    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
       >
@@ -401,7 +404,7 @@ export const StepNode = ({
               onClose={handleModalClose}
               stepType={step.type}
             >
-              <StepSettings step={step} onStepChange={handleStepUpdate} />
+              <StepSettings step={step} indices={indices} onStepChange={handleStepUpdate} />
             </SettingsModal>
           </Popover>
         )}
@@ -417,16 +420,16 @@ const isEndConversationStep = (
   return isOctaBubbleStep(step)
 }
 
-const isWozSuggestionStep = (step: Step): step is WOZSuggestionStep => {
-  return step.type === WOZStepType.MESSAGE
-}
-
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
   return step.type === OctaStepType.ASSIGN_TO_TEAM
 }
 
 const isWozAssignStep = (step: Step): step is WOZAssignStep => {
   return step.type === WOZStepType.ASSIGN
+}
+
+const isWozSuggestionStep = (step: Step): boolean => {
+  return step.type === WOZStepType.MESSAGE
 }
 
 const isCallOtherBotStep = (step: Step): step is CallOtherBotStep => {

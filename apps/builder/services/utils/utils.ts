@@ -10,20 +10,14 @@ export const fetcher = async (input: RequestInfo, init?: RequestInit) => {
   const url = input.toString().replace(config.basePath.toString() || '', '')
   if (url.startsWith('/api/typebots?')) {
     const client = await services.chatBots.getClient()
-    const response = await client.get(
-      `builder/all`,
-      headers.getAuthorizedHeaders()
-    )
+    const response = await client.get(`builder/all`, headers.getAuthorizedHeaders())
     return { typebots: response.data }
   }
 
   if (url.startsWith('/getTypebot-')) {
     const typebotId = url.replace('/getTypebot-', '')
     const client = await services.chatBots.getClient()
-    const response = await client.get(
-      `builder/${typebotId}`,
-      headers.getAuthorizedHeaders()
-    )
+    const response = await client.get(`builder/${typebotId}`, headers.getAuthorizedHeaders())
     const typebot = response.data
     if (!typebot) return { typebot: null }
 
@@ -79,9 +73,7 @@ export const compressFile = async (file: File) => {
     : file
 }
 
-export const removeUndefinedFields = <T extends Record<string, any>>(
-  obj: T
-): T =>
+export const removeUndefinedFields = <T>(obj: T): T =>
   Object.keys(obj).reduce(
     (acc, key) =>
       obj[key as keyof T] === undefined
@@ -107,8 +99,8 @@ export const parseVariableHighlight = (content: string, typebot: Typebot) => {
 
 export const setMultipleRefs =
   (refs: React.MutableRefObject<HTMLDivElement | null>[]) =>
-  (elem: HTMLDivElement) =>
-    refs.forEach((ref) => (ref.current = elem))
+    (elem: HTMLDivElement) =>
+      refs.forEach((ref) => (ref.current = elem))
 
 export const readFile = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -152,18 +144,3 @@ export const timeSince = (date: string) => {
 
 export const isCloudProdInstance = () =>
   window.location.hostname === 'app.typebot.io'
-
-export const getCookie = (name: string): string | undefined => {
-  const value = `; ${document.cookie}`
-  const parts = value.split(`; ${name}=`)
-  if (parts.length === 2) return parts?.pop()
-}
-
-export const setCookie = (
-  name: string,
-  value: string,
-  maxAge: number = 31536000,
-  path: string = '/'
-) => {
-  document.cookie = `${name}=${value}; path=${path}; max-age=${maxAge}`
-}

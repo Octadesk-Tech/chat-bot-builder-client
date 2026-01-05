@@ -10,7 +10,7 @@ const WOZSuggestionContent = ({ step }: Props) => {
   return (
     <Stack>
       <Text noOfLines={0}>
-        Mensagem será disparada pelo perfil do WOZ Agente que ativou a tarefa.
+        Saiba Mais...
       </Text>
     </Stack>
   )

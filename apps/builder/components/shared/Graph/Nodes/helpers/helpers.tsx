@@ -6,7 +6,7 @@ import {
   OctaStepType,
   OctaWabaStepType,
   Step,
-  IntegrationStepType,
+  IntegrationStepType
 } from 'models'
 import { isBubbleStepType, isInputStep } from 'utils'
 import { z } from 'zod'
@@ -40,7 +40,7 @@ const inpuStepsWithFallbackMessages = [
   OctaWabaStepType.WHATSAPP_OPTIONS_LIST,
   OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
   InputStepType.CHOICE,
-  IntegrationStepType.EXTERNAL_EVENT,
+  IntegrationStepType.EXTERNAL_EVENT
 ]
 
 export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
@@ -73,15 +73,13 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
     }
 
     if (OctaStepType.CONVERSATION_TAG === step.type) {
-      if (
-        !step?.options?.tags ||
-        step?.options?.tags.length === 0 ||
-        step?.options?.tags[0]?._id === ''
-      ) {
-        data.push({
-          message: undefined,
-          min: { value: 1 },
-        })
+      if (!step?.options?.tags || step?.options?.tags.length === 0 || step?.options?.tags[0]?._id === '') {
+        data.push(
+          {
+            message: undefined,
+            min: { value: 1 },
+          }
+        )
       }
     }
 
@@ -139,20 +137,21 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
           item.content.comparisons.forEach((comparison) => {
             data.push(
               {
-                message: comparison?.comparisonOperator,
+                message: comparison?.comparisonOperator
               },
               {
-                message: comparison?.variableId,
-              }
-            )
-          })
+                message: comparison?.variableId
+              },
+            );
+          });
         }
-      })
+      });
     }
 
     if (LogicStepType.CHAT_RETURN === step.type) {
       if (!step.options?.time || step.options?.validationError) {
-        data.push({ message: undefined })
+        data.push({ message: undefined }
+        )
       }
     }
 
@@ -164,11 +163,6 @@ export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
       })
     }
 
-    if (step.type === IntegrationStepType.WEBHOOK) {
-      data.push({
-        message: step?.options?.url || '',
-      })
-    }
     data.map((d) => {
       return runStringValidation({ min: d?.min, max: d?.max }).parse({
         message: d.message || '',

@@ -29,7 +29,7 @@ export const EdgeMenu = ({
       />
       <MenuList>
         <MenuItem icon={<TrashIcon />} onClick={onDeleteEdge}>
-          Delete
+          Deletar
         </MenuItem>
       </MenuList>
     </Menu>

@@ -4,25 +4,32 @@ import {
   Collapse,
   Flex,
   FormLabel,
+  Icon,
+  IconButton,
+  Input,
   Spacer,
   Stack,
   Text,
 } from '@chakra-ui/react'
-import { WhatsAppOptionsListOptions, Variable, TextBubbleContent } from 'models'
+import { WhatsAppOptionsListOptions, Variable, TextBubbleContent, WhatsAppOptionsListStep } from 'models'
 import { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
 import { SlArrowDown, SlArrowUp } from 'react-icons/sl'
+import { MdClose, MdAdd } from 'react-icons/md'
 import { AssignToResponsibleSelect } from '../../AssignToTeam/AssignToResponsibleSelect'
+import cuid from 'cuid'
 
 type WhatsAppOptionsListSettingsBodyProps = {
   options: WhatsAppOptionsListOptions
   onOptionsChange: (options: WhatsAppOptionsListOptions) => void
+  step?: WhatsAppOptionsListStep
 }
 
 export const WhatsAppOptionsListSettingsBody = ({
   options,
   onOptionsChange,
+  step,
 }: WhatsAppOptionsListSettingsBodyProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [value, setValue] = useState({
@@ -31,10 +38,40 @@ export const WhatsAppOptionsListSettingsBody = ({
     footer: '',
     listTitle: '',
   })
+
+  const [localListItems, setLocalListItems] = useState<any[]>(() => {
+    if (options.listItems && options.listItems.length > 0) {
+      return options.listItems
+    } else if (step?.items && step.items.length > 0) {
+      return step.items.map((item: any) => ({
+        description: '',
+        id: item.id,
+        label: item.content || '',
+        selected: false,
+        value: item.content || '',
+      }))
+    }
+    return []
+  })
+
   const MAX_LENGHT_HEADER_AND_FOOTER = 60
   const MAX_LENGHT_BODY = 1024
   const MAX_LENGHT_LIST_TITLE = 20
-  const handleVariableChange = (variable: Variable) => {
+  const MAX_LENGTH_OPTION_TEXT = 24
+  const MAX_OPTIONS = 10
+
+  const handleVariableChange = (variable?: Variable) => {
+    if (!variable || (!variable.id && !variable.variableId)) {
+      onOptionsChange({
+        ...options,
+        property: undefined,
+        variableId: undefined,
+      })
+      return
+    }
+
+    const varId = variable.variableId || variable.id
+
     onOptionsChange({
       ...options,
       property: {
@@ -43,7 +80,7 @@ export const WhatsAppOptionsListSettingsBody = ({
         type: variable.type ? variable.type : 'string',
         token: variable.token,
       },
-      variableId: variable.id,
+      variableId: varId,
     })
   }
 
@@ -75,17 +112,22 @@ export const WhatsAppOptionsListSettingsBody = ({
     })
   }
 
-  const handleFooterText = (content: any) => {
-    const updateFooterText = { footer: content.plainText }
+  const handleFooterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value
     setValue((value) => ({
       ...value,
-      ...updateFooterText,
+      footer: newValue,
     }))
+
+    const content = {
+      html: `<div>${newValue}</div>`,
+      richText: [{ children: [{ text: newValue }], type: 'p' }],
+      plainText: newValue,
+    }
+
     onOptionsChange({
       ...options,
-      footer: {
-        content,
-      },
+      footer: { content },
     })
   }
   const handleListTitle = (content: any) => {
@@ -126,9 +168,8 @@ export const WhatsAppOptionsListSettingsBody = ({
         </FormLabel>
         <TextBubbleEditor
           required={{
-            errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${
-              index + 1
-            }" é obrigatório`,
+            errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${index + 1
+              }" é obrigatório`,
           }}
           onClose={(content) => handleFallBackMessage(content, index)}
           initialValue={message ? message.richText : []}
@@ -146,11 +187,48 @@ export const WhatsAppOptionsListSettingsBody = ({
     })
   }
 
+  const handleAddOption = () => {
+    if (localListItems.length >= MAX_OPTIONS) return
+
+    const newOption = {
+      description: '',
+      id: cuid(),
+      label: '',
+      selected: false,
+      value: '',
+    }
+
+    const updatedItems = [...localListItems, newOption]
+    setLocalListItems(updatedItems)
+    onOptionsChange({ ...options, listItems: updatedItems })
+  }
+
+  const handleUpdateOption = (index: number, value: string) => {
+    const updatedItems = [...localListItems]
+    updatedItems[index] = {
+      ...updatedItems[index],
+      label: value,
+      value: value,
+    }
+
+    setLocalListItems(updatedItems)
+    onOptionsChange({ ...options, listItems: updatedItems })
+  }
+
+  const handleRemoveOption = (index: number) => {
+    if (localListItems.length <= 1) return
+
+    const updatedItems = localListItems.filter((_: any, i: number) => i !== index)
+
+    setLocalListItems(updatedItems)
+    onOptionsChange({ ...options, listItems: updatedItems })
+  }
+
   return (
     <Stack spacing={4}>
       <Stack>
         <Flex>
-          <FormLabel mb="0" htmlFor="button">
+          <FormLabel mb="0" htmlFor="button" fontWeight="bold" fontSize={'sm'}>
             Texto do cabeçalho
           </FormLabel>
           <Spacer />
@@ -170,7 +248,7 @@ export const WhatsAppOptionsListSettingsBody = ({
       </Stack>
       <Stack>
         <Flex>
-          <FormLabel mb="0" htmlFor="button">
+          <FormLabel mb="0" htmlFor="button" fontWeight="bold" fontSize={'sm'}>
             Texto do corpo da mensagem
           </FormLabel>
           <Spacer />
@@ -190,7 +268,7 @@ export const WhatsAppOptionsListSettingsBody = ({
           maxLength={MAX_LENGHT_BODY}
         />
       </Stack>
-      {options?.useFallback &&
+      {options?.useFallback && localListItems.length > 0 && localListItems.some((item: any) => item.label && item.label.trim() !== '') &&
         (options?.fallbackMessages?.length ? (
           <>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
@@ -227,28 +305,10 @@ export const WhatsAppOptionsListSettingsBody = ({
             onKeyUp={(content) => handleFallBackMessage(content, 0)}
           />
         ))}
+
       <Stack>
         <Flex>
-          <FormLabel mb="0" htmlFor="button">
-            Texto do rodapé
-          </FormLabel>
-          <Spacer />
-          <FormLabel mb="0" htmlFor="button">
-            {value?.footer?.length ?? 0}/{MAX_LENGHT_HEADER_AND_FOOTER}
-          </FormLabel>
-        </Flex>
-        <TextBubbleEditor
-          onClose={handleFooterText}
-          initialValue={
-            options.footer?.content ? options.footer.content.richText : []
-          }
-          onKeyUp={handleFooterText}
-          maxLength={MAX_LENGHT_HEADER_AND_FOOTER}
-        />
-      </Stack>
-      <Stack>
-        <Flex>
-          <FormLabel mb="0" htmlFor="button">
+          <FormLabel mb="0" htmlFor="button" fontWeight="bold" fontSize={'sm'}>
             Título da lista
           </FormLabel>
           <Spacer />
@@ -266,6 +326,86 @@ export const WhatsAppOptionsListSettingsBody = ({
           }
           onKeyUp={handleListTitle}
           maxLength={MAX_LENGHT_LIST_TITLE}
+        />
+      </Stack>
+
+      <Stack spacing={3}>
+        <FormLabel mb="0" fontWeight="bold" fontSize={'sm'}>
+          Opções de resposta
+        </FormLabel>
+
+        <Stack spacing={3}>
+          {(localListItems.length > 0 ? localListItems : [{ id: 'empty-1', label: '', value: '', description: '', selected: false }]).map((item: any, index: number) => (
+            <Flex key={item.id} gap={2} alignItems="center">
+              <Box
+                bg="#F4F4F5"
+                p={3}
+                borderRadius="md"
+                border="1px solid"
+                borderColor="#E3E4E8"
+                flex="1"
+              >
+                <Input
+                  placeholder="Insira o texto desta resposta..."
+                  value={item.label}
+                  onChange={(e) => handleUpdateOption(index, e.target.value)}
+                  maxLength={MAX_LENGTH_OPTION_TEXT}
+                  bg="white"
+                  size="md"
+                  focusBorderColor="blue.400"
+                />
+              </Box>
+
+              {localListItems.length > 1 && (
+                <IconButton
+                  aria-label="Remover opção"
+                  icon={<Icon as={MdClose} boxSize={5} />}
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleRemoveOption(index)}
+                  _hover={{ bg: 'transparent', color: 'red.500' }}
+                />
+              )}
+            </Flex>
+          ))}
+        </Stack>
+
+        <Flex justify="center">
+          <Button
+            leftIcon={<Icon as={MdAdd} boxSize={5} />}
+            onClick={handleAddOption}
+            variant="outline"
+            size="md"
+            color={localListItems.length >= MAX_OPTIONS ? 'gray.400' : '#1366C9'}
+            borderColor={localListItems.length >= MAX_OPTIONS ? 'gray.300' : '#1366C9'}
+            borderWidth="2px"
+            fontSize="sm"
+            _hover={localListItems.length >= MAX_OPTIONS ? {} : { bg: '#1366C9', color: 'white' }}
+            _disabled={{ opacity: 1, cursor: 'not-allowed' }}
+            isDisabled={localListItems.length >= MAX_OPTIONS}
+          >
+            Adicionar opção
+          </Button>
+        </Flex>
+      </Stack>
+      <Stack>
+        <Flex>
+          <FormLabel mb="0" htmlFor="footer-input" fontWeight="bold" fontSize={'sm'}>
+            Texto do rodapé
+          </FormLabel>
+          <Spacer />
+          <FormLabel mb="0" htmlFor="footer-input">
+            {value?.footer?.length ?? 0}/{MAX_LENGHT_HEADER_AND_FOOTER}
+          </FormLabel>
+        </Flex>
+        <Input
+          id="footer-input"
+          placeholder="Insira o texto do rodapé..."
+          value={options.footer?.content?.plainText || ''}
+          onChange={handleFooterChange}
+          maxLength={MAX_LENGHT_HEADER_AND_FOOTER}
+          size="md"
+          focusBorderColor="blue.400"
         />
       </Stack>
       <Stack>

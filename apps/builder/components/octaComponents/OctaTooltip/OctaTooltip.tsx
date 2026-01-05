@@ -85,7 +85,7 @@ const OctaTooltip = ({
             contentWithElements
           ) : (
             <HStack>
-              <Text dangerouslySetInnerHTML={{ __html: contentText }} />
+              <Text>{contentText}</Text>
               <Link
                 href={hrefUrl}
                 isExternal

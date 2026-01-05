@@ -1,6 +1,5 @@
 import { InfoIcon } from '@chakra-ui/icons'
 import {
-  Box,
   Fade,
   Flex,
   HStack,
@@ -31,9 +30,8 @@ import {
   StepType,
   WOZStepType,
 } from 'models'
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 import { StepCard, StepCardOverlay } from './StepCard'
-import LearnAutomatedTasks from './LearnAutomatedTasks'
 
 export const StepsSideBar = () => {
   const { setDraggedStepType, draggedStepType } = useStepDnd()
@@ -56,11 +54,6 @@ export const StepsSideBar = () => {
   const { typebot } = useTypebot()
 
   const { verifyFeatureToggle } = useUser()
-
-  const isAutomatedTasksBot = useMemo(
-    () => typebot?.availableFor?.includes('automated-tasks'),
-    [typebot]
-  )
 
   const handleMouseMove = (event: MouseEvent) => {
     if (!draggedStepType) return
@@ -125,15 +118,13 @@ export const StepsSideBar = () => {
       type !== LogicStepType.CODE &&
       type !== LogicStepType.TYPEBOT_LINK &&
       type !== InputStepType.DATE &&
-      type !== OctaStepType.CALL_OTHER_BOT
+      type !== OctaStepType.CALL_OTHER_BOT &&
+      type !== WOZStepType.MESSAGE
     )
   }
 
   const EVENT_AVAILABLE_STEPS: StepType[] = [IntegrationStepType.WEBHOOK]
-  const AUTOMATED_TASKS_AVAILABLE_STEPS: StepType[] = [
-    WOZStepType.MESSAGE,
-    WOZStepType.INTERPRET_DATA_WITH_AI,
-  ]
+
   const LIMITED_DOMAINS = ['person', 'ticket']
 
   const isValidToCurrentDomain = (type: StepType) => {
@@ -161,14 +152,7 @@ export const StepsSideBar = () => {
       return EVENT_AVAILABLE_STEPS.includes(type)
     }
 
-    if (typebot.availableFor.includes('automated-tasks')) {
-      return (
-        AUTOMATED_TASKS_AVAILABLE_STEPS.includes(type) ||
-        EVENT_AVAILABLE_STEPS.includes(type)
-      )
-    }
-
-    return !AUTOMATED_TASKS_AVAILABLE_STEPS.includes(type)
+    return true
   }
 
   const shouldShowComponent = (type: StepType) => {
@@ -224,20 +208,9 @@ export const StepsSideBar = () => {
       workspace?.channel === 'whatsapp' &&
       verifyFeatureToggle('commerce-enabled')
   )
-
-  const wozAssign = Object.values(WOZStepType).filter((step) =>
-    shouldShowComponent(step) && step === WOZStepType.ASSIGN
+  const wozSteps = Object.values(WOZStepType).filter(
+    (step) => shouldShowComponent(step) && verifyFeatureToggle('woz-in-bot')
   )
-
-  const wozInterpretDataWithAI = Object.values(WOZStepType).filter(
-    (step) =>
-      shouldShowComponent(step) && step === WOZStepType.INTERPRET_DATA_WITH_AI
-  )
-
-  const wozMessage = Object.values(WOZStepType).filter(
-    (step) => shouldShowComponent(step) && step === WOZStepType.MESSAGE
-  )
-
   const octaBubbleSteps = Object.values(OctaBubbleStepType).filter((step) =>
     shouldShowComponent(step)
   )
@@ -275,9 +248,7 @@ export const StepsSideBar = () => {
         {/* Header fijo */}
         <HStack w="full" pt="2" px="4" pb="4">
           <Text fontSize="lg" fontWeight="bold" color="gray.600">
-            {isAutomatedTasksBot
-              ? 'Etapas de configuração'
-              : 'Etapas da conversa'}
+            Etapas da conversa
           </Text>
 
           <Spacer />
@@ -300,6 +271,8 @@ export const StepsSideBar = () => {
             </Tooltip>
           </Flex>
         </HStack>
+
+        { }
         <Stack
           flex="1"
           overflowY="auto"
@@ -362,100 +335,23 @@ export const StepsSideBar = () => {
               </SimpleGrid>
             </Stack>
           )}
-
-          {wozMessage.length && (
-            <Stack>
-              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-                Mensagens
-                <Tooltip
-                  hasArrow
-                  label={
-                    <Box>
-                      <Text mb="2">
-                        Use este componente para comunicar o resultado ao
-                        usuário, seja uma resposta simples ou um resumo tratado
-                        pela IA.
-                      </Text>
-
-                      <Box as="ul" pl="5" style={{ listStyleType: 'disc' }}>
-                        <li>
-                          Finalize a tarefa enviando uma mensagem clara e
-                          humanizada para o contato.
-                        </li>
-                      </Box>
-                    </Box>
-                  }
-                  bg="gray.700"
-                  color="white"
-                  width={'200px'}
-                >
-                  <InfoIcon marginLeft={'10px'} color={'gray.300'} />
-                </Tooltip>
-              </Text>
-              <SimpleGrid columns={1} spacing="3">
-                <StepCard
-                  key={WOZStepType.MESSAGE}
-                  type={WOZStepType.MESSAGE}
-                  onMouseDown={handleMouseDown}
-                />
-              </SimpleGrid>
-            </Stack>
-          )}
-          {wozInterpretDataWithAI.length && (
-            <Stack>
-              <Text fontSize="sm" fontWeight="semibold" color="gray.600">
-                Análises
-                <Tooltip
-                  hasArrow
-                  label={
-                    <Box>
-                      <Text mb="2">
-                        Use este componente para traduzir dados brutos (JSON) em
-                        uma mensagem de texto em linguagem natural, pronta para
-                        ser usada no próximo passo do fluxo.
-                      </Text>
-
-                      <Box as="ul" pl="5" style={{ listStyleType: 'disc' }}>
-                        <li>
-                          Ideal para pegar o retorno técnico de uma integração
-                          (ex: um JSON) e criar um resumo amigável para
-                          responder a um cliente ou para continuar a tarefa.
-                        </li>
-                      </Box>
-                    </Box>
-                  }
-                  bg="gray.700"
-                  color="white"
-                  width={'200px'}
-                >
-                  <InfoIcon marginLeft={'10px'} color={'gray.300'} />
-                </Tooltip>
-              </Text>
-              <SimpleGrid columns={1} spacing="3">
-                <StepCard
-                  key={WOZStepType.INTERPRET_DATA_WITH_AI}
-                  type={WOZStepType.INTERPRET_DATA_WITH_AI}
-                  onMouseDown={handleMouseDown}
-                />
-              </SimpleGrid>
-            </Stack>
-          )}
-
-          {wozAssign.length && (
+          {wozSteps.length && (
             <Stack>
               <Text fontSize="sm" fontWeight="semibold" color="gray.600">
                 WOZ
               </Text>
               <SimpleGrid columns={1} spacing="3">
-                <StepCard
-                  key={WOZStepType.ASSIGN}
-                  type={WOZStepType.ASSIGN}
-                  onMouseDown={handleMouseDown}
-                />
+                {wozSteps.map((type) => (
+                  <StepCard
+                    key={type}
+                    type={type}
+                    onMouseDown={handleMouseDown}
+                    isDisabled={shouldDisableComponent(type)}
+                  />
+                ))}
               </SimpleGrid>
             </Stack>
           )}
-
           {inputSteps.length && (
             <Stack>
               <Text fontSize="sm" fontWeight="semibold" color="gray.600">
@@ -550,30 +446,6 @@ export const StepsSideBar = () => {
               <Flex>
                 <Text fontSize="sm" fontWeight="semibold" color="gray.600">
                   Superintegrações
-                  <Tooltip
-                    hasArrow
-                    label={
-                      <Box>
-                        <Text mb="2">
-                          Conecte sua tarefa a sistemas externos (ex.: CRM, ERP,
-                          API) para buscar ou enviar informações.
-                        </Text>
-
-                        <Box as="ul" pl="5" style={{ listStyleType: 'disc' }}>
-                          <li>
-                            Este é o ponto de integração: configure a chamada ao
-                            sistema e defina o que deve acontecer em caso de
-                            sucesso ou falha.
-                          </li>
-                        </Box>
-                      </Box>
-                    }
-                    bg="gray.700"
-                    color="white"
-                    width={'200px'}
-                  >
-                    <InfoIcon marginLeft={'10px'} color={'gray.300'} />
-                  </Tooltip>
                 </Text>
                 <Spacer />
               </Flex>
@@ -589,22 +461,25 @@ export const StepsSideBar = () => {
             </Stack>
           )}
         </Stack>
-        <LearnAutomatedTasks />
       </Flex>
-      {draggedStepType && (
-        <Portal>
-          <StepCardOverlay
-            type={draggedStepType}
-            onMouseUp={handleMouseUp}
-            pos="fixed"
-            top="0"
-            left="0"
-            style={{
-              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg)`,
-            }}
-          />
-        </Portal>
-      )}
+
+      {
+        draggedStepType && (
+          <Portal>
+            <StepCardOverlay
+              type={draggedStepType}
+              onMouseUp={handleMouseUp}
+              pos="fixed"
+              top="0"
+              left="0"
+              style={{
+                transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg)`,
+              }}
+            />
+          </Portal>
+        )
+      }
+
       <Fade in={!isLocked} unmountOnExit>
         <Flex
           pos="absolute"
@@ -619,6 +494,6 @@ export const StepsSideBar = () => {
           <Flex w="5px" h="20px" bgColor="gray.400" rounded="md" />
         </Flex>
       </Fade>
-    </Flex>
+    </Flex >
   )
 }

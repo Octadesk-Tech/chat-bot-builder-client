@@ -16,6 +16,7 @@ import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
 import { colors } from 'libs/theme'
 import { StepType, WOZStepType } from 'models'
 import React from 'react'
+import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 
 type Props = {
   isOpen: boolean
@@ -32,9 +33,11 @@ export const SettingsModal = ({
   const handleMouseDown = (e: React.MouseEvent) => {
     e.stopPropagation()
   }
+
+  useIframeOverlayEvent(isOpen, 'modal', `settings-modal-${stepType}`)
+
   return (
     <Modal
-      scrollBehavior="inside"
       isOpen={isOpen}
       onClose={onClose}
       size={stepType === WOZStepType.MESSAGE ? 'full' : 'xl'}
@@ -79,6 +82,7 @@ export const SettingsModal = ({
               background: colors.gray[300],
               borderRadius: '24px',
             },
+            overflow: 'visible',
           }}
           marginRight={0.5}
           {...props}

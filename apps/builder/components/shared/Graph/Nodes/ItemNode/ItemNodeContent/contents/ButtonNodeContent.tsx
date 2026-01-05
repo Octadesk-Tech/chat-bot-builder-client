@@ -5,24 +5,31 @@ import {
   Fade,
   IconButton,
   Flex,
+  Text,
 } from '@chakra-ui/react'
 import { PlusIcon, TrashIcon } from 'assets/icons'
+import { useGraph } from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
-import React, { useEffect, useRef, useState } from 'react'
-import { isNotDefined } from 'utils'
+import React, { useContext, useEffect, useRef, useState } from 'react'
+import { StepNodeContext } from '../../../StepNode/StepNode/StepNode'
+
+const defaultPlaceholder = 'Clique para editar...'
 
 type Props = {
   item: ButtonItem
   indices: ItemIndices
   isMouseOver: boolean
+  withControlButtons?: boolean
 }
 
 export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
-  const { deleteItem, updateItem, createItem } = useTypebot()
+  const { deleteItem, updateItem, createItem, typebot } = useTypebot()
+  const { setOpenedStepId, setFocusedBlockId } = useGraph()
+  const { setIsModalOpen } = useContext(StepNodeContext)
   const [initialContent] = useState(item.content ?? '')
   const [itemValue, setItemValue] = useState(
-    item.content ?? 'Editar opção de resposta'
+    item.content ?? defaultPlaceholder
   )
   const editableRef = useRef<HTMLDivElement | null>(null)
 
@@ -30,7 +37,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
 
   useEffect(() => {
     if (itemValue !== item.content)
-      setItemValue(item.content ?? 'Editar opção de resposta')
+      setItemValue(item.content ?? defaultPlaceholder)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item])
 
@@ -49,7 +56,7 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
   const handleKeyPress = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (
       e.key === 'Escape' &&
-      itemValue === 'Editar opção de resposta' &&
+      itemValue === defaultPlaceholder &&
       hasMoreThanOneItem()
     )
       deleteItem(indices)
@@ -71,11 +78,41 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
 
   const canAddItemFn = canAddItem && item.content !== 'Encerrar a conversa'
 
+  const handleReadOnlyClick = (e: React.MouseEvent) => {
+    e.stopPropagation()
+    if (item.stepId && typebot) {
+      const blockId = typebot.blocks[indices.blockIndex]?.id
+      if (blockId) {
+        setFocusedBlockId(blockId)
+      }
+      setIsModalOpen?.(true)
+      setOpenedStepId(item.stepId)
+    }
+  }
+
+  if (isReadOnly()) {
+    return (
+      <Flex justify="center" w="100%" pos="relative">
+        <Text
+          w="full"
+          px={4}
+          py={2}
+          color="inherit"
+          cursor="pointer"
+          userSelect="none"
+          onClick={(e) => handleReadOnlyClick(e)}
+        >
+          {item.content}
+        </Text>
+      </Flex>
+    )
+  }
+
   return (
     <Flex justify="center" w="100%" pos="relative">
       <Editable
         ref={editableRef}
-        startWithEditView={isNotDefined(item.content)}
+        startWithEditView={false}
         value={itemValue}
         onChange={setItemValue}
         onSubmit={handleInputSubmit}
@@ -86,13 +123,13 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
         <EditablePreview
           w="full"
           color={
-            item.content !== 'Editar opção de resposta' ? 'inherit' : 'gray.500'
+            item.content !== defaultPlaceholder ? 'inherit' : 'gray.500'
           }
           cursor="pointer"
           px={4}
           py={2}
         />
-        <EditableInput px={4} py={2} readOnly={isReadOnly()} />
+        <EditableInput px={4} py={2} />
       </Editable>
       <Fade
         in={isMouseOver}
@@ -109,17 +146,15 @@ export const ButtonNodeContent = ({ item, indices, isMouseOver }: Props) => {
             aria-label="Add item"
             icon={<PlusIcon />}
             size="xs"
-            shadow="md"
             colorScheme="gray"
             onClick={handlePlusClick}
           />
         )}
-        {hasMoreThanOneItem() && !isReadOnly() && (
+        {canAddItem && hasMoreThanOneItem() && (
           <IconButton
             aria-label="Delete item"
             icon={<TrashIcon />}
             size="xs"
-            shadow="md"
             colorScheme="gray"
             onClick={handleDeleteClick}
           />

@@ -19,7 +19,6 @@ export enum BubbleStepType {
 export enum WOZStepType {
   MESSAGE = 'woz message',
   ASSIGN = 'woz assign',
-  INTERPRET_DATA_WITH_AI = 'woz-parse-data',
 }
 
 export type BubbleStepContent =
@@ -101,7 +100,7 @@ export const defaultTextBubbleContent: TextBubbleContent = {
 export const defaultImageBubbleContent: ImageBubbleContent = {
   name: '',
   size: 1,
-  type: '',
+  type: ''
 }
 
 const mediaDefaultText = 'Confira nossas opções:'
@@ -111,23 +110,19 @@ export const defaultMediaBubbleContent: MediaBubbleContent = {
   type: 'media',
   message: {
     html: `<div style="margin-left: 8px;">${mediaDefaultText}</div>`,
-    richText: [
-      {
-        children: [
-          {
-            text: mediaDefaultText,
-          },
-        ],
-        type: 'p',
-      },
-    ],
-    plainText: mediaDefaultText,
+    richText: [{
+      children: [{
+        text: mediaDefaultText,
+      }],
+      type: "p"
+    }],
+    plainText: mediaDefaultText
   },
   useFallback: false,
   fallbackMessages: undefined,
   initialVariableToken: '',
   property: undefined,
-  variableId: undefined,
+  variableId: undefined
 }
 
 export const defaultVideoBubbleContent: VideoBubbleContent = {}

@@ -5,6 +5,8 @@ import {
   AccordionItem,
   AccordionPanel,
   Flex,
+  Icon,
+  IconButton,
   Portal,
   Stack,
   Text,
@@ -40,19 +42,24 @@ import {
   HandleSelectCalendar,
   SelectedCalendar,
 } from './ItemNodeList.style'
+import { MdClose } from 'react-icons/md'
 
 type Props = {
   step: StepWithItems | WOZAssignStep
   indices: StepIndices
   isReadOnly?: boolean
+  hideConnection?: boolean
+  withControlButtons?: boolean
 }
 
 export const ItemNodesList = ({
   step,
   indices: { blockIndex, stepIndex },
   isReadOnly = false,
+  hideConnection = false,
+  withControlButtons = false,
 }: Props) => {
-  const { typebot, createItem, detachItemFromStep } = useTypebot()
+  const { typebot, createItem, detachItemFromStep, deleteItem } = useTypebot()
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
   const placeholderRefs = useRef<HTMLDivElement[]>([])
   const { graphPosition } = useGraph()
@@ -138,6 +145,10 @@ export const ItemNodesList = ({
 
   const stopPropagating = (e: React.MouseEvent) => e.stopPropagation()
 
+  const handleRemoveItemClick = (itemIndex: number) => {
+    deleteItem({ blockIndex, stepIndex, itemIndex })
+  }
+
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
       elem && (placeholderRefs.current[idx] = elem)
@@ -151,9 +162,9 @@ export const ItemNodesList = ({
 
   const chatReturn = {
     time: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.time,
-    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue 
+    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue
       === TimeTypeValue.HOUR ? 'horas' : 'minutos',
-    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError 
+    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError
   }
 
   const getWebhookDetails = () => {
@@ -179,6 +190,17 @@ export const ItemNodesList = ({
     }
   }
 
+  const showControlButtons = withControlButtons && step.items.length > 1 && !isReadOnly
+
+  const optionStyleWithControls = withControlButtons ? {
+    borderWidth: '1px',
+    borderColor: 'gray.200',
+    borderRadius: 'md',
+    p: 4,
+    w: 'full',
+    bg: 'gray.100',
+  } : { w: 'full' }
+
 
   return (
     <Stack
@@ -187,6 +209,7 @@ export const ItemNodesList = ({
       maxW="full"
       onClick={stopPropagating}
       pointerEvents={isReadOnly ? 'none' : 'all'}
+      color="#5A6377"
     >
       {step.type === OctaStepType.OFFICE_HOURS && (
         <Stack paddingBottom={'10px'}>
@@ -247,14 +270,14 @@ export const ItemNodesList = ({
       )}
       {step.type === LogicStepType.CHAT_RETURN && (
         <ChatReturnContainer>
-          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ? 
-          (
-            <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
-          )
-          :
-          (
-            <Text noOfLines={0}>{'Configurar...'}</Text>
-          )
+          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ?
+            (
+              <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
+            )
+            :
+            (
+              <Text noOfLines={0}>{'Configurar...'}</Text>
+            )
           }
         </ChatReturnContainer>
       )}
@@ -262,14 +285,43 @@ export const ItemNodesList = ({
         step.items &&
         step.items.map((item, idx) => {
           return (
-            <Stack key={item.id} spacing={1}>
-              <ItemNode
-                item={item}
-                step={step}
-                indices={{ blockIndex, stepIndex, itemIndex: idx, itemsCount: step.items.length }}
-                onMouseDown={handleStepMouseDown(idx)}
-                isReadOnly={isReadOnly}
-              />
+            <Stack
+              key={item.id}
+              spacing={1}
+              width="100%"
+            >
+              <Flex alignItems="center">
+                <Stack {...optionStyleWithControls}>
+                  <ItemNode
+                    item={item}
+                    step={step}
+                    indices={{
+                      blockIndex,
+                      stepIndex,
+                      itemIndex: idx,
+                      itemsCount: step.items.length,
+                    }}
+                    onMouseDown={handleStepMouseDown(idx)}
+                    isReadOnly={isReadOnly}
+                    hideConnection={hideConnection}
+                  />
+                </Stack>
+                {showControlButtons && (
+                  <IconButton
+                    aria-label="Delete item"
+                    icon={<Icon as={MdClose} boxSize={5} />}
+                    onClick={() => handleRemoveItemClick(idx)}
+                    variant="outline"
+                    colorScheme="gray"
+                    color="gray.500"
+                    _hover={{ bg: 'transparent' }}
+                    _active={{ bg: 'transparent' }}
+                    fontSize="xs"
+                    size="sm"
+                    borderWidth="0"
+                  />
+                )}
+              </Flex>
               {step.type !== WOZStepType.ASSIGN && (
                 <Flex
                   ref={handlePushElementRef(idx + 1)}

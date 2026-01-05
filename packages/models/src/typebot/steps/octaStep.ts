@@ -14,7 +14,7 @@ export type OctaStep =
 
 export type OctaWabaStep = WhatsAppOptionsListStep | WhatsAppButtonsListStep
 
-export type WOZStep = WOZSuggestionStep | WOZAssignStep | WOZInterpretDataWithAI
+export type WOZStep = WOZSuggestionStep | WOZAssignStep
 
 // Bubble steps (editado na árvore)
 export type OctaBubbleStep = EndConversationStep
@@ -92,11 +92,6 @@ export type WOZAssignStep = StepBase & {
   type: WOZStepType.ASSIGN
   options: WOZAssignOptions
   items: []
-}
-
-export type WOZInterpretDataWithAI = StepBase & {
-  type: WOZStepType.INTERPRET_DATA_WITH_AI
-  content: WOZInterpretDataWithAIOptions
 }
 
 export type ConversationTagStep = StepBase & {
@@ -251,7 +246,7 @@ export type AssignToTeamOptions = BaseOctaOptions & {
   labels: {
     placeholder: { assignToTeam: string; connectionMessage: string }
     button: string
-  }
+  },
   showChatReturnOption: boolean
 }
 
@@ -274,10 +269,11 @@ export type WOZSuggestionOptions = BaseOctaOptions & {
 export type WOZAssignOptions = BaseOctaOptions & {
   virtualAgentId?: string
   limitAnswerNoContent: number
-}
-
-export type WOZInterpretDataWithAIOptions = {
-  systemMessage: string
+  customContexts?: Array<{
+    id: string
+    label: string
+    readonly?: boolean
+  }>
 }
 
 export type CallOtherBotOptions = BaseOctaOptions & {
@@ -347,6 +343,7 @@ export type WhatsAppButtonsListOptions = BaseOctaOptions & {
   footer: {
     content?: TextBubbleContent
   }
+  buttonItems?: Array<{ id: string; text: string }>
   useFallback: boolean
   fallbackMessages: Array<TextBubbleContent>
   property: OctaProperty
@@ -419,7 +416,7 @@ export const defaultAssignToTeamOptions: AssignToTeamOptions = {
   exceedLimit: false,
   subType: '',
   isAvailable: false,
-  showChatReturnOption: false,
+  showChatReturnOption: false
 }
 
 export const defaultPreReserveOptions: PreReserveOptions = {
@@ -451,11 +448,6 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
   limitAnswerNoContent: 3,
 }
 
-export const defaultWOZInterpretDataWithAIOptions: WOZInterpretDataWithAIOptions =
-  {
-    systemMessage: '',
-  }
-
 export const defaultCallOtherBotOptions: CallOtherBotOptions = {
   id: '',
   botToCall: '',
@@ -465,20 +457,20 @@ export const defaultCallOtherBotOptions: CallOtherBotOptions = {
 
 const seeYa = 'Até mais!'
 export const defaultEndConversationBubbleContent: EndConversationBubbleContent =
-  {
-    html: `<div style="margin-left: 8px;">${seeYa}</div>`,
-    richText: [
-      {
-        children: [
-          {
-            text: seeYa,
-          },
-        ],
-        type: 'p',
-      },
-    ],
-    plainText: seeYa,
-  }
+{
+  html: `<div style="margin-left: 8px;">${seeYa}</div>`,
+  richText: [
+    {
+      children: [
+        {
+          text: seeYa,
+        },
+      ],
+      type: 'p',
+    },
+  ],
+  plainText: seeYa,
+}
 
 export const defaultCommerceOptions: CommerceOptions = {
   catalogId: '',
