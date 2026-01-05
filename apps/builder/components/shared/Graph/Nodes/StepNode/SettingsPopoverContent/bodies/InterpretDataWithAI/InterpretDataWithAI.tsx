@@ -231,10 +231,11 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
               borderColor="purple.600"
               borderLeftWidth="3px"
             >
-              <Text fontWeight="bold" fontSize="lg">
+              <Text fontWeight="bold" fontSize="md">
                 Teste de retorno:
               </Text>
               <Text
+                fontSize="sm"
                 dangerouslySetInnerHTML={{ __html: resultOfInterpretWithAi }}
               />
             </Box>

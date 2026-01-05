@@ -163,7 +163,10 @@ export const StepSettings = ({
   onStepChange: (step: Partial<Step>) => void
 }) => {
   const handleContentChange = (
-    content: MediaBubbleContent | TextBubbleContent | WOZInterpretDataWithAIOptions
+    content:
+      | MediaBubbleContent
+      | TextBubbleContent
+      | WOZInterpretDataWithAIOptions
   ) => {
     onStepChange({ content } as Partial<Step>)
   }
@@ -282,12 +285,7 @@ export const StepSettings = ({
       )
     }
     case WOZStepType.ASSIGN: {
-      return (
-        <WOZAssignSettingBody
-          step={step}
-          onStepChange={onStepChange}
-        />
-      )
+      return <WOZAssignSettingBody step={step} onStepChange={onStepChange} />
     }
 
     case WOZStepType.INTERPRET_DATA_WITH_AI: {
