@@ -8,22 +8,22 @@ exports.CollaborationType = exports.WorkspaceRole = exports.Plan = exports.Graph
 // https://github.com/microsoft/TypeScript/issues/3192#issuecomment-261720275
 exports.GraphNavigation = {
     MOUSE: 'MOUSE',
-    TRACKPAD: 'TRACKPAD'
+    TRACKPAD: 'TRACKPAD',
 };
 exports.Plan = {
     FREE: 'FREE',
     PRO: 'PRO',
     TEAM: 'TEAM',
     LIFETIME: 'LIFETIME',
-    OFFERED: 'OFFERED'
+    OFFERED: 'OFFERED',
 };
 exports.WorkspaceRole = {
     ADMIN: 'ADMIN',
     MEMBER: 'MEMBER',
-    GUEST: 'GUEST'
+    GUEST: 'GUEST',
 };
 exports.CollaborationType = {
     READ: 'READ',
     WRITE: 'WRITE',
-    FULL_ACCESS: 'FULL_ACCESS'
+    FULL_ACCESS: 'FULL_ACCESS',
 };

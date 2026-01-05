@@ -24,8 +24,11 @@ import {
   TextIcon,
   WandIcon,
   WavingHandIcon,
-  WebhookIcon,
   ReturnArrow,
+  AIIcon,
+  InterpretDataWithAIIcon,
+  PlugConnectIconGradient,
+  PlugConnectIcon,
 } from 'assets/icons'
 import { MdOutlineCheckBox } from 'react-icons/md'
 import { colors } from 'libs/theme'
@@ -40,15 +43,26 @@ import {
   StepType,
   WOZStepType,
 } from 'models'
+import { useTypebot } from 'contexts/TypebotContext'
+import { useMemo } from 'react'
 
 type StepIconProps = { type: StepType } & IconProps
 
 export const StepIcon = ({ type, ...props }: StepIconProps) => {
+  const { typebot } = useTypebot()
+
+  const isAutomatedTasksBot = useMemo(
+    () => typebot?.availableFor?.includes('automated-tasks'),
+    [typebot]
+  )
+
   switch (type) {
     case BubbleStepType.TEXT:
       return <TextIcon color="#AA561C" {...props} />
     case WOZStepType.MESSAGE:
-      return <WandIcon color="#AA561C" {...props} />
+      return <AIIcon {...props} />
+    case WOZStepType.INTERPRET_DATA_WITH_AI:
+      return <InterpretDataWithAIIcon {...props} />
     case WOZStepType.ASSIGN:
       return <WandIcon color={`${colors.purple[400]}`} {...props} />
     case BubbleStepType.MEDIA:
@@ -86,7 +100,11 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
     case LogicStepType.CHAT_RETURN:
       return <ReturnArrow color="#D1155D" {...props} />
     case IntegrationStepType.WEBHOOK:
-      return <WebhookIcon {...props} />
+      return isAutomatedTasksBot ? (
+        <PlugConnectIconGradient {...props} />
+      ) : (
+        <PlugConnectIcon {...props} />
+      )
     case IntegrationStepType.EXTERNAL_EVENT:
       return <ExternalEventIcon {...props} />
     case OctaBubbleStepType.END_CONVERSATION:
