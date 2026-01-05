@@ -436,10 +436,6 @@ const isEndConversationStep = (
   return isOctaBubbleStep(step)
 }
 
-const isWozSuggestionStep = (step: Step): step is WOZSuggestionStep => {
-  return step.type === WOZStepType.MESSAGE
-}
-
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
   return step.type === OctaStepType.ASSIGN_TO_TEAM
 }

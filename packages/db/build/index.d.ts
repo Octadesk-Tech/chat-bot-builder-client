@@ -256,7 +256,7 @@ export declare const GraphNavigation: {
     MOUSE: string;
     TRACKPAD: string;
 };
-export type GraphNavigation = (typeof GraphNavigation)[keyof typeof GraphNavigation];
+export type GraphNavigation = typeof GraphNavigation[keyof typeof GraphNavigation];
 export declare const Plan: {
     FREE: string;
     PRO: string;
@@ -264,16 +264,16 @@ export declare const Plan: {
     LIFETIME: string;
     OFFERED: string;
 };
-export type Plan = (typeof Plan)[keyof typeof Plan];
+export type Plan = typeof Plan[keyof typeof Plan];
 export declare const WorkspaceRole: {
     ADMIN: string;
     MEMBER: string;
     GUEST: string;
 };
-export type WorkspaceRole = (typeof WorkspaceRole)[keyof typeof WorkspaceRole];
+export type WorkspaceRole = typeof WorkspaceRole[keyof typeof WorkspaceRole];
 export declare const CollaborationType: {
     READ: string;
     WRITE: string;
     FULL_ACCESS: string;
 };
-export type CollaborationType = (typeof CollaborationType)[keyof typeof CollaborationType];
+export type CollaborationType = typeof CollaborationType[keyof typeof CollaborationType];
