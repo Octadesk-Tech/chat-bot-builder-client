@@ -298,6 +298,8 @@ export const StepSettings = ({
       return (
         <InterpretDataWithAI
           step={step}
+          indices={indices}
+          onStepChange={onStepChange}
           onContentChange={handleContentChange}
         />
       )

@@ -53,9 +53,9 @@ const SortableItem = ({
   const { typebot } = useTypebot();
   
   const isConnectable = !(
-    typebot?.blocks[indices.blockIndex].steps[
+    (typebot?.blocks?.[indices.blockIndex]?.steps?.[
       indices.stepIndex
-    ] as ChoiceInputStep
+    ] as ChoiceInputStep | undefined)
   )?.options?.isMultipleChoice;
   const showConnection = typebot && isConnectable && isReadOnly;
 
