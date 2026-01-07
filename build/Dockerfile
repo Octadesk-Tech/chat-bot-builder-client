@@ -1,6 +1,6 @@
 # https://github.com/vercel/turborepo/issues/215#issuecomment-1027058056
-#FROM node:16-slim AS base
-FROM node:16-bullseye-slim AS base
+#FROM node:18-slim AS base
+FROM node:18-bullseye-slim AS base
 WORKDIR /app
 ARG SCOPE
 ENV SCOPE=${SCOPE}
