@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react'
-import { StackProps, HStack, Button } from '@chakra-ui/react'
+import { StackProps, HStack, Button, Portal, Box } from '@chakra-ui/react'
 import {
   MARK_BOLD,
   MARK_ITALIC,
@@ -36,8 +36,10 @@ export const ToolBar = ({
   ...props
 }: Props) => {
   const [showPicker, setShowPicker] = useState(false)
+  const [pickerPosition, setPickerPosition] = useState({ top: 0, left: 0 })
   const { workspace } = useWorkspace()
   const pickerRef = useRef<HTMLDivElement>(null)
+  const emojiButtonRef = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,6 +64,13 @@ export const ToolBar = ({
 
   const handleEmojiIconClick = (e: React.MouseEvent) => {
     e.stopPropagation()
+    if (emojiButtonRef.current) {
+      const rect = emojiButtonRef.current.getBoundingClientRect()
+      setPickerPosition({
+        top: rect.bottom + 5,
+        left: rect.left,
+      })
+    }
     setShowPicker((prevState) => !prevState)
   }
 
@@ -140,8 +149,9 @@ export const ToolBar = ({
           </span>
         </>
       )}
-      <span style={{ position: 'relative' }} ref={pickerRef}>
+      <span style={{ position: 'relative' }}>
         <span
+          ref={emojiButtonRef}
           onClick={handleEmojiIconClick}
           style={{
             color: 'gray',
@@ -154,14 +164,22 @@ export const ToolBar = ({
           <EmojiIcon fontSize="20px" />
         </span>
         {showPicker && (
-          <div style={{ position: 'absolute', top: '100%', zIndex: 9999 }}>
-            <style>{`
-              .emoji-mart-preview {
-                display: none;
-              }
-            `}</style>
-            <Picker onSelect={handleEmojiSelect} i18n={customI18n} />
-          </div>
+          <Portal>
+            <Box
+              ref={pickerRef}
+              position="fixed"
+              top={`${pickerPosition.top}px`}
+              left={`${pickerPosition.left}px`}
+              zIndex={9999}
+            >
+              <style>{`
+                .emoji-mart-preview {
+                  display: none;
+                }
+              `}</style>
+              <Picker onSelect={handleEmojiSelect} i18n={customI18n} />
+            </Box>
+          </Portal>
         )}
       </span>
     </HStack>
