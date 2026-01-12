@@ -63,7 +63,7 @@ export const WhatsAppOptionsListSettingsBody = ({
 
   const MAX_LENGHT_HEADER_AND_FOOTER = 60
   const MAX_LENGHT_BODY = 1024
-  const MAX_LENGHT_LIST_TITLE = 20
+  const MAX_LENGHT_LIST_TITLE = 30
   const MAX_OPTIONS = 10
 
   const handleVariableChange = (variable?: Variable) => {

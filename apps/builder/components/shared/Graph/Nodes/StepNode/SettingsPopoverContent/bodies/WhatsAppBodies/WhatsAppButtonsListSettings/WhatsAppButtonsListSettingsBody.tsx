@@ -35,9 +35,9 @@ export const WhatsAppButtonsListSettingsBody = ({
 }: WhatsAppButtonsListSettingsBodyProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [value, setValue] = useState({
-    header: '',
-    body: '',
-    footer: '',
+    header: options.header?.content?.plainText ?? '',
+    body: options.body?.content?.plainText ?? '',
+    footer: options.footer?.content?.plainText ?? '',
   })
 
   const [localListItems, setLocalListItems] = useState<any[]>(() => {
@@ -85,10 +85,11 @@ export const WhatsAppButtonsListSettingsBody = ({
   }
 
   const handleHeaderText = (content: any) => {
-    const updateHeaderText = { header: content.plainText }
-    setValue((value) => ({
-      ...value,
-      ...updateHeaderText,
+    const plainText = content.plainText ?? ''
+
+    setValue((prev) => ({
+      ...prev,
+      header: plainText,
     }))
     onOptionsChange({
       ...options,
