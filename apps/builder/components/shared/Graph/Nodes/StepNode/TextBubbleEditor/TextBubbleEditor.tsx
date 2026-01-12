@@ -220,13 +220,11 @@ export const TextBubbleEditor = ({
         return
       }
 
-      // Mostrar mensaje solo cuando se alcanza exactamente el límite (una vez)
       if (plainText.length === maxLength && !hasShownLimitMessage.current) {
         hasShownLimitMessage.current = true
         setIsLimitExceeded(true)
       }
 
-      // Ocultar mensaje y resetear cuando el texto está por debajo del límite
       if (plainText.length < maxLength) {
         hasShownLimitMessage.current = false
         setIsLimitExceeded(false)
