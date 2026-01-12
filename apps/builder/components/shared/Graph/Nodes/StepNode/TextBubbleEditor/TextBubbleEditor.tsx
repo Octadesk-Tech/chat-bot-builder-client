@@ -14,6 +14,7 @@ import {
   BaseEditor,
   BaseSelection,
   createEditor,
+  Editor,
   Node,
   Transforms,
 } from 'slate'
@@ -31,6 +32,7 @@ type TextBubbleEditorProps = {
   onKeyUp?: (newContent: TextBubbleContent) => void
   increment?: number
   maxLength?: number
+  maxLengthMessage?: string
   required?: boolean | { errorMsg?: string }
   menuPosition?: 'absolute' | 'fixed'
   wabaHeader?: boolean
@@ -43,6 +45,7 @@ export const TextBubbleEditor = ({
   onKeyUp,
   increment,
   maxLength,
+  maxLengthMessage,
   required,
   menuPosition = 'fixed',
   wabaHeader,
@@ -50,6 +53,7 @@ export const TextBubbleEditor = ({
 }: TextBubbleEditorProps) => {
   const initialValueRef = useRef(initialValue)
   const [focus, setFocus] = useState(false)
+  const [isLimitExceeded, setIsLimitExceeded] = useState(false)
 
   const [isVariableDropdownOpen, setIsVariableDropdownOpen] = useState(false)
   const varDropdownRef = useRef<HTMLDivElement | null>(null)
@@ -58,6 +62,7 @@ export const TextBubbleEditor = ({
 
   const currentValueRef = useRef<TElement[]>(initialValueRef.current)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const hasShownLimitMessage = useRef(false)
 
   const editorId = useRef(
     `text-bubble-editor-${increment ?? ''}-${Date.now()}`
@@ -164,10 +169,67 @@ export const TextBubbleEditor = ({
 
   const handleChangeEditorContent = useCallback((val: TElement[]) => {
     currentValueRef.current = val
+
     if (maxLength) {
       const plainText = val.map((node: TElement) => Node.string(node)).join('')
       if (plainText.length > maxLength) {
+        const truncatedText = plainText.slice(0, maxLength)
+
+        setTimeout(() => {
+          try {
+            const truncatedValue: TElement[] = [
+              {
+                type: 'p',
+                children: [{ text: truncatedText }],
+              } as TElement,
+            ]
+
+            Editor.withoutNormalizing(editor as BaseEditor, () => {
+              while (editor.children.length > 0) {
+                Transforms.removeNodes(editor as BaseEditor, { at: [0] })
+              }
+              Transforms.insertNodes(editor as BaseEditor, truncatedValue, { at: [0] })
+            })
+
+            currentValueRef.current = truncatedValue
+
+            const truncatedContent: TextBubbleContent = {
+              html: `<p>${truncatedText}</p>`,
+              richText: truncatedValue,
+              plainText: truncatedText,
+            }
+
+            if (onKeyUp) {
+              onKeyUp(truncatedContent)
+            }
+
+            requestAnimationFrame(() => {
+              try {
+                const textLength = Node.string(editor.children[0]).length
+                Transforms.select(editor as BaseEditor, {
+                  anchor: { path: [0, 0], offset: textLength },
+                  focus: { path: [0, 0], offset: textLength },
+                })
+              } catch { }
+            })
+          } catch (e) {
+            console.warn('Error truncating text:', e)
+          }
+        }, 0)
+
         return
+      }
+
+      // Mostrar mensaje solo cuando se alcanza exactamente el límite (una vez)
+      if (plainText.length === maxLength && !hasShownLimitMessage.current) {
+        hasShownLimitMessage.current = true
+        setIsLimitExceeded(true)
+      }
+
+      // Ocultar mensaje y resetear cuando el texto está por debajo del límite
+      if (plainText.length < maxLength) {
+        hasShownLimitMessage.current = false
+        setIsLimitExceeded(false)
       }
     }
 
@@ -184,7 +246,7 @@ export const TextBubbleEditor = ({
         onKeyUp(convertValueToStepContent(currentValueRef.current))
       }
     }, 500)
-  }, [maxLength, isVariableDropdownOpen, onKeyUp])
+  }, [maxLength, isVariableDropdownOpen, onKeyUp, editor])
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.shiftKey) return
@@ -196,6 +258,9 @@ export const TextBubbleEditor = ({
   }
 
   const chooseBorderColor = () => {
+    if (isLimitExceeded) {
+      return 'red.400'
+    }
     if (checkRequiredField()) {
       return 'red.400'
     }
@@ -230,6 +295,7 @@ export const TextBubbleEditor = ({
         onBlur={() => {
           setFocus(false)
         }}
+        transition="border-color 0.2s ease-in-out"
       >
         <ToolBar
           editor={editor}
@@ -293,6 +359,19 @@ export const TextBubbleEditor = ({
           </Flex>
         )}
       </Stack>
+      {isLimitExceeded && maxLength && (
+        <Flex
+          color="red.500"
+          fontSize="xs"
+          mt={2}
+          alignItems="center"
+          gap={1}
+        >
+          <Text>
+            {maxLengthMessage || `Limite de ${maxLength} caracteres atingido`}
+          </Text>
+        </Flex>
+      )}
       {checkRequiredField() && (
         <Flex color="red.400" fontSize="xs" mt={2}>
           {typeof required === 'object'
