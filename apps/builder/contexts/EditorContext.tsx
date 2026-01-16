@@ -8,7 +8,6 @@ import {
 } from 'react'
 
 export enum RightPanel {
-  PREVIEW,
   TODOLIST,
 }
 

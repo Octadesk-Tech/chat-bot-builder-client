@@ -434,7 +434,7 @@ export const Graph = memo(
             spacing="0"
             shadow="lg"
           >
-            <Tooltip label="Undo">
+            <Tooltip label="Desfazer">
               <IconButton
                 display={['none', 'flex']}
                 icon={<UndoIcon />}
@@ -445,7 +445,7 @@ export const Graph = memo(
               />
             </Tooltip>
 
-            <Tooltip label="Redo">
+            <Tooltip label="Refazer">
               <IconButton
                 display={['none', 'flex']}
                 icon={<RedoIcon />}
@@ -517,14 +517,14 @@ const useAutoMoveBoard = (
           autoMoveDirection === 'right'
             ? prev.x - 5
             : autoMoveDirection === 'left'
-            ? prev.x + 5
-            : prev.x,
+              ? prev.x + 5
+              : prev.x,
         y:
           autoMoveDirection === 'bottom'
             ? prev.y - 5
             : autoMoveDirection === 'top'
-            ? prev.y + 5
-            : prev.y,
+              ? prev.y + 5
+              : prev.y,
       }))
     }, 5)
 
