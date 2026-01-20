@@ -146,7 +146,7 @@ export const TypebotHeader = () => {
                 aria-label="Redo"
                 onClick={redo}
                 isDisabled={!canRedo}
-              />hd
+              />
             </Tooltip>
           </HStack>
         </HStack>
