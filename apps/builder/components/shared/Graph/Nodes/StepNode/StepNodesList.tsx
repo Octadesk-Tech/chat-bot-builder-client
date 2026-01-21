@@ -131,17 +131,17 @@ export const StepNodesList = ({
 
   const handleStepMouseDown =
     (stepIndex: number) =>
-    (
-      { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
-      step: DraggableStep
-    ) => {
-      if (isReadOnly) return
-      placeholderRefs.current.splice(stepIndex + 1, 1)
-      detachStepFromBlock({ blockIndex, stepIndex })
-      setPosition(absolute)
-      setMousePositionInElement(relative)
-      setDraggedStep(step)
-    }
+      (
+        { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
+        step: DraggableStep
+      ) => {
+        if (isReadOnly) return
+        placeholderRefs.current.splice(stepIndex + 1, 1)
+        detachStepFromBlock({ blockIndex, stepIndex })
+        setPosition(absolute)
+        setMousePositionInElement(relative)
+        setDraggedStep(step)
+      }
 
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
@@ -188,41 +188,15 @@ export const StepNodesList = ({
       </Flex>
       {typebot &&
         steps.map((step, idx) => (
-          <Stack key={step.id} spacing={1}>
-            <StepNode
-              key={step.id}
-              step={step}
-              indices={{ blockIndex, stepIndex: idx }}
-              isConnectable={steps.length - 1 === idx}
-              onMouseDown={handleStepMouseDown(idx)}
-              isStartBlock={isStartBlock}
-              unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
-            />
-            {!isFinalStep(step.type) && (
-              <Flex
-                ref={handlePushElementRef(idx + 1)}
-                h={
-                  showSortPlaceholders
-                    ? expandedPlaceholderIndex === idx + 1
-                      ? '50px'
-                      : '30px'
-                    : '2px'
-                }
-                bgColor={'gray.300'}
-                visibility={showSortPlaceholders ? 'visible' : 'hidden'}
-                rounded="lg"
-                transition={showSortPlaceholders ? 'height 200ms' : 'none'}
-                alignItems={'center'}
-              >
-                <Center w={'100%'} h={'100%'}>
-                  <HStack color={'gray'} fontWeight={'semibold'}>
-                    <PlusIcon />
-                    <Text>Adicionar aqui</Text>
-                  </HStack>
-                </Center>
-              </Flex>
-            )}
-          </Stack>
+          <StepNode
+            key={step.id}
+            step={step}
+            indices={{ blockIndex, stepIndex: idx }}
+            isConnectable={steps.length - 1 === idx}
+            onMouseDown={handleStepMouseDown(idx)}
+            isStartBlock={isStartBlock}
+            unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
+          />
         ))}
       {draggedStep && draggedStep.blockId === blockId && (
         <Portal>
