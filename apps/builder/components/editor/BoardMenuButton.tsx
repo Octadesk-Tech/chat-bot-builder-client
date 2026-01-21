@@ -1,25 +1,22 @@
 import {
   IconButton,
-  Menu,
-  MenuButton,
-  MenuButtonProps,
-  MenuItem,
-  MenuList,
+  IconButtonProps,
+  Tooltip,
   useDisclosure,
 } from '@chakra-ui/react'
-import { MoreVerticalIcon, EyeIcon, CheckIcon } from 'assets/icons'
-import { useTypebot } from 'contexts/TypebotContext'
+import { CheckIcon } from 'assets/icons'
 import { useUser } from 'contexts/UserContext'
 import { RightPanel, useEditor } from 'contexts/EditorContext'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
-import { isNotDefined } from 'utils'
 import { EditorSettingsModal } from './EditorSettingsModal'
 
-export const BoardMenuButton = (props: MenuButtonProps) => {
-  const { query } = useRouter()
+const isNotDefined = (value: unknown): value is null | undefined =>
+  value === null || value === undefined
 
-  const { save } = useTypebot()
+export const BoardMenuButton = (props: IconButtonProps) => {
+  const { onClick, ['aria-label']: ariaLabelProp, ...iconButtonProps } = props
+  const { query } = useRouter()
 
   const { user } = useUser()
 
@@ -27,20 +24,9 @@ export const BoardMenuButton = (props: MenuButtonProps) => {
 
   const { setRightPanel } = useEditor()
 
-  const handlePreviewClick = async () => {
-    setRightPanel(RightPanel.PREVIEW)
-  }
-
   const handleToDoListClick = async () => {
     setRightPanel(RightPanel.TODOLIST)
   }
-
-  useEffect(() => {
-    window.addEventListener('message', handleEventListeners)
-
-    return () => window.removeEventListener('message', handleEventListeners)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     if (
@@ -52,36 +38,24 @@ export const BoardMenuButton = (props: MenuButtonProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const handleEventListeners = (e: any): void => {
-    if (e.data === 'previewClick') {
-      save().then()
-
-      setRightPanel(RightPanel.PREVIEW)
-    }
-  }
-
   return (
-    <Menu>
-      <MenuButton
-        as={IconButton}
-        bgColor="white"
-        icon={<MoreVerticalIcon transform={'rotate(90deg)'} />}
-        size="sm"
-        shadow="lg"
-        {...props}
-      />
-
-      <MenuList>
-        <MenuItem icon={<EyeIcon />} onClick={handlePreviewClick}>
-          Visualizar
-        </MenuItem>
-
-        <MenuItem icon={<CheckIcon />} onClick={handleToDoListClick}>
-          Lista de pendências
-        </MenuItem>
-      </MenuList>
+    <>
+      <Tooltip label="Lista de pendências">
+        <IconButton
+          {...iconButtonProps}
+          aria-label={ariaLabelProp ?? 'Lista de pendências'}
+          onClick={(e) => {
+            onClick?.(e)
+            handleToDoListClick().then()
+          }}
+          bgColor="white"
+          icon={<CheckIcon />}
+          size="sm"
+          shadow="lg"
+        />
+      </Tooltip>
 
       <EditorSettingsModal isOpen={isOpen} onClose={onClose} />
-    </Menu>
+    </>
   )
 }

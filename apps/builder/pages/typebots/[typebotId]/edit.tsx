@@ -7,7 +7,6 @@ import {
 } from 'contexts/EditorContext'
 import { useEffect } from 'react'
 import { BoardMenuButton } from 'components/editor/BoardMenuButton'
-import { PreviewDrawer } from 'components/editor/preview/PreviewDrawer'
 import { ToDoList } from 'components/editor/todoList'
 import { StepsSideBar } from 'components/editor/StepsSideBar'
 import { Graph } from 'components/shared/Graph'
@@ -161,10 +160,6 @@ const RightPanel = () => {
     if (e.data === 'openToDoList') {
       setRightPanel(RightPanelEnum.TODOLIST)
     }
-  }
-
-  if (rightPanel === RightPanelEnum.PREVIEW) {
-    return <PreviewDrawer />
   }
 
   if (rightPanel === RightPanelEnum.TODOLIST) {

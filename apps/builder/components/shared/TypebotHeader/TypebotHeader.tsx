@@ -9,11 +9,9 @@ import {
 } from '@chakra-ui/react'
 import { ChevronLeftIcon, RedoIcon, UndoIcon } from 'assets/icons'
 import { NextChakraLink } from 'components/nextChakra/NextChakraLink'
-import { RightPanel, useEditor } from 'contexts/EditorContext'
 import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { isNotDefined } from 'utils'
 import { PublishButton } from '../buttons/PublishButton'
 import { EditableEmojiOrImageIcon } from '../EditableEmojiOrImageIcon'
 import { CollaborationMenuButton } from './CollaborationMenuButton'
@@ -24,28 +22,20 @@ export const headerHeight = 56
 
 export const TypebotHeader = () => {
   const router = useRouter()
-  const { rightPanel } = useEditor()
   const {
     typebot,
     updateOnBothTypebots,
     updateTypebot,
-    save,
     undo,
     redo,
     canUndo,
     canRedo,
     isSavingLoading,
   } = useTypebot()
-  const { setRightPanel } = useEditor()
 
   const handleNameSubmit = (name: string) => updateOnBothTypebots({ name })
 
   const handleChangeIcon = (icon: string) => updateTypebot({ icon })
-
-  const handlePreviewClick = async () => {
-    save().then()
-    setRightPanel(RightPanel.PREVIEW)
-  }
 
   return (
     <Flex
@@ -119,8 +109,8 @@ export const TypebotHeader = () => {
               router.query.parentId
                 ? `${config.basePath || ''}/typebots/${router.query.parentId}/edit`
                 : typebot?.folderId
-                ? `${config.basePath || ''}/typebots/folders/${typebot.folderId}`
-                : `${config.basePath || ''}/typebots`
+                  ? `${config.basePath || ''}/typebots/folders/${typebot.folderId}`
+                  : `${config.basePath || ''}/typebots`
             }
           />
           <HStack spacing={1}>
@@ -172,9 +162,6 @@ export const TypebotHeader = () => {
 
       <HStack right="40px" pos="absolute" display={['none', 'flex']}>
         <CollaborationMenuButton />
-        {router.pathname.includes('/edit') && isNotDefined(rightPanel) && (
-          <Button onClick={handlePreviewClick}>Preview</Button>
-        )}
         <PublishButton />
       </HStack>
     </Flex>
