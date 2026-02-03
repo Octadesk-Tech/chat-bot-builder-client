@@ -89,6 +89,7 @@ import {
   stepTypeHasWebhook,
 } from 'utils'
 import { fetcher, toKebabCase } from '../utils'
+import { sendMainBffRequest } from 'util/mainBffRequest'
 
 export type TypebotInDashboard = Pick<
   Typebot,
@@ -304,12 +305,13 @@ export const deleteTypebot = async (id: string) =>
     method: 'DELETE',
   })
 
-export const updateTypebot = async (id: string, typebot: Typebot) =>
-  sendOctaRequest({
+export const updateTypebot = async (id: string, typebot: Typebot) => {
+  return sendMainBffRequest({
     url: `${id}`,
     method: 'PUT',
     body: { bot: typebot },
   })
+}
 
 export const patchTypebot = async (id: string, typebot: Partial<Typebot>) =>
   sendOctaRequest({
