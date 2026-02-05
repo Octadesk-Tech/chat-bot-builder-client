@@ -28,6 +28,7 @@ type Props = {
 type CustomContext = {
   id: string
   label: string
+  outgoingEdgeId?: string
 }
 
 const DEFAULT_OPTIONS = [
@@ -58,11 +59,11 @@ export const WOZAssignSettingBody = ({
 
   const getInitialItems = () => {
     if (step.items && step.items.length > 2) {
-      const customItemsFromStep = (step.items as unknown as Array<{ id: string; content?: string }>).slice(2)
+      const customItemsFromStep = (step.items as unknown as Array<{ id: string; content?: string; outgoingEdgeId?: string }>).slice(2)
       return customItemsFromStep.map((item) => ({
         id: item.id,
         label: item.content || '',
-        readonly: false,
+        outgoingEdgeId: item.outgoingEdgeId,
       }))
     }
     if (step.options?.customContexts && step.options.customContexts.length > 0) {
@@ -112,6 +113,7 @@ export const WOZAssignSettingBody = ({
           content: item.label,
           readonly: true,
           canAddItem: false,
+          outgoingEdgeId: item.outgoingEdgeId,
         })),
       ]
 
@@ -156,6 +158,7 @@ export const WOZAssignSettingBody = ({
         content: item.label,
         readonly: true,
         canAddItem: false,
+        outgoingEdgeId: item.outgoingEdgeId,
       })),
     ]
 
