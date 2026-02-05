@@ -20,7 +20,7 @@ export const StepTypeLabel = ({ type }: Props) => {
     case WOZStepType.MESSAGE:
       return <Text>Envie mensagem com a IA</Text>
     case WOZStepType.INTERPRET_DATA_WITH_AI:
-      return <Text>Interpretar informações com a IA</Text>
+      return <Text>Formate informações com a IA</Text>
     case WOZStepType.ASSIGN:
       return <Text>Direcione a conversa para o WOZ</Text>
     case InputStepType.TEXT:
