@@ -228,7 +228,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             </Box>
             <Text mt={2} fontSize="xs" color="gray.500">
               A IA usará este texto como base. Não é necessário dar comandos de
-              comportamento aqui, apenas estruturar a informação
+              comportamento aqui, apenas estruturar a informação.
             </Text>
           </Box>
 
