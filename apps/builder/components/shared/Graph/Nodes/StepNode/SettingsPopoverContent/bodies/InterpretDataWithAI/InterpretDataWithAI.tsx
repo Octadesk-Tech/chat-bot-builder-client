@@ -79,15 +79,19 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
   }
 
   const placeholderInstructions = useMemo(() => {
-    return `Retorne ao cliente um resumo dos incidentes encontrados. 
+    return `Ex: Retorne ao cliente a lista dos tickets encontrados. 
   \b\b  
-Use as variáveis: {{incident_count}}, {{date_range}}, {{service_name}}, {{incident_date}}, 
-{{incident_title}}, {{incident_status}}.  `
+Use as variáveis: {{ numero-ticket }}, {{ status-ticket }}, 
+{{ criado-em }}`
   }, [])
 
   const tooltipInstructions = useMemo(() => {
-    return `Descreva o formato da mensagem que a IA deve gerar. Escreva o texto que desejar e clique nas {{variáveis}} disponíveis abaixo para incluir informações dinâmicas. <br /><br />
-Clique em 'Testar retorno' para ver como ficará na prática.`
+    return `Como instruir a IA?
+<ol style="margin: 8px 0; padding-left: 20px; list-style-type: decimal;">
+<li style="margin-bottom: 4px;">Digite quais dados você quer que apareça na resposta da conversa.</li>
+<li style="margin-bottom: 4px;">Use o botão (+) para inserir as informações (variáveis) capturadas no passo anterior.</li>
+<li style="margin-bottom: 4px;">Clique em 'Testar retorno' para ver um exemplo do que irá para a IA se basear e usar na conversa.</li>
+</ol>`
   }, [])
 
   const responseKeys = useMemo(
@@ -177,8 +181,7 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
     return (
       <Stack>
         <Text>
-          A IA interpreta a entrada e devolve como mensagem natural, para ser
-          usado no próximo passo do fluxo.
+          Defina como a IA deve apresentar os dados coletados na conversa.
         </Text>
 
         <Stack direction="row" justifyContent="space-between" w="full">
@@ -201,26 +204,32 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
         </Stack>
 
         <VStack gap={4} w="full">
-          <Box position="relative" w="full">
-            <Textarea
-              ref={textareaRef}
-              placeholder={placeholderInstructions}
-              resize="none"
-              maxLength={5000}
-              minLength={1}
-              value={step?.content?.systemMessage || ''}
-              onChange={(e) => handleInstructionsChange(e.target.value)}
-              rows={10}
-              paddingRight="45px"
-              className="scrollbar-custom"
-            />
-
-            <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
-              <VariablesMenu
-                variables={responseKeys || []}
-                onVariableSelect={handleVariableSelected}
+          <Box>
+            <Box position="relative" w="full">
+              <Textarea
+                ref={textareaRef}
+                placeholder={placeholderInstructions}
+                resize="none"
+                maxLength={5000}
+                minLength={1}
+                value={step?.content?.systemMessage || ''}
+                onChange={(e) => handleInstructionsChange(e.target.value)}
+                rows={10}
+                paddingRight="45px"
+                className="scrollbar-custom"
               />
+
+              <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
+                <VariablesMenu
+                  variables={responseKeys || []}
+                  onVariableSelect={handleVariableSelected}
+                />
+              </Box>
             </Box>
+            <Text mt={2} fontSize="xs" color="gray.500">
+              A IA usará este texto como base. Não é necessário dar comandos de
+              comportamento aqui, apenas estruturar a informação.
+            </Text>
           </Box>
 
           {resultOfInterpretWithAi.length > 0 && (

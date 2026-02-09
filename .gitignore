@@ -20,7 +20,7 @@ apps/docs/build/
 #build
 firebaseServiceAccount.json
 # tsbuildinfo file
-tsconfig.tsbuildinfo
+**/tsconfig.tsbuildinfo
 
 .env.production
 
