@@ -225,8 +225,11 @@ export const StepsSideBar = () => {
       verifyFeatureToggle('commerce-enabled')
   )
 
-  const wozAssign = Object.values(WOZStepType).filter((step) =>
-    shouldShowComponent(step) && step === WOZStepType.ASSIGN
+  const wozAssign = Object.values(WOZStepType).filter(
+    (step) =>
+      shouldShowComponent(step) &&
+      step === WOZStepType.ASSIGN &&
+      verifyFeatureToggle('woz-in-bot')
   )
 
   const wozInterpretDataWithAI = Object.values(WOZStepType).filter(
