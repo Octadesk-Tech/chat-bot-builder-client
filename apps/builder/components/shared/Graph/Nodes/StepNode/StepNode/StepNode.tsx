@@ -126,8 +126,10 @@ export const StepNode = ({
   const [validationMessages, setValidationMessages] =
     useState<Array<ValidationMessage>>()
 
+  const edgesLength = typebot?.edges?.length ?? 0
+
   useEffect(() => {
-    const currentMessages = getValidationMessages(step)
+    const currentMessages = getValidationMessages(step, typebot?.edges)
     setValidationMessages(currentMessages)
     if (currentMessages.length > 0) {
       if (!emptyFields.find((field) => field?.step.id === step?.id)) {
@@ -142,7 +144,7 @@ export const StepNode = ({
         setEmptyFields([step?.id], ActionsTypeEmptyFields.REMOVE)
       }
     }
-  }, [step])
+  }, [step, edgesLength, typebot?.edges])
 
   const { onClose: onModalClose } = useDisclosure({
     defaultIsOpen: true,

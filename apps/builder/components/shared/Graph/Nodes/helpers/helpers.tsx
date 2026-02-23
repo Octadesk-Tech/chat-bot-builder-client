@@ -7,8 +7,9 @@ import {
   OctaWabaStepType,
   Step,
   IntegrationStepType,
+  Edge,
 } from 'models'
-import { isBubbleStepType, isInputStep } from 'utils'
+import { isBubbleStepType, isInputStep, stepHasItems } from 'utils'
 import { z } from 'zod'
 
 export enum VALIDATION_MESSAGE_TYPE {
@@ -34,6 +35,28 @@ const runStringValidation = ({ max, min }: any) => {
   })
 }
 
+const hasConditionSameTargetBlock = (step: Step, edges: Edge[]): boolean => {
+  if (step.type !== LogicStepType.CONDITION) return false
+  if (!stepHasItems(step)) return false
+
+  const validItems = step.items.filter((item) => item != null)
+  if (validItems.length === 0) return false
+
+  const itemEdge = edges.find(
+    (e) => e.from.stepId === step.id && e.from.itemId && validItems.some((item) => item.id === e.from.itemId)
+  )
+
+  const stepEdge = edges.find(
+    (e) => e.from.stepId === step.id && !e.from.itemId
+  )
+
+  if (itemEdge && stepEdge) {
+    return itemEdge.to.blockId === stepEdge.to.blockId
+  }
+
+  return false
+}
+
 const inpuStepsWithFallbackMessages = [
   InputStepType.EMAIL,
   InputStepType.PHONE,
@@ -43,9 +66,18 @@ const inpuStepsWithFallbackMessages = [
   IntegrationStepType.EXTERNAL_EVENT,
 ]
 
-export const getValidationMessages = (step: Step): Array<ValidationMessage> => {
+export const getValidationMessages = (step: Step, edges?: Edge[]): Array<ValidationMessage> => {
   try {
     const data = []
+
+    if (edges && hasConditionSameTargetBlock(step, edges)) {
+      return [
+        {
+          type: VALIDATION_MESSAGE_TYPE.WARNING,
+          message: ['A etapa de sucesso e erro não pode apontar para a mesma etapa'],
+        },
+      ]
+    }
     if (isInputStep(step) || OctaWabaStepType.COMMERCE === step.type) {
       data.push({
         message: step?.options?.message?.plainText,

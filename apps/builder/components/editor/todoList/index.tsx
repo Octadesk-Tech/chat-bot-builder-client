@@ -187,12 +187,12 @@ export const ToDoList = () => {
                     >
                       <ErrorIcon color="#d33003" />
 
-                      <Title sm>Campos obrigatórios</Title>
+                      <Title sm>Etapas com pendências</Title>
                     </Flex>
 
                     <Tooltip
                       hasArrow
-                      label="Uma ou mais etapas do seu fluxo estão com campos obrigatórios não preenchidos."
+                      label="Uma ou mais etapas do seu fluxo possuem pendências que precisam ser corrigidas."
                       bg="gray.700"
                       color="white"
                       width="232px"
