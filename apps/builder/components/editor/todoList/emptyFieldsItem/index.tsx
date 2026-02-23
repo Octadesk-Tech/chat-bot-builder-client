@@ -1,4 +1,4 @@
-import { Flex } from '@chakra-ui/react'
+import { Flex, Text } from '@chakra-ui/react'
 import { StepIcon } from 'components/editor/StepsSideBar/StepIcon'
 import { StepTitle } from '../style'
 import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
@@ -26,6 +26,11 @@ const EmptyFieldsItem = ({ item }: { item: EmptyFields }) => {
 
     setGraphPosition({ x: calcX, y: calcY, scale: 1 })
   }
+
+  const hasCustomErrorMessage = item?.errorMessage && 
+    item.errorMessage.length > 0 && 
+    item.errorMessage[0] !== 'Preencha todos os campos obrigatórios'
+
   return (
     <Flex
       key={item?.step?.id}
@@ -36,6 +41,8 @@ const EmptyFieldsItem = ({ item }: { item: EmptyFields }) => {
       background="#F4F4F5"
       cursor={'pointer'}
       onClick={focusOnField}
+      flexDirection="column"
+      gap="1"
     >
       <Flex alignItems="center" gap="2">
         <StepIcon color={colors.orange[300]} type={item?.step?.type} />
@@ -43,6 +50,11 @@ const EmptyFieldsItem = ({ item }: { item: EmptyFields }) => {
           <StepTypeLabel type={item?.step?.type} />
         </StepTitle>
       </Flex>
+      {hasCustomErrorMessage && (
+        <Text fontSize="xs" color="gray.500" pl="6">
+          {item.errorMessage[0]}
+        </Text>
+      )}
     </Flex>
   )
 }
