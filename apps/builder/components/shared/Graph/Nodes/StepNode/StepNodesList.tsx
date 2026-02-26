@@ -19,6 +19,7 @@ import {
   DraggableStepType,
   InputStepType,
   IntegrationStepType,
+  LogicStepType,
   OctaBubbleStepType,
   OctaStepType,
   OctaWabaStepType,
@@ -26,7 +27,7 @@ import {
   StepType,
   WOZStepType,
 } from 'models'
-import { useEffect, useRef, useState } from 'react'
+import { Fragment, useEffect, useRef, useState } from 'react'
 import { StepNode } from './StepNode/StepNode'
 import { StepNodeOverlay } from './StepNodeOverlay'
 
@@ -85,15 +86,25 @@ export const StepNodesList = ({
 
   const handleMouseMoveOnBlock = (event: MouseEvent) => {
     if (!isDraggingOnCurrentBlock) return
-    setExpandedPlaceholderIndex(
-      computeNearestPlaceholderIndex(event.pageY, placeholderRefs)
+    let nearestIndex = computeNearestPlaceholderIndex(
+      event.pageY,
+      placeholderRefs
     )
+    if (blockEndedIndex >= 0 && nearestIndex > blockEndedIndex) {
+      nearestIndex = blockEndedIndex
+    }
+    setExpandedPlaceholderIndex(nearestIndex)
   }
 
   const handleMouseUpOnBlock = (e: MouseEvent) => {
     setExpandedPlaceholderIndex(undefined)
     if (!isDraggingOnCurrentBlock) return
     const stepIndex = computeNearestPlaceholderIndex(e.clientY, placeholderRefs)
+    if (blockEndedIndex >= 0 && stepIndex > blockEndedIndex) {
+      setDraggedStep(undefined)
+      setDraggedStepType(undefined)
+      return
+    }
     createStep(
       blockId,
       (draggedStep || draggedStepType) as DraggableStep | DraggableStepType,
@@ -106,26 +117,23 @@ export const StepNodesList = ({
     setDraggedStepType(undefined)
   }
 
-  const isFinalStep = (type: StepType) =>
+  const isRoutingStep = (type: StepType) =>
     [
       OctaBubbleStepType.END_CONVERSATION,
       OctaStepType.ASSIGN_TO_TEAM,
       OctaStepType.CALL_OTHER_BOT,
-    ].includes(type)
+      WOZStepType.ASSIGN,
+      InputStepType.CHOICE,
+      LogicStepType.CONDITION,
+      OctaWabaStepType.WHATSAPP_OPTIONS_LIST,
+      OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
+      IntegrationStepType.WEBHOOK,
+      IntegrationStepType.EXTERNAL_EVENT,
+    ].includes(type as string as never)
 
   const [blockEndedIndex, setHasBlockEndedIndex] = useState<number>(-1)
   useEffect(() => {
-    const endedIndex = steps.findIndex(
-      (s) =>
-        isFinalStep(s.type) ||
-        s.type === InputStepType.CHOICE ||
-        s.type === OctaStepType.OFFICE_HOURS ||
-        s.type === WOZStepType.ASSIGN ||
-        s.type === IntegrationStepType.WEBHOOK ||
-        s.type === IntegrationStepType.EXTERNAL_EVENT ||
-        s.type === OctaWabaStepType.WHATSAPP_OPTIONS_LIST ||
-        s.type === OctaWabaStepType.WHATSAPP_BUTTONS_LIST
-    )
+    const endedIndex = steps.findIndex((s) => isRoutingStep(s.type))
     setHasBlockEndedIndex(endedIndex)
   }, [steps])
 
@@ -188,15 +196,40 @@ export const StepNodesList = ({
       </Flex>
       {typebot &&
         steps.map((step, idx) => (
-          <StepNode
-            key={step.id}
-            step={step}
-            indices={{ blockIndex, stepIndex: idx }}
-            isConnectable={steps.length - 1 === idx}
-            onMouseDown={handleStepMouseDown(idx)}
-            isStartBlock={isStartBlock}
-            unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
-          />
+          <Fragment key={step.id}>
+            <StepNode
+              step={step}
+              indices={{ blockIndex, stepIndex: idx }}
+              isConnectable={steps.length - 1 === idx}
+              onMouseDown={handleStepMouseDown(idx)}
+              isStartBlock={isStartBlock}
+              unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
+            />
+            {!isRoutingStep(step.type) && (
+              <Flex
+                ref={handlePushElementRef(idx + 1)}
+                h={
+                  showSortPlaceholders
+                    ? expandedPlaceholderIndex === idx + 1
+                      ? '50px'
+                      : '30px'
+                    : '2px'
+                }
+                bgColor={'gray.300'}
+                visibility={showSortPlaceholders ? 'visible' : 'hidden'}
+                rounded="lg"
+                transition={showSortPlaceholders ? 'height 200ms' : 'none'}
+                alignItems={'center'}
+              >
+                <Center w={'100%'} h={'100%'}>
+                  <HStack color={'gray'} fontWeight={'semibold'}>
+                    <PlusIcon />
+                    <Text>Adicionar aqui</Text>
+                  </HStack>
+                </Center>
+              </Flex>
+            )}
+          </Fragment>
         ))}
       {draggedStep && draggedStep.blockId === blockId && (
         <Portal>
