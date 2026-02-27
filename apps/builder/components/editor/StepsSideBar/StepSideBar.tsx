@@ -229,7 +229,10 @@ export const StepsSideBar = () => {
   )
 
   const wozAssign = Object.values(WOZStepType).filter(
-    (step) => shouldShowComponent(step) && step === WOZStepType.ASSIGN
+    (step) =>
+      shouldShowComponent(step) &&
+      step === WOZStepType.ASSIGN &&
+      verifyFeatureToggle('woz-in-bot')
   )
 
   const wozInterpretDataWithAI = Object.values(WOZStepType).filter(
