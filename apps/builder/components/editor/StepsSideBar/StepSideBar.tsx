@@ -129,7 +129,10 @@ export const StepsSideBar = () => {
     )
   }
 
-  const EVENT_AVAILABLE_STEPS: StepType[] = [IntegrationStepType.WEBHOOK]
+  const EVENT_AVAILABLE_STEPS: StepType[] = [
+    IntegrationStepType.WEBHOOK,
+    WOZStepType.INTERPRET_DATA_WITH_AI,
+  ]
   const AUTOMATED_TASKS_AVAILABLE_STEPS: StepType[] = [
     WOZStepType.MESSAGE,
     WOZStepType.INTERPRET_DATA_WITH_AI,
@@ -225,8 +228,8 @@ export const StepsSideBar = () => {
       verifyFeatureToggle('commerce-enabled')
   )
 
-  const wozAssign = Object.values(WOZStepType).filter((step) =>
-    shouldShowComponent(step) && step === WOZStepType.ASSIGN
+  const wozAssign = Object.values(WOZStepType).filter(
+    (step) => shouldShowComponent(step) && step === WOZStepType.ASSIGN
   )
 
   const wozInterpretDataWithAI = Object.values(WOZStepType).filter(

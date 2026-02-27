@@ -19,6 +19,7 @@ import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
 import { WOZInterpretDataWithAI } from 'models'
 import { getDeepKeys } from 'services/integrations'
+import { useTypebot } from 'contexts/TypebotContext'
 
 type Props = {
   step: WOZInterpretDataWithAI
@@ -34,6 +35,9 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
     testReturn,
     refetch,
   } = useInterpretDataWithAI({ step })
+
+  const { typebot } = useTypebot()
+  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const [isTesting, setIsTesting] = useState(false)
 
   const [resultOfInterpretWithAi, setResultOfInterpretWithAi] =
@@ -129,7 +133,10 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
 
     if (whoIsConnectedOnMyBlock?.length === 1) {
       const block = whoIsConnectedOnMyBlock[0]
-      if (block.steps[0].type !== IntegrationStepType.WEBHOOK)
+      if (
+        block.steps[0].type !== IntegrationStepType.WEBHOOK &&
+        isAutomatedTasksBot
+      )
         return (
           <Stack>
             <Text>
@@ -144,8 +151,11 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
       return (
         <Stack>
           <Text>
-            Este bloco deve receber apenas uma conexão, sendo esta conexão um
-            componente chamado "Conecte a outro sistema"
+            Este bloco deve receber apenas uma conexão{' '}
+            {isAutomatedTasksBot
+              ? `, sendo esta conexão um
+            componente chamado "Conecte a outro sistema"`
+              : ''}
           </Text>
         </Stack>
       )
@@ -160,7 +170,7 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
       )
     }
 
-    if (!success) {
+    if (!success && isAutomatedTasksBot) {
       return (
         <Stack>
           <Text color="red">
@@ -215,12 +225,14 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
               className="scrollbar-custom"
             />
 
-            <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
-              <VariablesMenu
-                variables={responseKeys || []}
-                onVariableSelect={handleVariableSelected}
-              />
-            </Box>
+            {responseKeys.length > 0 && (
+              <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
+                <VariablesMenu
+                  variables={responseKeys || []}
+                  onVariableSelect={handleVariableSelected}
+                />
+              </Box>
+            )}
           </Box>
 
           {resultOfInterpretWithAi.length > 0 && (
@@ -241,19 +253,21 @@ Clique em 'Testar retorno' para ver como ficará na prática.`
             </Box>
           )}
 
-          <Button
-            disabled={isTesting || !step?.content?.systemMessage?.length}
-            w="full"
-            colorScheme="blue"
-            onClick={handleTestReturn}
-          >
-            <HStack alignItems="center" gap={2}>
-              {isTesting && <Spinner size="sm" />}
-              <Text>
-                {isTesting ? 'Testando  retorno...' : 'Testar retorno'}
-              </Text>
-            </HStack>
-          </Button>
+          {isAutomatedTasksBot && (
+            <Button
+              disabled={isTesting || !step?.content?.systemMessage?.length}
+              w="full"
+              colorScheme="blue"
+              onClick={handleTestReturn}
+            >
+              <HStack alignItems="center" gap={2}>
+                {isTesting && <Spinner size="sm" />}
+                <Text>
+                  {isTesting ? 'Testando  retorno...' : 'Testar retorno'}
+                </Text>
+              </HStack>
+            </Button>
+          )}
         </VStack>
       </Stack>
     )
