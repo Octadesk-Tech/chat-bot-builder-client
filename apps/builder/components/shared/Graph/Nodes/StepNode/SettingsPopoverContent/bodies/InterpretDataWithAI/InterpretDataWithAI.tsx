@@ -19,6 +19,7 @@ import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
 import { WOZInterpretDataWithAI } from 'models'
 import { getDeepKeys } from 'services/integrations'
+import { useTypebot } from 'contexts/TypebotContext'
 
 type Props = {
   step: WOZInterpretDataWithAI
@@ -34,6 +35,9 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
     testReturn,
     refetch,
   } = useInterpretDataWithAI({ step })
+
+  const { typebot } = useTypebot()
+  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const [isTesting, setIsTesting] = useState(false)
 
   const [resultOfInterpretWithAi, setResultOfInterpretWithAi] =
@@ -133,7 +137,10 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
 
     if (whoIsConnectedOnMyBlock?.length === 1) {
       const block = whoIsConnectedOnMyBlock[0]
-      if (block.steps[0].type !== IntegrationStepType.WEBHOOK)
+      if (
+        block.steps[0].type !== IntegrationStepType.WEBHOOK &&
+        isAutomatedTasksBot
+      )
         return (
           <Stack>
             <Text>
@@ -148,8 +155,11 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
       return (
         <Stack>
           <Text>
-            Este bloco deve receber apenas uma conexão, sendo esta conexão um
-            componente chamado "Conecte a outro sistema"
+            Este bloco deve receber apenas uma conexão{' '}
+            {isAutomatedTasksBot
+              ? `, sendo esta conexão um
+            componente chamado "Conecte a outro sistema"`
+              : ''}
           </Text>
         </Stack>
       )
@@ -164,7 +174,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
       )
     }
 
-    if (!success) {
+    if (!success && isAutomatedTasksBot) {
       return (
         <Stack>
           <Text color="red">
@@ -204,28 +214,28 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
         </Stack>
 
         <VStack gap={4} w="full">
-          <Box>
-            <Box position="relative" w="full">
-              <Textarea
-                ref={textareaRef}
-                placeholder={placeholderInstructions}
-                resize="none"
-                maxLength={5000}
-                minLength={1}
-                value={step?.content?.systemMessage || ''}
-                onChange={(e) => handleInstructionsChange(e.target.value)}
-                rows={10}
-                paddingRight="45px"
-                className="scrollbar-custom"
-              />
+          <Box position="relative" w="full">
+            <Textarea
+              ref={textareaRef}
+              placeholder={placeholderInstructions}
+              resize="none"
+              maxLength={5000}
+              minLength={1}
+              value={step?.content?.systemMessage || ''}
+              onChange={(e) => handleInstructionsChange(e.target.value)}
+              rows={10}
+              paddingRight="45px"
+              className="scrollbar-custom"
+            />
 
+            {responseKeys.length > 0 && (
               <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
                 <VariablesMenu
                   variables={responseKeys || []}
                   onVariableSelect={handleVariableSelected}
                 />
               </Box>
-            </Box>
+            )}
             <Text mt={2} fontSize="xs" color="gray.500">
               A IA usará este texto como base. Não é necessário dar comandos de
               comportamento aqui, apenas estruturar a informação.
@@ -250,19 +260,21 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             </Box>
           )}
 
-          <Button
-            disabled={isTesting || !step?.content?.systemMessage?.length}
-            w="full"
-            colorScheme="blue"
-            onClick={handleTestReturn}
-          >
-            <HStack alignItems="center" gap={2}>
-              {isTesting && <Spinner size="sm" />}
-              <Text>
-                {isTesting ? 'Testando  retorno...' : 'Testar retorno'}
-              </Text>
-            </HStack>
-          </Button>
+          {isAutomatedTasksBot && (
+            <Button
+              disabled={isTesting || !step?.content?.systemMessage?.length}
+              w="full"
+              colorScheme="blue"
+              onClick={handleTestReturn}
+            >
+              <HStack alignItems="center" gap={2}>
+                {isTesting && <Spinner size="sm" />}
+                <Text>
+                  {isTesting ? 'Testando  retorno...' : 'Testar retorno'}
+                </Text>
+              </HStack>
+            </Button>
+          )}
         </VStack>
       </Stack>
     )
