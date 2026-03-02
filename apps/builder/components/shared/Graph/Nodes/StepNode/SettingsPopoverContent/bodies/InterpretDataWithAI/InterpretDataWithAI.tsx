@@ -214,28 +214,30 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
         </Stack>
 
         <VStack gap={4} w="full">
-          <Box position="relative" w="full">
-            <Textarea
-              ref={textareaRef}
-              placeholder={placeholderInstructions}
-              resize="none"
-              maxLength={5000}
-              minLength={1}
-              value={step?.content?.systemMessage || ''}
-              onChange={(e) => handleInstructionsChange(e.target.value)}
-              rows={10}
-              paddingRight="45px"
-              className="scrollbar-custom"
-            />
+          <Box>
+            <Box position="relative" w="full">
+              <Textarea
+                ref={textareaRef}
+                placeholder={placeholderInstructions}
+                resize="none"
+                maxLength={5000}
+                minLength={1}
+                value={step?.content?.systemMessage || ''}
+                onChange={(e) => handleInstructionsChange(e.target.value)}
+                rows={10}
+                paddingRight="45px"
+                className="scrollbar-custom"
+              />
 
-            {responseKeys.length > 0 && (
-              <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
-                <VariablesMenu
-                  variables={responseKeys || []}
-                  onVariableSelect={handleVariableSelected}
-                />
-              </Box>
-            )}
+              {responseKeys.length > 0 && (
+                <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
+                  <VariablesMenu
+                    variables={responseKeys || []}
+                    onVariableSelect={handleVariableSelected}
+                  />
+                </Box>
+              )}
+            </Box>
             <Text mt={2} fontSize="xs" color="gray.500">
               A IA usará este texto como base. Não é necessário dar comandos de
               comportamento aqui, apenas estruturar a informação.
