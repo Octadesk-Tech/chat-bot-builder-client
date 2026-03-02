@@ -37,6 +37,8 @@ import { Input, Textarea } from 'components/shared/Textbox'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
+import { CurlImportView } from './CurlImportView'
+import type { ParsedCurl } from 'services/curlParser'
 
 type Props = {
   step: WebhookStep
@@ -74,6 +76,8 @@ export const WebhookSettings = React.memo(function WebhookSettings({
 
   const [variablesKeyDown, setVariablesKeyDown] = useState<KeyboardEvent>()
   const [accordionIndex, setAccordionIndex] = useState<number[]>([0, 1, 2, 3, 4, 5])
+
+  const [showCurlImport, setShowCurlImport] = useState(false)
 
   const schema = z.object({
     url: z.string().url({ message: 'url inválida' }),
@@ -364,6 +368,32 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   const handleBodyFormStateChange = (isCustomBody: boolean) =>
     onOptionsChange({ ...step.options, isCustomBody })
 
+  const handleCurlImport = (parsed: ParsedCurl) => {
+    setValue('url', parsed.url)
+    setValue('pathPortion', parsed.path || '/')
+    trigger('url')
+    trigger('pathPortion')
+
+    onOptionsChange({
+      ...step.options,
+      method: parsed.method,
+      url: parsed.url,
+      path: parsed.path || '/',
+      headers: parsed.headers,
+      parameters: parsed.parameters,
+      body: parsed.body,
+      isCustomBody: parsed.body !== '{}',
+      variablesForTest: [],
+      responseVariableMapping: [],
+    })
+
+    clearOptions()
+    setShowCurlImport(false)
+    successToast({
+      title: 'cURL importado com sucesso!',
+    })
+  }
+
   const resolveSession = (
     variablesForTest: VariableForTest[],
     variables: Variable[]
@@ -458,17 +488,31 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     [responseKeys]
   )
 
+  if (showCurlImport) {
+    return <CurlImportView onImport={handleCurlImport} />
+  }
+
   return (
     <Stack spacing={4}>
       (
       <Stack>
         <HStack justify="space-between">
           <Text>O que você quer fazer ?</Text>
-          <DropdownList<HttpMethodsWebhook>
-            currentItem={step.options.method}
-            onItemSelect={handleMethodChange}
-            items={Object.values(HttpMethodsWebhook)}
-          />
+          <HStack>
+            <Button
+              colorScheme="blue"
+              size="md"
+              borderRadius="md"
+              onClick={() => setShowCurlImport(true)}
+            >
+              Importar cURL
+            </Button>
+            <DropdownList<HttpMethodsWebhook>
+              currentItem={step.options.method}
+              onItemSelect={handleMethodChange}
+              items={Object.values(HttpMethodsWebhook)}
+            />
+          </HStack>
         </HStack>
         <HStack justify="space-between">
           <Text color="gray.400" fontSize="sm">
@@ -684,7 +728,6 @@ export const WebhookSettings = React.memo(function WebhookSettings({
           </Accordion>
         )}
       </Stack>
-      as
     </Stack>
   )
 })
