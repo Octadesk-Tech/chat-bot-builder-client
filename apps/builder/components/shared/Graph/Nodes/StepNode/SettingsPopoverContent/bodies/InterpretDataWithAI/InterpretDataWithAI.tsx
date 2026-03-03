@@ -89,12 +89,25 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
 {{ criado-em }}`
   }, [])
 
+  const placeholderInstructionsEvents = useMemo(() => {
+    return `Ex: Crie um JSON com os dados do ticket. Use as variáveis: {ticked_id}, {assunto}, {responsavel}, {data_de_criacao}`
+  }, [])
+
   const tooltipInstructions = useMemo(() => {
     return `Como instruir a IA?
 <ol style="margin: 8px 0; padding-left: 20px; list-style-type: decimal;">
 <li style="margin-bottom: 4px;">Digite quais dados você quer que apareça na resposta da conversa.</li>
 <li style="margin-bottom: 4px;">Use o botão (+) para inserir as informações (variáveis) capturadas no passo anterior.</li>
 <li style="margin-bottom: 4px;">Clique em 'Testar retorno' para ver um exemplo do que irá para a IA se basear e usar na conversa.</li>
+</ol>`
+  }, [])
+
+  const tooltipInstructionsEvents = useMemo(() => {
+    return `Como instruir a IA?
+<ol style="margin: 8px 0; padding-left: 20px; list-style-type: decimal;">
+<li style="margin-bottom: 4px;">Defina a estrutura de dados (ex: um JSON) que o próximo passo do fluxo deve receber.</li>
+<li style="margin-bottom: 4px;">Escreva manualmente o nome das variáveis capturadas nos passos anteriores usando chaves, como {nome_da_variavel}.</li>
+<li style="margin-bottom: 4px;">Este campo é técnico: a IA usará suas instruções para organizar as informações antes de enviá-las ao sistema, sem que o cliente veja este texto. </li>
 </ol>`
   }, [])
 
@@ -200,7 +213,11 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             <Tooltip
               label={
                 <Box
-                  dangerouslySetInnerHTML={{ __html: tooltipInstructions }}
+                  dangerouslySetInnerHTML={{
+                    __html: isAutomatedTasksBot
+                      ? tooltipInstructions
+                      : tooltipInstructionsEvents,
+                  }}
                 />
               }
               hasArrow
@@ -218,7 +235,11 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             <Box position="relative" w="full">
               <Textarea
                 ref={textareaRef}
-                placeholder={placeholderInstructions}
+                placeholder={
+                  isAutomatedTasksBot
+                    ? placeholderInstructions
+                    : placeholderInstructionsEvents
+                }
                 resize="none"
                 maxLength={5000}
                 minLength={1}
