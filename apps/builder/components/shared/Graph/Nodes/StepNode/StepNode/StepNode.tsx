@@ -65,6 +65,7 @@ import { BlockStack } from './StepNode.style'
 type StepNodeContextProps = {
   setIsPopoverOpened?: (isPopoverOpened: boolean) => void
   setIsModalOpen?: (isModalOpen: boolean) => void
+  registerBeforeClose?: (handler: (() => boolean) | null) => void
 }
 
 export const StepNodeContext = createContext<StepNodeContextProps>({})
@@ -122,6 +123,11 @@ export const StepNode = ({
   })
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const beforeCloseRef = useRef<(() => boolean) | null>(null)
+
+  const registerBeforeClose = (handler: (() => boolean) | null) => {
+    beforeCloseRef.current = handler
+  }
 
   const [validationMessages, setValidationMessages] =
     useState<Array<ValidationMessage>>()
@@ -171,6 +177,8 @@ export const StepNode = ({
   }, [cleanup])
 
   const handleModalClose = () => {
+    if (beforeCloseRef.current?.()) return
+
     updateStep(indices, { ...step })
     
     refreshConnections(step)
@@ -247,7 +255,7 @@ export const StepNode = ({
       menuPosition="absolute"
     />
   ) : (
-    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen }}>
+    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen, registerBeforeClose }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
       >

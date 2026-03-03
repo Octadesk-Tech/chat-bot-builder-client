@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import {
   Accordion,
   AccordionButton,
@@ -39,6 +39,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { CurlImportView } from './CurlImportView'
 import type { ParsedCurl } from 'services/curlParser'
+import { StepNodeContext } from '../../../StepNode/StepNode'
 
 type Props = {
   step: WebhookStep
@@ -77,7 +78,21 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   const [variablesKeyDown, setVariablesKeyDown] = useState<KeyboardEvent>()
   const [accordionIndex, setAccordionIndex] = useState<number[]>([0, 1, 2, 3, 4, 5])
 
+  const { registerBeforeClose } = useContext(StepNodeContext)
   const [showCurlImport, setShowCurlImport] = useState(false)
+
+  useEffect(() => {
+    if (!registerBeforeClose) return
+    if (showCurlImport) {
+      registerBeforeClose(() => {
+        setShowCurlImport(false)
+        return true
+      })
+    } else {
+      registerBeforeClose(null)
+    }
+    return () => registerBeforeClose(null)
+  }, [showCurlImport, registerBeforeClose])
 
   const schema = z.object({
     url: z.string().url({ message: 'url inválida' }),
