@@ -1,14 +1,12 @@
-import { CopyIcon, PlayIcon, TrashIcon } from 'assets/icons'
+import { CopyIcon, TrashIcon } from 'assets/icons'
 import { HStack, IconButton, useColorModeValue } from '@chakra-ui/react'
 
 type Props = {
-  onPlayClick?: () => void
   onDuplicateClick: () => void
   onDeleteClick: () => void
 }
 
 export const BlockFocusToolbar = ({
-  onPlayClick,
   onDuplicateClick,
   onDeleteClick,
 }: Props) => {
@@ -46,7 +44,10 @@ export const BlockFocusToolbar = ({
         aria-label="Delete"
         borderLeftRadius="none"
         icon={<TrashIcon />}
-        onClick={onDeleteClick}
+        onClick={(e) => {
+          e.stopPropagation()
+          onDeleteClick()
+        }}
         variant="ghost"
         size="sm"
       />
