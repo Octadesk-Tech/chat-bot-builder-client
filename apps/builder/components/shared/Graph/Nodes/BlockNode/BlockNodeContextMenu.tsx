@@ -4,12 +4,14 @@ import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
 
 export const BlockNodeContextMenu = ({
   blockIndex,
+  blockId,
 }: {
   blockIndex: number
+  blockId: string
 }) => {
-  const { deleteBlock, duplicateBlock } = useTypebot()
+  const { deleteBlockById, duplicateBlock } = useTypebot()
 
-  const handleDeleteClick = () => deleteBlock(blockIndex)
+  const handleDeleteClick = () => deleteBlockById(blockId)
 
   const handleDuplicateClick = () => duplicateBlock(blockIndex)
 

@@ -26,6 +26,7 @@ export type BlocksActions = {
   updateBlock: (blockIndex: number, updates: Partial<Omit<Block, 'id'>>) => void
   duplicateBlock: (blockIndex: number) => void
   deleteBlock: (blockIndex: number) => void
+  deleteBlockById: (blockId: string) => void
 }
 
 const blockName = (typebot: WritableDraft<Typebot>) => {
@@ -101,7 +102,25 @@ const blocksActions = (
   deleteBlock: (blockIndex: number) => {
     setTypebot((typebot) =>
       produce(typebot, (typebot) => {
-        const stepIds = typebot.blocks[blockIndex].steps.map((step) => step.id)
+        const block = typebot.blocks[blockIndex]
+        if (!block) return
+        
+        const stepIds = block.steps.map((step) => step.id)
+        setEmptyFields(stepIds, ActionsTypeEmptyFields.REMOVE)
+        deleteBlockDraft(typebot)(blockIndex)
+
+        typebot.blocks = updateBlocksHasConnections(typebot)
+      })
+    )
+  },
+  deleteBlockById: (blockId: string) => {
+    setTypebot((typebot) =>
+      produce(typebot, (typebot) => {
+        const blockIndex = typebot.blocks.findIndex((b) => b.id === blockId)
+        if (blockIndex === -1) return
+        
+        const block = typebot.blocks[blockIndex]
+        const stepIds = block.steps.map((step) => step.id)
         setEmptyFields(stepIds, ActionsTypeEmptyFields.REMOVE)
         deleteBlockDraft(typebot)(blockIndex)
 
@@ -113,7 +132,10 @@ const blocksActions = (
 
 const deleteBlockDraft =
   (typebot: WritableDraft<Typebot>) => (blockIndex: number) => {
-    cleanUpEdgeDraft(typebot, typebot.blocks[blockIndex].id)
+    const block = typebot.blocks[blockIndex]
+    if (!block) return
+    
+    cleanUpEdgeDraft(typebot, block.id)
     typebot.blocks.splice(blockIndex, 1)
   }
 

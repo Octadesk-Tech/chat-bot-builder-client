@@ -42,7 +42,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
     setDraggingBlockId,
   } = useGraph()
 
-  const { typebot, updateBlock, deleteBlock, duplicateBlock } = useTypebot()
+  const { typebot, updateBlock, deleteBlockById, duplicateBlock } = useTypebot()
 
   const { setMouseOverBlock, mouseOverBlock } = useStepDnd()
 
@@ -160,7 +160,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   return (
     <ContextMenu<HTMLDivElement>
-      renderMenu={() => <BlockNodeContextMenu blockIndex={blockIndex} />}
+      renderMenu={() => <BlockNodeContextMenu blockIndex={blockIndex} blockId={block.id} />}
       isDisabled={isReadOnly || isStartBlock}
     >
       {(ref, isOpened) => (
@@ -262,7 +262,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                       setIsFocused(false)
                       duplicateBlock(blockIndex)
                     }}
-                    onDeleteClick={() => deleteBlock(blockIndex)}
+                    onDeleteClick={() => deleteBlockById(block.id)}
                   />
                 </SlideFade>
               )}
