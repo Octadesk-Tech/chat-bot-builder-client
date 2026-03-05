@@ -452,48 +452,55 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     if (!typebot || !step.options || !!Object.keys(errors).length) return
     setIsTestResponseLoading(true)
 
-    const options = step.options as WebhookOptions
-    const parameters = step.options.parameters.concat(options.headers)
+    try {
+      const options = step.options as WebhookOptions
+      const parameters = step.options.parameters.concat(options.headers)
 
-    const localWebhook = {
-      method: options.method,
-      body: options.body,
-      path: options.path,
-      parameters: parameters,
-      url: options.url,
-    }
+      const localWebhook = {
+        method: options.method,
+        body: options.body,
+        path: options.path,
+        parameters: parameters,
+        url: options.url,
+      }
 
-    const session = resolveSession(options.variablesForTest, typebot.variables)
+      const session = resolveSession(options.variablesForTest, typebot.variables)
 
-    const { data } = await sendOctaRequest({
-      url: `validate/webhook`,
-      method: 'POST',
-      body: {
-        session,
-        webhook: localWebhook,
-      },
-    })
+      const { data } = await sendOctaRequest({
+        url: `validate/webhook`,
+        method: 'POST',
+        body: {
+          session,
+          webhook: localWebhook,
+        },
+      })
 
-    const { response, success } = data
+      const { response, success } = data
 
-    setIsTestResponseLoading(false)
-    setSuccessTest(success)
-    setResponseData(data)
-    if (!success) {
+      setSuccessTest(success)
+      setResponseData(data)
+      if (!success) {
+        errorToast({
+          title: 'Não foi possível executar sua integração.',
+        })
+      } else {
+        successToast({
+          title: 'Sua integração está funcionando!',
+        })
+      }
+
+      if (typeof response === 'object') {
+        setTestResponse(JSON.stringify(response, undefined, 2))
+        setResponseKeys(getDeepKeys(response))
+      } else {
+        setTestResponse(response)
+      }
+    } catch (err) {
       errorToast({
-        title: 'Não foi possível executar sua integração.',
+        title: 'Erro ao executar a requisição. Verifique os dados e tente novamente.',
       })
-    } else {
-      successToast({
-        title: 'Sua integração está funcionando!',
-      })
-    }
-
-    if (typeof response === 'object') {
-      setTestResponse(JSON.stringify(response, undefined, 2))
-      setResponseKeys(getDeepKeys(response))
-    } else {
-      setTestResponse(response)
+    } finally {
+      setIsTestResponseLoading(false)
     }
   }
 
