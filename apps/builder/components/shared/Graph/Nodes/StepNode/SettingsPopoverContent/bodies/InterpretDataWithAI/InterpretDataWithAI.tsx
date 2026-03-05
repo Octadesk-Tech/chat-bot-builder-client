@@ -283,16 +283,18 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             </Stack>
           </Stack>
         )}
-        <OctaSelect
-          defaultSelected={
-            step?.content?.responseFormat ||
-            WOZInterpretDataWithAIResponseFormat.TEXT
-          }
-          onChange={handleSelectResponseFormat}
-          placeholder="selecione uma opção"
-          options={responseFormatOptions}
-          findable
-        />
+        {!isAutomatedTasksBot && (
+          <OctaSelect
+            defaultSelected={
+              step?.content?.responseFormat ||
+              WOZInterpretDataWithAIResponseFormat.TEXT
+            }
+            onChange={handleSelectResponseFormat}
+            placeholder="selecione uma opção"
+            options={responseFormatOptions}
+            findable
+          />
+        )}
         <Stack direction="row" justifyContent="space-between" w="full">
           <Stack direction="row" alignItems="center" gap={2}>
             <Text fontWeight="bold">Instruções de retorno</Text>
