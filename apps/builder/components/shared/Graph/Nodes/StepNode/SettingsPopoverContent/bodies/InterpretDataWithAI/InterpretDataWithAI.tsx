@@ -12,14 +12,19 @@ import {
   Spinner,
   HStack,
 } from '@chakra-ui/react'
-import { IntegrationStepType, WOZInterpretDataWithAIOptions } from 'models'
-import { useMemo, useState, useRef, useEffect } from 'react'
+import {
+  IntegrationStepType,
+  WOZInterpretDataWithAIOptions,
+  WOZInterpretDataWithAIResponseFormat,
+} from 'models'
+import { useMemo, useState, useRef } from 'react'
 import { useInterpretDataWithAI } from 'hooks/InterpretDataWithAI/useInterpretDataWithAI'
 import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
 import { WOZInterpretDataWithAI } from 'models'
 import { getDeepKeys } from 'services/integrations'
 import { useTypebot } from 'contexts/TypebotContext'
+import OctaSelect from 'components/octaComponents/OctaSelect/OctaSelect'
 
 type Props = {
   step: WOZInterpretDataWithAI
@@ -82,6 +87,13 @@ export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
     }, 0)
   }
 
+  const stepDescription = useMemo(() => {
+    if (isAutomatedTasksBot) {
+      return 'Defina como a IA deve apresentar os dados coletados na conversa.'
+    }
+    return 'Defina como a IA deve apresentar os dados coletados para o próximo passo do fluxo.'
+  }, [])
+
   const placeholderInstructions = useMemo(() => {
     return `Ex: Retorne ao cliente a lista dos tickets encontrados. 
   \b\b  
@@ -90,8 +102,14 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
   }, [])
 
   const placeholderInstructionsEvents = useMemo(() => {
-    return `Ex: Crie um JSON com os dados do ticket. Use as variáveis: {ticked_id}, {assunto}, {responsavel}, {data_de_criacao}`
-  }, [])
+    if (
+      step?.content?.responseFormat ===
+      WOZInterpretDataWithAIResponseFormat.JSON
+    ) {
+      return `Ex: Crie um JSON com os dados do ticket. Use as variáveis: {ticked_id}, {assunto}, {responsavel}, {data_de_criacao}`
+    }
+    return `Ex: Gere um resumo das informações coletadas, listando o motivo do contato, o status atual e a data de abertura.`
+  }, [step?.content?.responseFormat])
 
   const tooltipInstructions = useMemo(() => {
     return `Como instruir a IA?
@@ -109,6 +127,18 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
 <li style="margin-bottom: 4px;">Escreva manualmente o nome das variáveis capturadas nos passos anteriores usando chaves, como {nome_da_variavel}.</li>
 <li style="margin-bottom: 4px;">Este campo é técnico: a IA usará suas instruções para organizar as informações antes de enviá-las ao sistema, sem que o cliente veja este texto. </li>
 </ol>`
+  }, [])
+
+  const tooltipInstructionsResponseFormat = useMemo(() => {
+    return `<strong>Mensagem natural (texto):</strong>
+    <br />
+    Quando a informação for usada como um texto simples ou resumo em etapas posteriores do fluxo.
+    <br />
+    <br />
+    <strong>JSON (estrutura):</strong>
+    <br />
+    Quando o próximo passo é uma integração/sistema externo e é preciso transformar informação em código para enviar para outro sistema.
+    `
   }, [])
 
   const responseKeys = useMemo(
@@ -138,6 +168,34 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
       setIsTesting(false)
     }
   }
+
+  const handleSelectResponseFormat = (
+    value: WOZInterpretDataWithAIResponseFormat
+  ) => {
+    console.log('response format', {
+      ...step.content,
+      responseFormat: value,
+    })
+    onContentChange({
+      ...step.content,
+      responseFormat: value,
+    })
+  }
+
+  const responseFormatOptions = useMemo(() => {
+    return [
+      {
+        key: 'json',
+        label: 'JSON',
+        value: WOZInterpretDataWithAIResponseFormat.JSON,
+      },
+      {
+        key: 'text',
+        label: 'Mensagem natural',
+        value: WOZInterpretDataWithAIResponseFormat.TEXT,
+      },
+    ]
+  }, [])
 
   const componentToRender = useMemo(() => {
     if (whoIsConnectedOnMyBlock?.length <= 0) {
@@ -202,11 +260,39 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
     }
 
     return (
-      <Stack>
-        <Text>
-          Defina como a IA deve apresentar os dados coletados na conversa.
-        </Text>
-
+      <Stack direction="column" gap={4}>
+        <Text>{stepDescription}</Text>
+        {!isAutomatedTasksBot && (
+          <Stack direction="row" justifyContent="space-between" w="full">
+            <Stack direction="row" alignItems="center" gap={2}>
+              <Text fontWeight="bold">Formato de saída</Text>
+              <Tooltip
+                label={
+                  <Box
+                    dangerouslySetInnerHTML={{
+                      __html: tooltipInstructionsResponseFormat,
+                    }}
+                  />
+                }
+                hasArrow
+              >
+                <Box as="span" display="inline-flex" cursor="pointer">
+                  <Icon as={MdInfoOutline} boxSize={4} />
+                </Box>
+              </Tooltip>
+            </Stack>
+          </Stack>
+        )}
+        <OctaSelect
+          defaultSelected={
+            step?.content?.responseFormat ||
+            WOZInterpretDataWithAIResponseFormat.TEXT
+          }
+          onChange={handleSelectResponseFormat}
+          placeholder="selecione uma opção"
+          options={responseFormatOptions}
+          findable
+        />
         <Stack direction="row" justifyContent="space-between" w="full">
           <Stack direction="row" alignItems="center" gap={2}>
             <Text fontWeight="bold">Instruções de retorno</Text>

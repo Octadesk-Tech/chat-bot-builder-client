@@ -107,6 +107,7 @@ const LearnAutomatedTasks = () => {
           justifyContent="flex-start"
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          gap={0}
         >
           <Box
             bg="blueGray.200"
