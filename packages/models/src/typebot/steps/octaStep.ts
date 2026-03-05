@@ -281,8 +281,14 @@ export type WOZAssignOptions = BaseOctaOptions & {
   }>
 }
 
+export enum WOZInterpretDataWithAIResponseFormat {
+  TEXT = 'text',
+  JSON = 'json',
+}
+
 export type WOZInterpretDataWithAIOptions = {
   systemMessage: string
+  responseFormat?: WOZInterpretDataWithAIResponseFormat
 }
 
 export type CallOtherBotOptions = BaseOctaOptions & {
@@ -460,6 +466,7 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
 export const defaultWOZInterpretDataWithAIOptions: WOZInterpretDataWithAIOptions =
   {
     systemMessage: '',
+    responseFormat: WOZInterpretDataWithAIResponseFormat.TEXT,
   }
 
 export const defaultCallOtherBotOptions: CallOtherBotOptions = {
@@ -471,20 +478,20 @@ export const defaultCallOtherBotOptions: CallOtherBotOptions = {
 
 const seeYa = 'Até mais!'
 export const defaultEndConversationBubbleContent: EndConversationBubbleContent =
-{
-  html: `<div style="margin-left: 8px;">${seeYa}</div>`,
-  richText: [
-    {
-      children: [
-        {
-          text: seeYa,
-        },
-      ],
-      type: 'p',
-    },
-  ],
-  plainText: seeYa,
-}
+  {
+    html: `<div style="margin-left: 8px;">${seeYa}</div>`,
+    richText: [
+      {
+        children: [
+          {
+            text: seeYa,
+          },
+        ],
+        type: 'p',
+      },
+    ],
+    plainText: seeYa,
+  }
 
 export const defaultCommerceOptions: CommerceOptions = {
   catalogId: '',
