@@ -37,7 +37,7 @@ export const parseCurlCommand = (curl: string): ParsedCurl | null => {
     let fullUrl = urlMatch[0]
 
     const headers: QueryParameters[] = []
-    const headerRegex = /-H\s+["']([^"']+)["']/g
+    const headerRegex = /(?:-H|--header)\s+["']([^"']+)["']/g
     let headerMatch
     while ((headerMatch = headerRegex.exec(normalized)) !== null) {
       const [key, value] = headerMatch[1].split(/:(.+)/)
@@ -53,7 +53,9 @@ export const parseCurlCommand = (curl: string): ParsedCurl | null => {
     }
 
     let body = ''
-    const bodyMatch = normalized.match(/--data(?:-raw|-binary|-urlencode)?\s+(['"])([\s\S]*?)\1/)
+    const bodyMatch = normalized.match(
+      /--data(?:-raw|-binary|-urlencode)?\s+(['"])([\s\S]*?)\1/
+    )
     if (bodyMatch) {
       body = bodyMatch[2]
       if (!hasExplicitMethod) method = HttpMethodsWebhook.POST
