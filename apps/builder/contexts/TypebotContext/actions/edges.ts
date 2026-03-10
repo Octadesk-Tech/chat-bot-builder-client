@@ -124,28 +124,27 @@ const deleteOutgoingEdgeIdProps = (
   if (!edge) return
 
   const fromBlockIndex = typebot.blocks.findIndex(byId(edge.from.blockId))
+  if (fromBlockIndex === -1) return
 
-  const fromStepIndex = typebot.blocks[fromBlockIndex].steps.findIndex(
-    byId(edge.from.stepId)
-  )
+  const fromBlock = typebot.blocks[fromBlockIndex]
+  if (!fromBlock?.steps) return
 
-  const step = typebot.blocks[fromBlockIndex].steps[fromStepIndex] as
-    | Step
-    | undefined
+  const fromStepIndex = fromBlock.steps.findIndex(byId(edge.from.stepId))
+
+  const step = fromBlock.steps[fromStepIndex] as Step | undefined
 
   const fromItemIndex =
     edge.from.itemId && step && stepHasItems(step)
       ? step.items.findIndex(byId(edge.from.itemId))
       : -1
 
-  if (fromStepIndex !== -1)
-    typebot.blocks[fromBlockIndex].steps[fromStepIndex].outgoingEdgeId =
-      undefined
+  if (fromStepIndex !== -1 && fromBlock.steps[fromStepIndex])
+    fromBlock.steps[fromStepIndex].outgoingEdgeId = undefined
 
-  if (fromItemIndex !== -1)
-    (
-      typebot.blocks[fromBlockIndex].steps[fromStepIndex] as StepWithItems
-    ).items[fromItemIndex].outgoingEdgeId = undefined
+  if (fromItemIndex !== -1 && step)
+    (fromBlock.steps[fromStepIndex] as StepWithItems).items[
+      fromItemIndex
+    ].outgoingEdgeId = undefined
 }
 
 export const cleanUpEdgeDraft = (
