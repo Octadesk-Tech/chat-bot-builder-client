@@ -12,6 +12,7 @@ import React, { useEffect, useState } from 'react'
 import { StepIcon } from './StepIcon'
 import { StepTypeLabel } from './StepTypeLabel'
 import { InfoIcon } from '@chakra-ui/icons'
+import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
 
 export const StepCard = ({
   type,
@@ -28,6 +29,7 @@ export const StepCard = ({
 }) => {
   const { draggedStepType } = useStepDnd()
   const [isMouseDown, setIsMouseDown] = useState(false)
+  const { typebot } = useTypebot()
 
   useEffect(() => {
     setIsMouseDown(draggedStepType === type)
@@ -35,10 +37,10 @@ export const StepCard = ({
 
   const handleMouseDown = (e: React.MouseEvent) => onMouseDown(e, type)
 
-  const shouldAddGradientBorder = [
-    WOZStepType.MESSAGE,
-    WOZStepType.INTERPRET_DATA_WITH_AI,
-  ].includes(type as WOZStepType)
+  const shouldAddGradientBorder =
+    [WOZStepType.MESSAGE, WOZStepType.INTERPRET_DATA_WITH_AI].includes(
+      type as WOZStepType
+    ) && typebot?.availableFor?.includes('automated-tasks')
 
   return (
     <Tooltip
