@@ -32,6 +32,8 @@ import { EditIcon } from '@chakra-ui/icons'
 
 import { useRouter } from 'next/router'
 
+import { config } from 'config/octadesk.config'
+
 interface IFlux {
   botId: string
   id: string
@@ -48,6 +50,11 @@ const DashboardPage = () => {
   const [fluxes, setFluxes] = useState<IFlux[]>([])
 
   useEffect(() => {
+    if (!config.local) {
+      window.parent.postMessage({ name: 'navigateToTypebots' }, '*')
+      return
+    }
+
     const fetchBots = async (): Promise<void> => {
       const { fluxes } = (await BotsService().getBots('whatsapp', 2)) as {
         fluxes: IFlux[]
@@ -64,6 +71,8 @@ const DashboardPage = () => {
   const handleRedirect = (botId: string) => {
     router.replace(`/typebots/${botId}/edit`)
   }
+
+  if (!config.local) return null
 
   return (
     <Stack minH="100vh">
