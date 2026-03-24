@@ -51,8 +51,9 @@ const DashboardPage = () => {
 
   useEffect(() => {
     if (!config.local) {
-      window.parent.postMessage({ name: 'navigateToTypebots' }, '*')
-      return
+      globalThis.location.replace(
+        `${globalThis.location.origin}/automation-studio`
+      )
     }
 
     const fetchBots = async (): Promise<void> => {
