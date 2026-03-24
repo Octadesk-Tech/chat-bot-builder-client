@@ -73,7 +73,12 @@ export const useInterpretDataWithAI = ({
   }
 
   const requestParams = useMemo(() => {
-    if (!whoIsConnectedOnMyBlock?.length || !typebot) return null
+    if (
+      !whoIsConnectedOnMyBlock?.length ||
+      !typebot ||
+      typebot?.availableFor?.includes('event')
+    )
+      return null
 
     const block = whoIsConnectedOnMyBlock[0]
 
