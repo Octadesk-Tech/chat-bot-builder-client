@@ -65,7 +65,7 @@ export const WhatsAppButtonsListSettingsBody = ({
   })
 
   const MAX_LENGHT_HEADER_AND_FOOTER = 60
-  const MAX_LENGHT_BODY = 4096
+  const MAX_LENGHT_BODY = 1024
   const MAX_BUTTONS = 3
 
   const handleVariableChange = (variable?: Variable) => {
