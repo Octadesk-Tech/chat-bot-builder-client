@@ -172,10 +172,6 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
   const handleSelectResponseFormat = (
     value: WOZInterpretDataWithAIResponseFormat
   ) => {
-    console.log('response format', {
-      ...step.content,
-      responseFormat: value,
-    })
     onContentChange({
       ...step.content,
       responseFormat: value,
