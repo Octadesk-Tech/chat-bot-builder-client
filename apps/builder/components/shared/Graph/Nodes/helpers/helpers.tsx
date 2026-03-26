@@ -43,7 +43,10 @@ const hasConditionSameTargetBlock = (step: Step, edges: Edge[]): boolean => {
   if (validItems.length === 0) return false
 
   const itemEdge = edges.find(
-    (e) => e.from.stepId === step.id && e.from.itemId && validItems.some((item) => item.id === e.from.itemId)
+    (e) =>
+      e.from.stepId === step.id &&
+      e.from.itemId &&
+      validItems.some((item) => item.id === e.from.itemId)
   )
 
   const stepEdge = edges.find(
@@ -66,7 +69,10 @@ const inpuStepsWithFallbackMessages = [
   IntegrationStepType.EXTERNAL_EVENT,
 ]
 
-export const getValidationMessages = (step: Step, edges?: Edge[]): Array<ValidationMessage> => {
+export const getValidationMessages = (
+  step: Step,
+  edges?: Edge[]
+): Array<ValidationMessage> => {
   try {
     const data = []
 
@@ -74,7 +80,9 @@ export const getValidationMessages = (step: Step, edges?: Edge[]): Array<Validat
       return [
         {
           type: VALIDATION_MESSAGE_TYPE.WARNING,
-          message: ['A etapa de sucesso e erro não pode apontar para a mesma etapa'],
+          message: [
+            'A etapa de sucesso e erro não pode apontar para a mesma etapa',
+          ],
         },
       ]
     }
@@ -129,7 +137,7 @@ export const getValidationMessages = (step: Step, edges?: Edge[]): Array<Validat
     ) {
       data.push({
         message: step?.options?.body?.content?.plainText,
-        max: { value: 1024 },
+        max: { value: 4096 },
       })
 
       if (OctaWabaStepType.WHATSAPP_OPTIONS_LIST === step.type) {
