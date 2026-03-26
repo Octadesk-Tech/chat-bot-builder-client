@@ -137,7 +137,7 @@ export const getValidationMessages = (
     ) {
       data.push({
         message: step?.options?.body?.content?.plainText,
-        max: { value: 4096 },
+        max: { value: 1024 },
       })
 
       if (OctaWabaStepType.WHATSAPP_OPTIONS_LIST === step.type) {

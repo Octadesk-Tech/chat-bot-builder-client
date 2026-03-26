@@ -10,7 +10,14 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import { WhatsAppOptionsListOptions, Variable, TextBubbleContent, WhatsAppOptionsListStep, StepWithItems, ItemType } from 'models'
+import {
+  WhatsAppOptionsListOptions,
+  Variable,
+  TextBubbleContent,
+  WhatsAppOptionsListStep,
+  StepWithItems,
+  ItemType,
+} from 'models'
 import { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
@@ -62,7 +69,7 @@ export const WhatsAppOptionsListSettingsBody = ({
   })
 
   const MAX_LENGHT_HEADER_AND_FOOTER = 60
-  const MAX_LENGHT_BODY = 4096
+  const MAX_LENGHT_BODY = 1024
   const MAX_LENGHT_LIST_TITLE = 20
   const MAX_OPTIONS = 10
 
@@ -174,8 +181,9 @@ export const WhatsAppOptionsListSettingsBody = ({
         </FormLabel>
         <TextBubbleEditor
           required={{
-            errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${index + 1
-              }" é obrigatório`,
+            errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${
+              index + 1
+            }" é obrigatório`,
           }}
           onClose={(content) => handleFallBackMessage(content, index)}
           initialValue={message ? message.richText : []}
@@ -225,7 +233,9 @@ export const WhatsAppOptionsListSettingsBody = ({
   const handleRemoveOption = (index: number) => {
     if (localListItems.length <= 1) return
 
-    const updatedItems = localListItems.filter((_: any, i: number) => i !== index)
+    const updatedItems = localListItems.filter(
+      (_: any, i: number) => i !== index
+    )
 
     setLocalListItems(updatedItems)
     onOptionsChange({ ...options, listItems: updatedItems })
@@ -284,11 +294,17 @@ export const WhatsAppOptionsListSettingsBody = ({
           maxLength={MAX_LENGHT_BODY}
         />
       </Stack>
-      {options?.useFallback && localListItems.length > 0 && localListItems.some((item: any) => item.label && item.label.trim() !== '') &&
+      {options?.useFallback &&
+        localListItems.length > 0 &&
+        localListItems.some(
+          (item: any) => item.label && item.label.trim() !== ''
+        ) &&
         (options?.fallbackMessages?.length ? (
           <>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
-              <Text fontWeight="bold" fontSize="sm">Se o cliente não responder com nenhuma das opções:</Text>
+              <Text fontWeight="bold" fontSize="sm">
+                Se o cliente não responder com nenhuma das opções:
+              </Text>
               <Button
                 background={'transparent'}
                 onClick={() => setIsCollapsed((v) => !v)}
@@ -302,7 +318,12 @@ export const WhatsAppOptionsListSettingsBody = ({
                   fallbackMessageComponent(message, index)
                 )}
                 <Box>
-                  <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
+                  <FormLabel
+                    mb="0"
+                    htmlFor="placeholder"
+                    fontWeight="bold"
+                    fontSize="sm"
+                  >
                     Se o cliente errar 3 vezes seguidas, atribuir conversa para:
                   </FormLabel>
                   <AssignToResponsibleSelect
@@ -356,7 +377,9 @@ export const WhatsAppOptionsListSettingsBody = ({
             step={step as StepWithItems}
             indices={indices}
             isReadOnly={false}
-            handleUpdateItem={(_, itemIndex, value) => handleUpdateOption(itemIndex, value)}
+            handleUpdateItem={(_, itemIndex, value) =>
+              handleUpdateOption(itemIndex, value)
+            }
             handleRemoveItem={(_, itemIndex) => handleRemoveOption(itemIndex)}
             handleReorderItem={handleReorderOption}
           />
@@ -368,11 +391,19 @@ export const WhatsAppOptionsListSettingsBody = ({
             onClick={handleAddOption}
             variant="outline"
             size="md"
-            color={localListItems.length >= MAX_OPTIONS ? 'gray.400' : '#1366C9'}
-            borderColor={localListItems.length >= MAX_OPTIONS ? 'gray.300' : '#1366C9'}
+            color={
+              localListItems.length >= MAX_OPTIONS ? 'gray.400' : '#1366C9'
+            }
+            borderColor={
+              localListItems.length >= MAX_OPTIONS ? 'gray.300' : '#1366C9'
+            }
             borderWidth="2px"
             fontSize="sm"
-            _hover={localListItems.length >= MAX_OPTIONS ? {} : { bg: '#1366C9', color: 'white' }}
+            _hover={
+              localListItems.length >= MAX_OPTIONS
+                ? {}
+                : { bg: '#1366C9', color: 'white' }
+            }
             _disabled={{ opacity: 1, cursor: 'not-allowed' }}
             isDisabled={localListItems.length >= MAX_OPTIONS}
           >
@@ -382,7 +413,12 @@ export const WhatsAppOptionsListSettingsBody = ({
       </Stack>
       <Stack>
         <Flex>
-          <FormLabel mb="0" htmlFor="footer-input" fontWeight="bold" fontSize={'sm'}>
+          <FormLabel
+            mb="0"
+            htmlFor="footer-input"
+            fontWeight="bold"
+            fontSize={'sm'}
+          >
             Texto do rodapé
           </FormLabel>
           <Spacer />
