@@ -10,7 +10,15 @@ import {
   Stack,
   Text,
 } from '@chakra-ui/react'
-import { TextBubbleContent, Variable, WhatsAppButtonsListOptions, WhatsAppButtonsListStep, StepWithItems, StepIndices, ItemType } from 'models'
+import {
+  TextBubbleContent,
+  Variable,
+  WhatsAppButtonsListOptions,
+  WhatsAppButtonsListStep,
+  StepWithItems,
+  StepIndices,
+  ItemType,
+} from 'models'
 import { useState } from 'react'
 import { TextBubbleEditor } from 'components/shared/Graph/Nodes/StepNode/TextBubbleEditor'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
@@ -156,8 +164,9 @@ export const WhatsAppButtonsListSettingsBody = ({
         </FormLabel>
         <TextBubbleEditor
           required={{
-            errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${index + 1
-              }" é obrigatório`,
+            errorMsg: `O campo "Mensagem para resposta inválida - Tentativa ${
+              index + 1
+            }" é obrigatório`,
           }}
           onClose={(content) => handleFallBackMessage(content, index)}
           initialValue={message ? message.richText : []}
@@ -203,7 +212,9 @@ export const WhatsAppButtonsListSettingsBody = ({
   const handleRemoveButton = (index: number) => {
     if (localListItems.length <= 1) return
 
-    const updatedItems = localListItems.filter((_: any, i: number) => i !== index)
+    const updatedItems = localListItems.filter(
+      (_: any, i: number) => i !== index
+    )
 
     setLocalListItems(updatedItems)
     onOptionsChange({ ...options, buttonItems: updatedItems })
@@ -273,7 +284,9 @@ export const WhatsAppButtonsListSettingsBody = ({
             step={step as StepWithItems}
             indices={indices}
             isReadOnly={false}
-            handleUpdateItem={(_, itemIndex, value) => handleUpdateButton(itemIndex, value)}
+            handleUpdateItem={(_, itemIndex, value) =>
+              handleUpdateButton(itemIndex, value)
+            }
             handleRemoveItem={(_, itemIndex) => handleRemoveButton(itemIndex)}
             handleReorderItem={handleReorderButton}
           />
@@ -285,11 +298,19 @@ export const WhatsAppButtonsListSettingsBody = ({
             onClick={handleAddButton}
             variant="outline"
             size="md"
-            color={localListItems.length >= MAX_BUTTONS ? 'gray.400' : '#1366C9'}
-            borderColor={localListItems.length >= MAX_BUTTONS ? 'gray.300' : '#1366C9'}
+            color={
+              localListItems.length >= MAX_BUTTONS ? 'gray.400' : '#1366C9'
+            }
+            borderColor={
+              localListItems.length >= MAX_BUTTONS ? 'gray.300' : '#1366C9'
+            }
             borderWidth="2px"
             fontSize="sm"
-            _hover={localListItems.length >= MAX_BUTTONS ? {} : { bg: '#1366C9', color: 'white' }}
+            _hover={
+              localListItems.length >= MAX_BUTTONS
+                ? {}
+                : { bg: '#1366C9', color: 'white' }
+            }
             _disabled={{ opacity: 1, cursor: 'not-allowed' }}
             isDisabled={localListItems.length >= MAX_BUTTONS}
           >
@@ -298,7 +319,11 @@ export const WhatsAppButtonsListSettingsBody = ({
         </Flex>
       </Stack>
 
-      {options?.useFallback && localListItems.length > 0 && localListItems.some((item: any) => item.text && item.text.trim() !== '') &&
+      {options?.useFallback &&
+        localListItems.length > 0 &&
+        localListItems.some(
+          (item: any) => item.text && item.text.trim() !== ''
+        ) &&
         (options?.fallbackMessages?.length ? (
           <>
             <Flex justifyContent={'space-between'} alignItems={'center'}>
@@ -318,7 +343,12 @@ export const WhatsAppButtonsListSettingsBody = ({
                   fallbackMessageComponent(message, index)
                 )}
                 <Box>
-                  <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
+                  <FormLabel
+                    mb="0"
+                    htmlFor="placeholder"
+                    fontWeight="bold"
+                    fontSize="sm"
+                  >
                     Se o cliente errar 3 vezes seguidas, atribuir conversa para:
                   </FormLabel>
                   <AssignToResponsibleSelect
@@ -339,7 +369,12 @@ export const WhatsAppButtonsListSettingsBody = ({
         ))}
       <Stack>
         <Flex>
-          <FormLabel mb="0" htmlFor="footer-input" fontWeight="bold" fontSize={'sm'}>
+          <FormLabel
+            mb="0"
+            htmlFor="footer-input"
+            fontWeight="bold"
+            fontSize={'sm'}
+          >
             Texto do rodapé
           </FormLabel>
           <Spacer />
@@ -359,7 +394,9 @@ export const WhatsAppButtonsListSettingsBody = ({
       </Stack>
       <Stack>
         <VariableSearchInput
-          initialVariableId={options.variableId || (step as any)?.initialVariableToken}
+          initialVariableId={
+            options.variableId || (step as any)?.initialVariableToken
+          }
           onSelectVariable={handleVariableChange}
         />
       </Stack>
