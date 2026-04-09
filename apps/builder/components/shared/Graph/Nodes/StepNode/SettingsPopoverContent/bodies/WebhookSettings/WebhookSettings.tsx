@@ -598,7 +598,6 @@ export const WebhookSettings = React.memo(function WebhookSettings({
                     debounceTimeout={5}
                     value={getValues('pathPortion')}
                     withVariableButton={true}
-                    withSelectTokenButton={true}
                   />
                 </HStack>
                 <Text color="red.400" fontSize="sm" mt={0.5}>
@@ -625,6 +624,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
                 addLabel="Adicionar parâmetro"
                 type="query"
                 debounceTimeout={0}
+                withSelectTokenButton={false}
               />
             </AccordionPanel>
           </AccordionItem>
@@ -645,6 +645,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
                 addLabel="Adicionar parâmetro"
                 type="header"
                 debounceTimeout={0}
+                withSelectTokenButton={true}
               />
             </AccordionPanel>
           </AccordionItem>
