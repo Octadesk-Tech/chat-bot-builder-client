@@ -76,7 +76,9 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   })
 
   const [variablesKeyDown, setVariablesKeyDown] = useState<KeyboardEvent>()
-  const [accordionIndex, setAccordionIndex] = useState<number[]>([0, 1, 2, 3, 4, 5])
+  const [accordionIndex, setAccordionIndex] = useState<number[]>([
+    0, 1, 2, 3, 4, 5,
+  ])
 
   const { registerBeforeClose } = useContext(StepNodeContext)
   const [showCurlImport, setShowCurlImport] = useState(false)
@@ -464,7 +466,10 @@ export const WebhookSettings = React.memo(function WebhookSettings({
         url: options.url,
       }
 
-      const session = resolveSession(options.variablesForTest, typebot.variables)
+      const session = resolveSession(
+        options.variablesForTest,
+        typebot.variables
+      )
 
       const { data } = await sendOctaRequest({
         url: `validate/webhook`,
@@ -497,8 +502,10 @@ export const WebhookSettings = React.memo(function WebhookSettings({
       }
     } catch (err) {
       errorToast({
-        title: 'Erro ao executar a requisição. Verifique os dados e tente novamente.',
+        title:
+          'Erro ao executar a requisição. Verifique os dados e tente novamente.',
       })
+      console.error(err)
     } finally {
       setIsTestResponseLoading(false)
     }
@@ -579,17 +586,20 @@ export const WebhookSettings = React.memo(function WebhookSettings({
                   composição (ex.: /<strong>#valor</strong>/valid)
                 </Text>
                 <label>{step.options.url ?? ''}</label>
-                <Textarea
-                  placeholder=""
-                  onKeyDown={handleKeyDown as any}
-                  defaultValue={getValues('pathPortion')}
-                  handleOpenVariablesSelect={variablesKeyDown}
-                  onChange={handlePathChange}
-                  onBlur={() => effectPathChange()}
-                  debounceTimeout={5}
-                  value={getValues('pathPortion')}
-                  withVariableButton={true}
-                />
+                <HStack>
+                  <Textarea
+                    className="w-full"
+                    placeholder=""
+                    onKeyDown={handleKeyDown as any}
+                    defaultValue={getValues('pathPortion')}
+                    handleOpenVariablesSelect={variablesKeyDown}
+                    onChange={handlePathChange}
+                    onBlur={() => effectPathChange()}
+                    debounceTimeout={5}
+                    value={getValues('pathPortion')}
+                    withVariableButton={true}
+                  />
+                </HStack>
                 <Text color="red.400" fontSize="sm" mt={0.5}>
                   {errors.pathPortion?.message}
                 </Text>
@@ -614,6 +624,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
                 addLabel="Adicionar parâmetro"
                 type="query"
                 debounceTimeout={0}
+                withSelectTokenButton={false}
               />
             </AccordionPanel>
           </AccordionItem>
@@ -634,10 +645,13 @@ export const WebhookSettings = React.memo(function WebhookSettings({
                 addLabel="Adicionar parâmetro"
                 type="header"
                 debounceTimeout={0}
+                withSelectTokenButton={true}
               />
             </AccordionPanel>
           </AccordionItem>
-          {['POST', 'PUT', 'PATCH', 'DELETE'].includes(step.options?.method) && (
+          {['POST', 'PUT', 'PATCH', 'DELETE'].includes(
+            step.options?.method
+          ) && (
             <AccordionItem>
               <AccordionButton justifyContent="space-between">
                 Body
