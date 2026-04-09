@@ -505,7 +505,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
         title:
           'Erro ao executar a requisição. Verifique os dados e tente novamente.',
       })
-      return err
+      console.error(err)
     } finally {
       setIsTestResponseLoading(false)
     }
