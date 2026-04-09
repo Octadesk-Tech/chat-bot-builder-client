@@ -12,6 +12,7 @@ export type TableListItemProps<T> = {
   onItemChange: (item: T) => void
   onRemoveItem: (item: T) => void
   required?: boolean | { errorMsg?: string }
+  withSelectTokenButton?: boolean
 }
 
 type Props<T> = {
@@ -23,9 +24,10 @@ type Props<T> = {
   onItemsChange?: (items: ItemWithId<T>[], addedItem?: boolean) => void
   Item: (props: TableListItemProps<T>) => JSX.Element
   shouldHideButton?: boolean
-  ComponentBetweenItems?: (props: unknown) => JSX.Element,
-  minItems?: number,
+  ComponentBetweenItems?: (props: unknown) => JSX.Element
+  minItems?: number
   buttonWidth?: string
+  withSelectTokenButton?: boolean
 }
 
 export const TableList = <T,>({
@@ -39,7 +41,8 @@ export const TableList = <T,>({
   shouldHideButton,
   ComponentBetweenItems = () => <></>,
   minItems,
-  buttonWidth = "100%"
+  buttonWidth = '100%',
+  withSelectTokenButton = false,
 }: Props<T>) => {
   const [items, setItems] = useState(initialItems)
   const [showDeleteIndex, setShowDeleteIndex] = useState<number | null>(null)
@@ -85,21 +88,26 @@ export const TableList = <T,>({
   return (
     <Stack spacing="4">
       {items.map((item, itemIndex) => (
-        <Box key={item.id}
+        <Box
+          key={item.id}
           onMouseEnter={handleMouseEnter(itemIndex)}
-          onMouseLeave={handleMouseLeave}>
+          onMouseLeave={handleMouseLeave}
+        >
           {itemIndex !== 0 && <ComponentBetweenItems />}
           <Item
             item={item}
             onItemChange={handleCellChange(itemIndex)}
             onRemoveItem={handleCellDelete(itemIndex)}
             debounceTimeout={debounceTimeout}
+            withSelectTokenButton={withSelectTokenButton}
           />
         </Box>
       ))}
       {!shouldHideButton && (
         <Center>
-          <OctaButton onClick={createItem} width={buttonWidth}>{addLabel}</OctaButton>
+          <OctaButton onClick={createItem} width={buttonWidth}>
+            {addLabel}
+          </OctaButton>
         </Center>
       )}
     </Stack>
