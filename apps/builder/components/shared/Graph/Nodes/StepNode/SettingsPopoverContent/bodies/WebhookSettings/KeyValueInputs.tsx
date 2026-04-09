@@ -81,6 +81,7 @@ export const KeyValueInputs = ({
         onChange={handleValueChange}
         placeholder={valuePlaceholder}
         debounceTimeout={debounceTimeout}
+        withSelectTokenButton={true}
       />
     </Stack>
   )
