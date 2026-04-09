@@ -10,34 +10,48 @@ import {
   Box,
   List,
   ListItem,
+  Tooltip,
 } from '@chakra-ui/react'
 import { FiPlus } from 'react-icons/fi'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, type ReactElement } from 'react'
 
-type Props = {
-  variables: string[]
-  onVariableSelect: (variable: string) => void
+export type VariablesMenuProps<T extends { id: string | number }> = {
+  items: T[]
+  getLabel: (item: T) => string
+  onSelect: (item: T) => void
+  icon?: ReactElement
   ariaLabel?: string
+  searchPlaceholder?: string
+  emptyMessage?: string
+  tooltip?: string
+  size?: 'sm' | 'md' | 'lg'
+  isDisabled?: boolean
 }
 
-export const VariablesMenu = ({
-  variables,
-  onVariableSelect,
+export function VariablesMenu<T extends { id: string | number }>({
+  items,
+  getLabel,
+  onSelect,
+  icon,
   ariaLabel = 'Adicionar variável',
-}: Props) => {
+  searchPlaceholder = 'Pesquisar variável...',
+  emptyMessage = 'Nenhuma variável encontrada',
+  tooltip = 'Selecionar variável',
+  size = 'md',
+  isDisabled = false,
+}: Readonly<VariablesMenuProps<T>>) {
   const [searchText, setSearchText] = useState('')
   const [isOpen, setIsOpen] = useState(false)
 
-  const filteredVariables = useMemo(() => {
-    if (!searchText) return variables
-    return variables.filter((variable) =>
-      variable.toLowerCase().includes(searchText.toLowerCase())
-    )
-  }, [variables, searchText])
+  const filteredItems = useMemo(() => {
+    if (!searchText) return items
+    const q = searchText.toLowerCase()
+    return items.filter((item) => getLabel(item).toLowerCase().includes(q))
+  }, [items, searchText, getLabel])
 
-  const handleVariableSelect = (variable: string) => {
-    onVariableSelect(variable)
+  const handleSelect = (item: T) => {
+    onSelect(item)
     setSearchText('')
     setIsOpen(false)
   }
@@ -56,22 +70,25 @@ export const VariablesMenu = ({
       offset={[0, 8]}
     >
       <PopoverTrigger>
-        <IconButton
-          icon={<FiPlus size={16} />}
-          variant="ghost"
-          size="sm"
-          backgroundColor="gray.100"
-          _hover={{ backgroundColor: 'gray.200' }}
-          aria-label={ariaLabel}
-          onClick={() => setIsOpen(!isOpen)}
-        />
+        <Tooltip label={tooltip}>
+          <IconButton
+            icon={icon ?? <FiPlus size={16} />}
+            variant="ghost"
+            size={size}
+            backgroundColor="gray.100"
+            _hover={{ backgroundColor: 'gray.200' }}
+            aria-label={ariaLabel}
+            isDisabled={isDisabled}
+            onClick={() => setIsOpen(!isOpen)}
+          />
+        </Tooltip>
       </PopoverTrigger>
       <PopoverContent width="250px">
         <PopoverBody p={0}>
           <Stack spacing={0}>
             <Box p={2} borderBottom="1px" borderColor="gray.200">
               <Input
-                placeholder="Pesquisar variável..."
+                placeholder={searchPlaceholder}
                 size="sm"
                 value={searchText}
                 onChange={(e) => setSearchText(e.target.value)}
@@ -79,25 +96,25 @@ export const VariablesMenu = ({
               />
             </Box>
             <List maxH="300px" overflowY="auto" className="scrollbar-custom">
-              {filteredVariables.length > 0 ? (
-                filteredVariables.map((variable) => (
+              {filteredItems.length > 0 ? (
+                filteredItems.map((item) => (
                   <ListItem
-                    key={variable}
+                    key={String(item.id)}
                     px={3}
                     py={2}
                     cursor="pointer"
                     _hover={{ bg: 'gray.100' }}
-                    onClick={() => handleVariableSelect(variable)}
+                    onClick={() => handleSelect(item)}
                   >
                     <Text fontSize="sm" fontWeight="medium">
-                      {variable}
+                      {getLabel(item)}
                     </Text>
                   </ListItem>
                 ))
               ) : (
                 <Box px={3} py={4} textAlign="center">
                   <Text fontSize="sm" color="gray.500">
-                    Nenhuma variável encontrada
+                    {emptyMessage}
                   </Text>
                 </Box>
               )}
