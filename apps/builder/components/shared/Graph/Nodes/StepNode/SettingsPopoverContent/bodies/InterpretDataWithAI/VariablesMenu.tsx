@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { FiPlus } from 'react-icons/fi'
 
-import { useState, useMemo, type ReactElement } from 'react'
+import { useState, useMemo, type ReactElement, type ReactNode } from 'react'
 
 export type VariablesMenuProps<T extends { id: string | number }> = {
   items: T[]
@@ -23,7 +23,7 @@ export type VariablesMenuProps<T extends { id: string | number }> = {
   icon?: ReactElement
   ariaLabel?: string
   searchPlaceholder?: string
-  emptyMessage?: string
+  emptyMessage?: ReactNode | string
   tooltip?: string
   size?: 'sm' | 'md' | 'lg'
   isDisabled?: boolean
@@ -114,7 +114,7 @@ export function VariablesMenu<T extends { id: string | number }>({
               ) : (
                 <Box px={3} py={4} textAlign="center">
                   <Text fontSize="sm" color="gray.500">
-                    {emptyMessage}
+                    <div dangerouslySetInnerHTML={{ __html: emptyMessage }} />
                   </Text>
                 </Box>
               )}
