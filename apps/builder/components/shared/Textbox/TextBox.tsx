@@ -9,6 +9,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import { isEmpty } from 'utils'
 import { VariablesButton } from '../buttons/VariablesButton'
+import SelectTokenButton from '../buttons/SelectTokenButton'
 
 export type TextBoxProps = {
   onChange: (value: string) => void
@@ -18,12 +19,14 @@ export type TextBoxProps = {
   withVariableButton?: boolean
   debounceTimeout?: number
   handleOpenVariablesSelect?: KeyboardEvent
+  withSelectTokenButton?: boolean
 } & Omit<InputProps & TextareaProps, 'onChange'>
 
 export const TextBox = ({
   onChange,
   TextBox,
   withVariableButton = true,
+  withSelectTokenButton = false,
   debounceTimeout = 1000,
   handleOpenVariablesSelect,
   ...props
@@ -90,16 +93,21 @@ export const TextBox = ({
 
   if (!withVariableButton) {
     return (
-      <TextBox
-        ref={textBoxRef}
-        onChange={(e) => onChange(adapterValueOnChange(e))}
-        bgColor={'white'}
-        {...props}
-      />
+      <HStack spacing={0} align={'flex-end'} w="full" gap={2}>
+        <TextBox
+          ref={textBoxRef}
+          onChange={(e) => onChange(adapterValueOnChange(e))}
+          bgColor={'white'}
+          {...props}
+        />
+        {withSelectTokenButton && (
+          <SelectTokenButton onSelectToken={handleVariableSelected} />
+        )}
+      </HStack>
     )
   }
   return (
-    <HStack spacing={0} align={'flex-end'}>
+    <HStack spacing={0} align={'flex-end'} w="full" gap={2}>
       <TextBox
         {...props}
         onBlur={props.onBlur}
@@ -113,6 +121,9 @@ export const TextBox = ({
         onSelectVariable={handleVariableSelected}
         id="variables-button"
       />
+      {withSelectTokenButton && (
+        <SelectTokenButton onSelectToken={handleVariableSelected} />
+      )}
     </HStack>
   )
 }
