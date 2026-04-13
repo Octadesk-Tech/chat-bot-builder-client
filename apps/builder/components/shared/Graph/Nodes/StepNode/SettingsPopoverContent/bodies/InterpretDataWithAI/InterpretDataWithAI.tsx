@@ -146,6 +146,15 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
     [data?.response]
   )
 
+  const responseKeyMenuItems = useMemo(
+    () =>
+      responseKeys.map((key, index) => ({
+        id: index,
+        label: key,
+      })),
+    [responseKeys]
+  )
+
   const handleTestReturn = async () => {
     setIsTesting(true)
     try {
@@ -337,8 +346,10 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
               {responseKeys.length > 0 && (
                 <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
                   <VariablesMenu
-                    variables={responseKeys || []}
-                    onVariableSelect={handleVariableSelected}
+                    size="sm"
+                    items={responseKeyMenuItems}
+                    getLabel={(item) => item.label}
+                    onSelect={(item) => handleVariableSelected(item.label)}
                   />
                 </Box>
               )}

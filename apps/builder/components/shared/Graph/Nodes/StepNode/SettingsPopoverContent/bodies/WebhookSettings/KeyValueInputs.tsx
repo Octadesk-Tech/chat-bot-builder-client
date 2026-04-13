@@ -30,9 +30,11 @@ export const KeyValueInputs = ({
   keyPlaceholder,
   valuePlaceholder,
   debounceTimeout,
+  withSelectTokenButton,
 }: TableListItemProps<QueryParameters> & {
   keyPlaceholder?: string
   valuePlaceholder?: string
+  withSelectTokenButton?: boolean
 }) => {
   const { typebot } = useTypebot()
 
@@ -81,6 +83,7 @@ export const KeyValueInputs = ({
         onChange={handleValueChange}
         placeholder={valuePlaceholder}
         debounceTimeout={debounceTimeout}
+        withSelectTokenButton={withSelectTokenButton}
       />
     </Stack>
   )
