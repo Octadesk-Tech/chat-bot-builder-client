@@ -59,7 +59,7 @@ export const VariableSearchInput = ({
   addVariable = true,
   isCloseModal = true,
   debounceTimeout = 1000,
-  labelDefault = '',
+  labelDefault = 'Salvar resposta em',
   isSaveContext = true,
   isApi = false,
   variablesSelectorIsOpen = false,
@@ -103,10 +103,16 @@ export const VariableSearchInput = ({
 
   const hasValidInitialId = initialVariableId && initialVariableId.trim() !== ''
 
-  const myVariable = (hasValidInitialId ? typebot?.variables.find((v) => {
-    return (v.id && v.id === initialVariableId) || v.variableId === initialVariableId || v.token === initialVariableId
-  }) : undefined) ||
-    (isSaveContext && !isApi && dontSave) as Variable
+  const myVariable =
+    (hasValidInitialId
+      ? typebot?.variables.find((v) => {
+          return (
+            (v.id && v.id === initialVariableId) ||
+            v.variableId === initialVariableId ||
+            v.token === initialVariableId
+          )
+        })
+      : undefined) || ((isSaveContext && !isApi && dontSave) as Variable)
 
   const initial = {
     ACTIONS: {
@@ -244,16 +250,14 @@ export const VariableSearchInput = ({
   }
 
   return (
-    <Flex
-      ref={boxRef}
-      direction="column"
-      w="100%"
-    >
+    <Flex ref={boxRef} direction="column" w="100%">
       {screen === 'VIEWER' && (
         <Container data-screen={screen} ref={dropdownRef}>
-          <Flex fontWeight="bold" fontSize="sm" mb="2">
-            {labelDefault || 'Salvar resposta em'}
-          </Flex>
+          {labelDefault && (
+            <Flex fontWeight="bold" fontSize="sm" mb="2">
+              {labelDefault}
+            </Flex>
+          )}
           <div onWheelCapture={handleContentWheel}>
             <Select
               menuIsOpen={variablesSelectorIsOpen ? true : undefined}
