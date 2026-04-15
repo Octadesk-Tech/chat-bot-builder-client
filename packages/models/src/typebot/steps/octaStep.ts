@@ -280,6 +280,16 @@ export type WOZAssignOptions = BaseOctaOptions & {
     readonly?: boolean
   }>
   disableContextConfirmation: boolean
+  collectors?: DataCollectorOptions[]
+}
+
+export type DataCollectorOptions = {
+  id: string
+  context: string
+  target: string
+  variableId: string
+  required: boolean
+  retries: number
 }
 
 export enum WOZInterpretDataWithAIResponseFormat {
@@ -463,6 +473,7 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
   virtualAgentId: undefined,
   limitAnswerNoContent: 3,
   disableContextConfirmation: false,
+  collectors: [],
 }
 
 export const defaultWOZInterpretDataWithAIOptions: WOZInterpretDataWithAIOptions =

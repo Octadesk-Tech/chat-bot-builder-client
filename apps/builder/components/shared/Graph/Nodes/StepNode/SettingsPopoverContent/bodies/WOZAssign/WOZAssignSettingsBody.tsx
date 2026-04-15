@@ -26,6 +26,7 @@ import WozQtdAttemptsSelect from './WozQtdAttemptsSelect'
 import cuid from 'cuid'
 import { ItemDraggableList } from 'components/shared/Graph/Nodes/ItemNode/ItemDraggable/ItemDraggableList'
 import DisableContextConfirmationBox from './DisableContextConfirmationBox'
+import DataCollector from './DataCollector/DataCollector'
 
 type Props = {
   step: WOZAssignStep
@@ -400,6 +401,10 @@ export const WOZAssignSettingBody = ({
           </Button>
         </Flex>
       </Stack>
+
+      <OctaDivider width="100%" />
+
+      <DataCollector onStepChange={onStepChange} stepRef={stepRef} />
     </Stack>
   )
 }
