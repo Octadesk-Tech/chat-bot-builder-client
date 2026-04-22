@@ -279,6 +279,7 @@ export type WOZAssignOptions = BaseOctaOptions & {
     label: string
     readonly?: boolean
   }>
+  disableContextConfirmation: boolean
 }
 
 export enum WOZInterpretDataWithAIResponseFormat {
@@ -461,6 +462,7 @@ export const defaultWOZAssignOptions: WOZAssignOptions = {
   subject: '',
   virtualAgentId: undefined,
   limitAnswerNoContent: 3,
+  disableContextConfirmation: false,
 }
 
 export const defaultWOZInterpretDataWithAIOptions: WOZInterpretDataWithAIOptions =

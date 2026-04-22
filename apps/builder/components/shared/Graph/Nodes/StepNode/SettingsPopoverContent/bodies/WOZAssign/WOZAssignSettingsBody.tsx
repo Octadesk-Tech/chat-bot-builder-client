@@ -12,13 +12,21 @@ import {
   Text,
 } from '@chakra-ui/react'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
-import { Item, StepWithItems, WOZAssignStep, Step, ItemType, StepIndices } from 'models'
+import {
+  Item,
+  StepWithItems,
+  WOZAssignStep,
+  Step,
+  ItemType,
+  StepIndices,
+} from 'models'
 import { useState, useRef, useEffect } from 'react'
 import { MdAdd } from 'react-icons/md'
 import { WozAssignSelect } from './WozAssignSelect'
 import WozQtdAttemptsSelect from './WozQtdAttemptsSelect'
 import cuid from 'cuid'
 import { ItemDraggableList } from 'components/shared/Graph/Nodes/ItemNode/ItemDraggable/ItemDraggableList'
+import DisableContextConfirmationBox from './DisableContextConfirmationBox'
 
 type Props = {
   step: WOZAssignStep
@@ -60,20 +68,31 @@ export const WOZAssignSettingBody = ({
 
   const getInitialItems = () => {
     if (step.items && step.items.length > 2) {
-      const customItemsFromStep = (step.items as unknown as Array<{ id: string; content?: string; outgoingEdgeId?: string }>).slice(2)
+      const customItemsFromStep = (
+        step.items as unknown as Array<{
+          id: string
+          content?: string
+          outgoingEdgeId?: string
+        }>
+      ).slice(2)
       return customItemsFromStep.map((item) => ({
         id: item.id,
         label: item.content || '',
         outgoingEdgeId: item.outgoingEdgeId,
       }))
     }
-    if (step.options?.customContexts && step.options.customContexts.length > 0) {
+    if (
+      step.options?.customContexts &&
+      step.options.customContexts.length > 0
+    ) {
       return [...step.options.customContexts] as CustomContext[]
     }
     return []
   }
 
-  const [localListItems, setLocalListItems] = useState<CustomContext[]>(() => getInitialItems())
+  const [localListItems, setLocalListItems] = useState<CustomContext[]>(() =>
+    getInitialItems()
+  )
   const localListItemsRef = useRef(localListItems)
   localListItemsRef.current = localListItems
 
@@ -84,26 +103,27 @@ export const WOZAssignSettingBody = ({
       )
 
       const currentItems = stepRef.current?.items || []
-      const defaultItems = currentItems.length >= 2
-        ? currentItems.slice(0, 2)
-        : [
-          {
-            id: 'default-1',
-            stepId: stepRef.current?.id,
-            type: ItemType.BUTTON,
-            content: 'Encerrar a conversa',
-            readonly: true,
-            canAddItem: false,
-          },
-          {
-            id: 'default-2',
-            stepId: stepRef.current?.id,
-            type: ItemType.BUTTON,
-            content: 'Falar com um humano',
-            readonly: true,
-            canAddItem: false,
-          },
-        ]
+      const defaultItems =
+        currentItems.length >= 2
+          ? currentItems.slice(0, 2)
+          : [
+              {
+                id: 'default-1',
+                stepId: stepRef.current?.id,
+                type: ItemType.BUTTON,
+                content: 'Encerrar a conversa',
+                readonly: true,
+                canAddItem: false,
+              },
+              {
+                id: 'default-2',
+                stepId: stepRef.current?.id,
+                type: ItemType.BUTTON,
+                content: 'Falar com um humano',
+                readonly: true,
+                canAddItem: false,
+              },
+            ]
 
       const newStepItems = [
         ...defaultItems,
@@ -120,7 +140,10 @@ export const WOZAssignSettingBody = ({
 
       onStepChange({
         items: newStepItems,
-        options: { ...stepRef.current?.options, customContexts: itemsWithContent }
+        options: {
+          ...stepRef.current?.options,
+          customContexts: itemsWithContent,
+        },
       } as Partial<Step>)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -136,19 +159,21 @@ export const WOZAssignSettingBody = ({
 
   const handleWozAssignSelect = (e: { profile?: string }) => {
     onStepChange({
-      options: { ...stepRef.current?.options, virtualAgentId: e.profile }
+      options: { ...stepRef.current?.options, virtualAgentId: e.profile },
     } as Partial<Step>)
   }
 
   const handleChangeAttempts = (e: number) => {
     onStepChange({
-      options: { ...stepRef.current?.options, limitAnswerNoContent: e }
+      options: { ...stepRef.current?.options, limitAnswerNoContent: e },
     } as Partial<Step>)
   }
 
   const updateStepAndOptions = (customItems: CustomContext[]) => {
     const defaultItems = getDefaultItems()
-    const filteredCustomItems = customItems.filter((item) => item.label && item.label.trim() !== '')
+    const filteredCustomItems = customItems.filter(
+      (item) => item.label && item.label.trim() !== ''
+    )
 
     const newItems = [
       ...defaultItems,
@@ -165,7 +190,7 @@ export const WOZAssignSettingBody = ({
 
     onStepChange({
       items: newItems,
-      options: { ...stepRef.current?.options, customContexts: customItems }
+      options: { ...stepRef.current?.options, customContexts: customItems },
     } as Partial<Step>)
   }
 
@@ -193,7 +218,9 @@ export const WOZAssignSettingBody = ({
   }
 
   const handleRemoveOption = (index: number) => {
-    const updatedItems = localListItems.filter((_: CustomContext, i: number) => i !== index)
+    const updatedItems = localListItems.filter(
+      (_: CustomContext, i: number) => i !== index
+    )
 
     setLocalListItems(updatedItems)
     updateStepAndOptions(updatedItems)
@@ -217,9 +244,17 @@ export const WOZAssignSettingBody = ({
           onSelect={handleWozAssignSelect}
         />
       </Stack>
+
       <WozQtdAttemptsSelect
         selectedValue={options.limitAnswerNoContent}
         onChange={handleChangeAttempts}
+      />
+
+      <OctaDivider width="100%" />
+
+      <DisableContextConfirmationBox
+        onStepChange={onStepChange}
+        stepRef={stepRef}
       />
 
       <Stack>
@@ -229,7 +264,7 @@ export const WOZAssignSettingBody = ({
           <Text
             cursor={'pointer'}
             onClick={() => changeViewMoreInfo('redirection')}
-            fontSize={'13px'}
+            fontSize={'sm'}
             align={'center'}
             color={'purple.400'}
           >
@@ -328,7 +363,9 @@ export const WOZAssignSettingBody = ({
             step={step as unknown as StepWithItems}
             indices={indices}
             isReadOnly={false}
-            handleUpdateItem={(_, itemIndex, value) => handleUpdateOption(itemIndex, value)}
+            handleUpdateItem={(_, itemIndex, value) =>
+              handleUpdateOption(itemIndex, value)
+            }
             handleRemoveItem={(_, itemIndex) => handleRemoveOption(itemIndex)}
             handleReorderItem={handleReorderOption}
             renderItemContent={({ item, onUpdateItem }) => (
