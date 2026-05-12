@@ -31,16 +31,18 @@ function TypebotEditPage() {
   }, [])
 
   useEffect(() => {
-    if (!dequal(typebot?.blocks, currentTypebot?.blocks)) {
+    if (!typebot?.blocks) return
+
+    if (!dequal(typebot.blocks, currentTypebot?.blocks)) {
       window.parent.postMessage({ name: 'hasUnsavedChanges' }, '*')
     }
 
-    const groupsWithoutConnection = typebot?.blocks?.filter(
+    const groupsWithoutConnection = typebot.blocks.filter(
       (block) => !block.hasConnection
     )
 
     const hasGroupsWithoutConnection = !!groupsWithoutConnection?.length
-    const hasMoreThanOneBlock = (typebot?.blocks ? typebot.blocks.length : 0) > 1;
+    const hasMoreThanOneBlock = typebot.blocks.length > 1
 
     window.parent.postMessage(
       {
