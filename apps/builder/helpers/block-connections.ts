@@ -90,7 +90,10 @@ export const updateBlocksHasConnections = ({
         step.type === OctaWabaStepType.WHATSAPP_OPTIONS_LIST ||
         step.type === OctaWabaStepType.WHATSAPP_BUTTONS_LIST ||
         step.type === WOZStepType.ASSIGN ||
-        step.type === LogicStepType.CHAT_RETURN
+        step.type === LogicStepType.CHAT_RETURN ||
+        (step.type === WOZStepType.INTERPRET_DATA_WITH_AI &&
+          (((step as unknown as { items?: unknown[] }).items?.length ?? 0) >
+            0))
 
       if (hasToConnectEachItem) {
         if (!areAllItemsConnected(step)) {

@@ -11,9 +11,12 @@ import {
   useToast,
   Spinner,
   HStack,
+  Divider,
 } from '@chakra-ui/react'
 import {
   IntegrationStepType,
+  Step,
+  StepIndices,
   WOZInterpretDataWithAIOptions,
   WOZInterpretDataWithAIResponseFormat,
 } from 'models'
@@ -25,13 +28,21 @@ import { WOZInterpretDataWithAI } from 'models'
 import { getDeepKeys } from 'services/integrations'
 import { useTypebot } from 'contexts/TypebotContext'
 import OctaSelect from 'components/octaComponents/OctaSelect/OctaSelect'
+import ConditionalEdges from './ConditionalEdges/ConditionalEdges'
 
 type Props = {
   step: WOZInterpretDataWithAI
+  indices: StepIndices
+  onStepChange: (updates: Partial<Step>) => void
   onContentChange: (content: WOZInterpretDataWithAIOptions) => void
 }
 
-export const InterpretDataWithAI = ({ step, onContentChange }: Props) => {
+export const InterpretDataWithAI = ({
+  step,
+  indices,
+  onStepChange,
+  onContentChange,
+}: Props) => {
   const {
     data,
     success,
@@ -322,7 +333,6 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
           </Stack>
           <Text>{step?.content?.systemMessage?.length || 0}/5000</Text>
         </Stack>
-
         <VStack gap={4} w="full">
           <Box>
             <Box position="relative" w="full">
@@ -359,7 +369,6 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
               comportamento aqui, apenas estruturar a informação.
             </Text>
           </Box>
-
           {resultOfInterpretWithAi.length > 0 && (
             <Box
               w="full"
@@ -377,7 +386,6 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
               />
             </Box>
           )}
-
           {isAutomatedTasksBot && (
             <Button
               disabled={isTesting || !step?.content?.systemMessage?.length}
@@ -394,9 +402,15 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             </Button>
           )}
         </VStack>
+        <Divider />
+        <ConditionalEdges
+          step={step}
+          indices={indices}
+          onStepChange={onStepChange}
+        />
       </Stack>
     )
-  }, [data, success, isLoading, whoIsConnectedOnMyBlock, isTesting])
+  }, [data, success, isLoading, whoIsConnectedOnMyBlock, isTesting, step])
 
   return (
     <Stack>

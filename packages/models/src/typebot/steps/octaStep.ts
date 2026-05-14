@@ -97,6 +97,7 @@ export type WOZAssignStep = StepBase & {
 export type WOZInterpretDataWithAI = StepBase & {
   type: WOZStepType.INTERPRET_DATA_WITH_AI
   content: WOZInterpretDataWithAIOptions
+  items: []
 }
 
 export type ConversationTagStep = StepBase & {
