@@ -128,6 +128,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
 <li style="margin-bottom: 4px;">Digite quais dados você quer que apareça na resposta da conversa.</li>
 <li style="margin-bottom: 4px;">Use o botão (+) para inserir as informações (variáveis) capturadas no passo anterior.</li>
 <li style="margin-bottom: 4px;">Clique em 'Testar retorno' para ver um exemplo do que irá para a IA se basear e usar na conversa.</li>
+<li style="margin-bottom: 4px;">Se usar <b>Saídas Condicionais:</b> Instrua a IA a analisar os dados e decidir qual o nome da saída correta (ex: "Se o status for 'novo', seguir saída 2”).</li>
 </ol>`
   }, [])
 
@@ -135,8 +136,8 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
     return `Como instruir a IA?
 <ol style="margin: 8px 0; padding-left: 20px; list-style-type: decimal;">
 <li style="margin-bottom: 4px;">Defina a estrutura de dados (ex: um JSON) que o próximo passo do fluxo deve receber.</li>
-<li style="margin-bottom: 4px;">Escreva manualmente o nome das variáveis capturadas nos passos anteriores usando chaves, como {nome_da_variavel}.</li>
-<li style="margin-bottom: 4px;">Este campo é técnico: a IA usará suas instruções para organizar as informações antes de enviá-las ao sistema, sem que o cliente veja este texto. </li>
+<li style="margin-bottom: 4px;">Use chaves {nome_da_variavel} para inserir dados de passos anteriores.</li>
+<li style="margin-bottom: 4px;">Se usar <b>Saídas Condicionais:</b> Instrua a IA a analisar os dados e decidir qual o nome da saída correta (ex: "Se o status for 'novo', seguir saída 2”).</li>
 </ol>`
   }, [])
 
@@ -313,7 +314,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
         )}
         <Stack direction="row" justifyContent="space-between" w="full">
           <Stack direction="row" alignItems="center" gap={2}>
-            <Text fontWeight="bold">Instruções de retorno</Text>
+            <Text fontWeight="bold">Instrução de formatação</Text>
             <Tooltip
               label={
                 <Box
@@ -334,7 +335,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
           <Text>{step?.content?.systemMessage?.length || 0}/5000</Text>
         </Stack>
         <VStack gap={4} w="full">
-          <Box>
+          <Box w="full">
             <Box position="relative" w="full">
               <Textarea
                 ref={textareaRef}
@@ -350,7 +351,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
                 onChange={(e) => handleInstructionsChange(e.target.value)}
                 rows={10}
                 paddingRight="45px"
-                className="scrollbar-custom"
+                className="scrollbar-custom flex-1"
               />
 
               {responseKeys.length > 0 && (
@@ -364,10 +365,6 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
                 </Box>
               )}
             </Box>
-            <Text mt={2} fontSize="xs" color="gray.500">
-              A IA usará este texto como base. Não é necessário dar comandos de
-              comportamento aqui, apenas estruturar a informação.
-            </Text>
           </Box>
           {resultOfInterpretWithAi.length > 0 && (
             <Box
