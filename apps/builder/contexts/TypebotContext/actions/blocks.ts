@@ -12,7 +12,6 @@ import {
 import { SetEmptyFields, SetTypebot } from '../TypebotContext'
 import { cleanUpEdgeDraft } from './edges'
 import { createStepDraft, duplicateStepDraft } from './steps'
-import { updateBlocksHasConnections } from 'helpers/block-connections'
 import { ActionsTypeEmptyFields } from 'hooks/EmptyFields/useEmptyFields'
 
 export type BlocksActions = {
@@ -70,8 +69,7 @@ const blocksActions = (
         const block = typebot.blocks[blockIndex]
 
         typebot.blocks[blockIndex] = { ...block, ...updates }
-
-        typebot.blocks = updateBlocksHasConnections(typebot)
+        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },
@@ -104,8 +102,7 @@ const blocksActions = (
         const stepIds = typebot.blocks[blockIndex].steps.map((step) => step.id)
         setEmptyFields(stepIds, ActionsTypeEmptyFields.REMOVE)
         deleteBlockDraft(typebot)(blockIndex)
-
-        typebot.blocks = updateBlocksHasConnections(typebot)
+        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },

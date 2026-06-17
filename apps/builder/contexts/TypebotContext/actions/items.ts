@@ -13,7 +13,6 @@ import { cleanUpEdgeDraft } from './edges'
 
 import cuid from 'cuid'
 import { byId, stepHasItems } from 'utils'
-import { updateBlocksHasConnections } from 'helpers/block-connections'
 
 export type ItemsActions = {
   createItem: (
@@ -135,8 +134,7 @@ const itemsAction = (setTypebot: SetTypebot): ItemsActions => ({
         }
         
         step.items.splice(newIndex, 0, movedItem)
-        
-        typebot.blocks = updateBlocksHasConnections(typebot)
+        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     ),
 })

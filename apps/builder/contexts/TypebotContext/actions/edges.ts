@@ -12,8 +12,6 @@ import { produce } from 'immer'
 import { byId, isDefined, stepHasItems } from 'utils'
 import cuid from 'cuid'
 
-import { updateBlocksHasConnections } from 'helpers/block-connections'
-
 export type EdgesActions = {
   createEdge: (edge: Omit<Edge, 'id'>) => void
   updateEdge: (edgeIndex: number, updates: Partial<Omit<Edge, 'id'>>) => void
@@ -69,8 +67,7 @@ export const edgesAction = (setTypebot: SetTypebot): EdgesActions => ({
           ...currentEdge,
           ...updates,
         }
-
-        typebot.blocks = updateBlocksHasConnections(typebot)
+        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },
@@ -78,8 +75,7 @@ export const edgesAction = (setTypebot: SetTypebot): EdgesActions => ({
     setTypebot((typebot) =>
       produce(typebot, (typebot) => {
         deleteEdgeDraft(typebot, edgeId)
-
-        typebot.blocks = updateBlocksHasConnections(typebot)
+        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },
