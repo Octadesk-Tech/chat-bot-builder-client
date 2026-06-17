@@ -15,6 +15,7 @@ export const SourceEndpoint = ({
   const {
     setConnectingIds,
     addSourceEndpoint,
+    removeSourceEndpoint,
     blocksCoordinates,
     previewingEdge,
   } = useGraph()
@@ -38,6 +39,17 @@ export const SourceEndpoint = ({
     setRanOnce(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current, blocksCoordinates])
+
+  // CHAT-1630: remove the endpoint only on unmount (separate effect with empty deps).
+  // It must NOT go in the cleanup of the effect above — that one re-runs on every
+  // blocksCoordinates change (each drag frame), and the ranOnce guard would prevent re-add.
+  useEffect(() => {
+    const id = source.itemId ?? source.stepId
+    return () => {
+      if (id) removeSourceEndpoint(id)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if (!blocksCoordinates) return <></>
   return (

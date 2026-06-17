@@ -5,6 +5,7 @@ import { Edges } from './Edges'
 import { BlockNode } from './Nodes/BlockNode'
 import { useGraph } from 'contexts/GraphContext'
 import { isItemVisible } from 'services/graph'
+import { buildBlockIndexById } from 'services/canvasHelpers'
 import { Block } from 'models'
 
 type Props = {
@@ -16,8 +17,12 @@ type Props = {
 const MyComponent = memo(
   ({ answersCounts, onUnlockProPlanClick, graphContainerRef }: Props) => {
     const { typebot, hideEdges } = useTypebot()
-    const { graphPosition, draggingBlockId, blocksCoordinates } = useGraph()
+    const { graphPosition, draggingBlockId } = useGraph()
 
+    // CHAT-1630: cull by the committed graphCoordinates, NOT the live blocksCoordinates.
+    // Keeping blocksCoordinates in the deps re-ran this O(total) filter on every mousemove
+    // during a drag. The visible set is stable during a single block drag (the dragged
+    // block is force-included below); pan still recomputes via graphPosition.
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
 
@@ -25,13 +30,10 @@ const MyComponent = memo(
       const containerHeight = graphContainerRef.current.offsetHeight
 
       const baseVisible = typebot.blocks.filter((block) => {
-        const liveCoordinates =
-          blocksCoordinates[block.id] ?? block.graphCoordinates
-
-        if (!liveCoordinates) return false
+        if (!block.graphCoordinates) return false
 
         return isItemVisible(
-          { ...block, graphCoordinates: liveCoordinates },
+          block,
           graphPosition,
           containerWidth,
           containerHeight,
@@ -52,13 +54,14 @@ const MyComponent = memo(
       if (alreadyVisible) return baseVisible
 
       return [...baseVisible, draggingBlock]
-    }, [
-      typebot?.blocks,
-      graphPosition,
-      graphContainerRef,
-      draggingBlockId,
-      blocksCoordinates,
-    ])
+    }, [typebot?.blocks, graphPosition, graphContainerRef, draggingBlockId])
+
+    // CHAT-1630: O(1) index lookup memoized on blocks, replacing a findIndex per visible
+    // block on every render (MyComponent re-renders each frame via context during drag).
+    const blockIndexById = useMemo(
+      () => buildBlockIndexById(typebot?.blocks ?? []),
+      [typebot?.blocks]
+    )
 
     const visibleItemsMap = useMemo(() => {
       const map = new Map<string, Block>()
@@ -92,7 +95,7 @@ const MyComponent = memo(
         )}
 
         {visibleItems.map((block) => {
-          const blockIndex = typebot?.blocks.findIndex((b) => b.id === block.id)
+          const blockIndex = blockIndexById.get(block.id)
           return (
             <BlockNode
               block={block}

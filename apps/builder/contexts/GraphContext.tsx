@@ -5,12 +5,14 @@ import {
   MutableRefObject,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
 } from 'react'
 import { useTypebot } from './TypebotContext'
+import { omitFromIdMap } from 'services/canvasHelpers'
 
 export const stubLength = 20
 export const blockWidth = 300
@@ -71,8 +73,10 @@ const graphContext = createContext<{
   setPreviewingEdge: Dispatch<SetStateAction<Edge | undefined>>
   sourceEndpoints: IdMap<Endpoint>
   addSourceEndpoint: (endpoint: Endpoint) => void
+  removeSourceEndpoint: (id: string) => void
   targetEndpoints: IdMap<Endpoint>
   addTargetEndpoint: (endpoint: Endpoint) => void
+  removeTargetEndpoint: (id: string) => void
   openedStepId?: string
   setOpenedStepId: Dispatch<SetStateAction<string | undefined>>
   isReadOnly: boolean
@@ -136,6 +140,16 @@ export const GraphProvider = ({
     }))
   }
 
+  // CHAT-1630: endpoints must be removed when their node unmounts (culling), otherwise
+  // the map keeps stale refs to detached DOM and edges compute wrong/empty paths.
+  const removeSourceEndpoint = useCallback((id: string) => {
+    setSourceEndpoints((endpoints) => omitFromIdMap(endpoints, id))
+  }, [])
+
+  const removeTargetEndpoint = useCallback((id: string) => {
+    setTargetEndpoints((endpoints) => omitFromIdMap(endpoints, id))
+  }, [])
+
   const updateBlockCoordinates = (blockId: string, newCoord: Coordinates) =>
     setBlocksCoordinates((blocksCoordinates) => ({
       ...blocksCoordinates,
@@ -179,7 +193,9 @@ export const GraphProvider = ({
       sourceEndpoints,
       targetEndpoints,
       addSourceEndpoint,
+      removeSourceEndpoint,
       addTargetEndpoint,
+      removeTargetEndpoint,
       openedStepId,
       setOpenedStepId,
       blocksCoordinates,
@@ -201,7 +217,9 @@ export const GraphProvider = ({
       sourceEndpoints,
       targetEndpoints,
       addSourceEndpoint,
+      removeSourceEndpoint,
       addTargetEndpoint,
+      removeTargetEndpoint,
       openedStepId,
       setOpenedStepId,
       blocksCoordinates,

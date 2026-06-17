@@ -10,7 +10,7 @@ export const TargetEndpoint = ({
   stepId: string
   isVisible?: boolean
 }) => {
-  const { addTargetEndpoint } = useGraph()
+  const { addTargetEndpoint, removeTargetEndpoint } = useGraph()
   const ref = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -21,6 +21,14 @@ export const TargetEndpoint = ({
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
+
+  // CHAT-1630: remove the endpoint when the node unmounts (culling), avoiding stale refs.
+  useEffect(() => {
+    return () => {
+      if (stepId) removeTargetEndpoint(stepId)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <Box
