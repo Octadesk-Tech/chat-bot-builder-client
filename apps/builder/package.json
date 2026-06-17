@@ -10,7 +10,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "yarn playwright test",
-    "test:open": "PWDEBUG=1 yarn playwright test"
+    "test:open": "PWDEBUG=1 yarn playwright test",
+    "test:unit": "jest --config jest.config.cjs"
   },
   "msw": {
     "workerDirectory": "public"
