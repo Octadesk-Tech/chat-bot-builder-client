@@ -22,13 +22,11 @@ export const TargetEndpoint = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 
-  // CHAT-1630: remove the endpoint when the node unmounts (culling), avoiding stale refs.
   useEffect(() => {
     return () => {
       if (stepId) removeTargetEndpoint(stepId)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [stepId, removeTargetEndpoint])
 
   return (
     <Box

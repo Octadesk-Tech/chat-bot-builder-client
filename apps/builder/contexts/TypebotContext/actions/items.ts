@@ -134,7 +134,6 @@ const itemsAction = (setTypebot: SetTypebot): ItemsActions => ({
         }
         
         step.items.splice(newIndex, 0, movedItem)
-        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     ),
 })

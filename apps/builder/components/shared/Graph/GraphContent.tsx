@@ -19,10 +19,6 @@ const MyComponent = memo(
     const { typebot, hideEdges } = useTypebot()
     const { graphPosition, draggingBlockId } = useGraph()
 
-    // CHAT-1630: cull by the committed graphCoordinates, NOT the live blocksCoordinates.
-    // Keeping blocksCoordinates in the deps re-ran this O(total) filter on every mousemove
-    // during a drag. The visible set is stable during a single block drag (the dragged
-    // block is force-included below); pan still recomputes via graphPosition.
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
 
@@ -56,8 +52,6 @@ const MyComponent = memo(
       return [...baseVisible, draggingBlock]
     }, [typebot?.blocks, graphPosition, graphContainerRef, draggingBlockId])
 
-    // CHAT-1630: O(1) index lookup memoized on blocks, replacing a findIndex per visible
-    // block on every render (MyComponent re-renders each frame via context during drag).
     const blockIndexById = useMemo(
       () => buildBlockIndexById(typebot?.blocks ?? []),
       [typebot?.blocks]

@@ -140,8 +140,6 @@ export const GraphProvider = ({
     }))
   }
 
-  // CHAT-1630: endpoints must be removed when their node unmounts (culling), otherwise
-  // the map keeps stale refs to detached DOM and edges compute wrong/empty paths.
   const removeSourceEndpoint = useCallback((id: string) => {
     setSourceEndpoints((endpoints) => omitFromIdMap(endpoints, id))
   }, [])

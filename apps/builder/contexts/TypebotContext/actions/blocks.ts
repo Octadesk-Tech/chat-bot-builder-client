@@ -69,7 +69,6 @@ const blocksActions = (
         const block = typebot.blocks[blockIndex]
 
         typebot.blocks[blockIndex] = { ...block, ...updates }
-        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },
@@ -102,7 +101,6 @@ const blocksActions = (
         const stepIds = typebot.blocks[blockIndex].steps.map((step) => step.id)
         setEmptyFields(stepIds, ActionsTypeEmptyFields.REMOVE)
         deleteBlockDraft(typebot)(blockIndex)
-        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },

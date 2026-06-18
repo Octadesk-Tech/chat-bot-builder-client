@@ -67,7 +67,6 @@ export const edgesAction = (setTypebot: SetTypebot): EdgesActions => ({
           ...currentEdge,
           ...updates,
         }
-        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },
@@ -75,7 +74,6 @@ export const edgesAction = (setTypebot: SetTypebot): EdgesActions => ({
     setTypebot((typebot) =>
       produce(typebot, (typebot) => {
         deleteEdgeDraft(typebot, edgeId)
-        // hasConnection is recomputed once at the single choke point (useUndo set). CHAT-1630
       })
     )
   },
