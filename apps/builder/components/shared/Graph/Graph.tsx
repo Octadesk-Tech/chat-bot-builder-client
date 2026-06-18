@@ -354,11 +354,12 @@ export const Graph = memo(
     const onDrag = (_: DraggableEvent, draggableData: DraggableData) => {
       const { deltaX, deltaY } = draggableData
 
-      setGraphPosition({
-        ...graphPosition,
-        x: graphPosition.x + deltaX,
-        y: graphPosition.y + deltaY,
-      })
+
+      setGraphPosition((prev) => ({
+        ...prev,
+        x: prev.x + deltaX,
+        y: prev.y + deltaY,
+      }))
     }
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -469,7 +470,10 @@ export const Graph = memo(
             position="absolute"
             style={{
               transform,
-              transition: draggingBlockId ? '0s' : '0.1s',
+              // Sem easing ao arrastar bloco OU ao dar pan no board (arraste):
+              // o transform segue o cursor 1:1. Mantém o easing de 0.1s só para
+              // o scroll, onde ele suaviza os passos discretos da roda.
+              transition: draggingBlockId || isMovingBoard ? '0s' : '0.1s',
             }}
             willChange="transform"
             transformOrigin="0px 0px 0px"

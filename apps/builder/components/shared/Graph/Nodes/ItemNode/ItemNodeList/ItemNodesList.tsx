@@ -16,7 +16,7 @@ import {
   computeNearestPlaceholderIndex,
   useStepDnd,
 } from 'contexts/GraphDndContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotActions, useTypebotSelector } from 'contexts/TypebotContext'
 import {
   ButtonItem,
   InputStepType,
@@ -52,17 +52,17 @@ export const ItemNodesList = ({
   indices: { blockIndex, stepIndex },
   isReadOnly = false,
 }: Props) => {
-  const { typebot, createItem } = useTypebot()
+  const { createItem } = useTypebotActions()
+  const block = useTypebotSelector((t) => t?.blocks[blockIndex])
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
   const placeholderRefs = useRef<HTMLDivElement[]>([])
   const { getGraphPosition } = useGraph()
-  const blockId = typebot?.blocks[blockIndex].id
+  const blockId = block?.id
   const isDraggingOnCurrentBlock =
     (draggedItem && mouseOverBlock?.id === blockId) ?? false
   const showPlaceholders = draggedItem && !isReadOnly
 
-  const isLastStep =
-    typebot?.blocks[blockIndex].steps[stepIndex + 1] === undefined
+  const isLastStep = block?.steps[stepIndex + 1] === undefined
 
   const [position, setPosition] = useState({
     x: 0,
@@ -130,23 +130,23 @@ export const ItemNodesList = ({
     }
 
   const webhook = {
-    method: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.method,
-    url: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.url,
-    path: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.path,
+    method: block?.steps[stepIndex]?.options?.method,
+    url: block?.steps[stepIndex]?.options?.url,
+    path: block?.steps[stepIndex]?.options?.path,
   }
 
   const chatReturn = {
-    time: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.time,
-    timeType: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.timeTypeValue
+    time: block?.steps[stepIndex]?.options?.time,
+    timeType: block?.steps[stepIndex]?.options?.timeTypeValue
       === TimeTypeValue.HOUR ? 'horas' : 'minutos',
-    validationError: typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.validationError
+    validationError: block?.steps[stepIndex]?.options?.validationError
   }
 
   const getWebhookDetails = () => {
     try {
       const headers = {}
 
-      typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.headers.map(
+      block?.steps[stepIndex]?.options?.headers.map(
         (header) => {
           headers[header.key] = header.value
         }
@@ -155,7 +155,7 @@ export const ItemNodesList = ({
       const jsonPreview = {
         headers,
         body: JSON.parse(
-          typebot?.blocks[blockIndex]?.steps[stepIndex]?.options?.body
+          block?.steps[stepIndex]?.options?.body
         ),
       }
 
@@ -178,14 +178,14 @@ export const ItemNodesList = ({
     >
       {step.type === OctaStepType.OFFICE_HOURS && (
         <Stack paddingBottom={'10px'}>
-          {!typebot?.blocks[blockIndex].steps[stepIndex]?.options?.name && (
+          {!block?.steps[stepIndex]?.options?.name && (
             <HandleSelectCalendar>Selecione o expediente:</HandleSelectCalendar>
           )}
-          {typebot?.blocks[blockIndex].steps[stepIndex]?.options?.name && (
+          {block?.steps[stepIndex]?.options?.name && (
             <div>
               Horário: &nbsp;&nbsp;
               <SelectedCalendar>
-                {typebot?.blocks[blockIndex].steps[stepIndex].options?.name}
+                {block?.steps[stepIndex].options?.name}
               </SelectedCalendar>
             </div>
           )}

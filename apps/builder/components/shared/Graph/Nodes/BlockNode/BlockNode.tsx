@@ -13,7 +13,11 @@ import { useBlockCoordinates, useGraph } from 'contexts/GraphContext'
 import { useStepDnd } from 'contexts/GraphDndContext'
 import { StepNodesList } from '../StepNode/StepNodesList'
 import { isDefined, isNotDefined } from 'utils'
-import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
+import {
+  useTypebotActions,
+  useTypebotAvailableFor,
+  useHasTypebot,
+} from 'contexts/TypebotContext/TypebotContext'
 import { ContextMenu } from 'components/shared/ContextMenu'
 import { BlockNodeContextMenu } from './BlockNodeContextMenu'
 import { useDebounce } from 'use-debounce'
@@ -43,7 +47,9 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   const blockCoordinates = useBlockCoordinates(block.id)
 
-  const { typebot, updateBlock, deleteBlock, duplicateBlock } = useTypebot()
+  const { updateBlock, deleteBlock, duplicateBlock } = useTypebotActions()
+  const availableFor = useTypebotAvailableFor()
+  const hasTypebot = useHasTypebot()
 
   const { setMouseOverBlock, mouseOverBlock } = useStepDnd()
 
@@ -54,7 +60,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
   const [isFocused, setIsFocused] = useState(false)
 
   const availableOnlyForEvent =
-    typebot?.availableFor?.length == 1 && typebot.availableFor.includes('event')
+    availableFor?.length == 1 && availableFor.includes('event')
 
   const showWarning = !availableOnlyForEvent
 
@@ -118,6 +124,8 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
   const onDrag = (_: DraggableEvent, draggableData: DraggableData) => {
     _.preventDefault()
 
+    if (!blockCoordinates) return
+
     const { deltaX, deltaY } = draggableData
 
     const { scale } = getGraphPosition()
@@ -156,7 +164,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   const hasWarning = !block.hasConnection && showWarning
   const showEmptyConnectionAlert = () => !block.hasConnection && showWarning
-  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
+  const isAutomatedTasksBot = availableFor?.includes('automated-tasks')
   const emptyConnectionMessage = `Este bloco precisa se conectar e/ou receber uma conexão de outro bloco.`
 
   return (
@@ -238,7 +246,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                 )}
               </Flex>
 
-              {typebot && (
+              {hasTypebot && (
                 <StepNodesList
                   blockId={block.id}
                   steps={block.steps}

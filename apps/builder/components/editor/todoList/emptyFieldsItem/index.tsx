@@ -3,12 +3,12 @@ import { StepIcon } from 'components/editor/StepsSideBar/StepIcon'
 import { StepTitle } from '../style'
 import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
 import { colors } from 'libs/theme'
-import { useGraph } from 'contexts/GraphContext'
+import { useGraphPosition } from 'contexts/GraphContext'
 import { EmptyFields } from 'hooks/EmptyFields/useEmptyFields'
 import { useTypebot } from 'contexts/TypebotContext'
 
 const EmptyFieldsItem = ({ item }: { item: EmptyFields }) => {
-  const { setGraphPosition } = useGraph()
+  const { setGraphPosition } = useGraphPosition()
   const { typebot } = useTypebot()
 
   const focusOnField = () => {

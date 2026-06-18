@@ -87,7 +87,6 @@ const MyComponent = memo(
 
     return (
       <>
-        {!hideEdges && (
           <Edges
             visibleItems={visibleItems}
             edges={visibleEdges}
@@ -95,7 +94,6 @@ const MyComponent = memo(
             answersCounts={answersCounts}
             onUnlockProPlanClick={onUnlockProPlanClick}
           />
-        )}
 
         {visibleItems.map((block) => {
           const blockIndex = typebot?.blocks.findIndex((b) => b.id === block.id)

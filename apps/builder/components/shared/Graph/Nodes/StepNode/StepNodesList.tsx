@@ -13,7 +13,7 @@ import {
   computeNearestPlaceholderIndex,
   useStepDnd,
 } from 'contexts/GraphDndContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useHasTypebot, useTypebotActions } from 'contexts/TypebotContext'
 import {
   DraggableStep,
   DraggableStepType,
@@ -52,7 +52,8 @@ export const StepNodesList = ({
     mouseOverBlock,
     setDraggedStepType,
   } = useStepDnd()
-  const { typebot, createStep, detachStepFromBlock } = useTypebot()
+  const { createStep, detachStepFromBlock } = useTypebotActions()
+  const hasTypebot = useHasTypebot()
   const { isReadOnly, getGraphPosition } = useGraph()
   const [expandedPlaceholderIndex, setExpandedPlaceholderIndex] = useState<
     number | undefined
@@ -194,7 +195,7 @@ export const StepNodesList = ({
           </HStack>
         </Center>
       </Flex>
-      {typebot &&
+      {hasTypebot &&
         steps.map((step, idx) => (
           <Fragment key={step.id}>
             <StepNode

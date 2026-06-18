@@ -16,7 +16,13 @@ import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
 import { ContextMenu } from 'components/shared/ContextMenu'
 import { useGraph } from 'contexts/GraphContext'
 import { NodePosition, useDragDistance } from 'contexts/GraphDndContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import {
+  useGetEmptyFields,
+  useTypebotActions,
+  useTypebotAvailableFor,
+  useTypebotEdges,
+  useTypebotExtras,
+} from 'contexts/TypebotContext'
 import { ActionsTypeEmptyFields } from 'hooks/EmptyFields/useEmptyFields'
 import { useRefreshGraphConnections } from 'hooks/useRefreshGraphConnections'
 import { colors } from 'libs/theme'
@@ -92,12 +98,16 @@ export const StepNode = ({
     setFocusedBlockId,
     previewingEdge,
   } = useGraph()
-  const { updateStep, emptyFields, setEmptyFields, typebot } = useTypebot()
+  const { updateStep } = useTypebotActions()
+  const { setEmptyFields } = useTypebotExtras()
+  const getEmptyFields = useGetEmptyFields()
+  const availableFor = useTypebotAvailableFor()
+  const edges = useTypebotEdges()
   const { refreshConnections, cleanup } = useRefreshGraphConnections()
   const [isConnecting, setIsConnecting] = useState(false)
 
   const availableOnlyForEvent =
-    typebot?.availableFor?.length == 1 && typebot.availableFor.includes('event')
+    availableFor?.length == 1 && availableFor.includes('event')
 
   const showWarning = !availableOnlyForEvent
 
@@ -132,11 +142,12 @@ export const StepNode = ({
   const [validationMessages, setValidationMessages] =
     useState<Array<ValidationMessage>>()
 
-  const edgesLength = typebot?.edges?.length ?? 0
+  const edgesLength = edges?.length ?? 0
 
   useEffect(() => {
-    const currentMessages = getValidationMessages(step, typebot?.edges)
+    const currentMessages = getValidationMessages(step, edges)
     setValidationMessages(currentMessages)
+    const emptyFields = getEmptyFields()
     if (currentMessages.length > 0) {
       if (!emptyFields.find((field) => field?.step.id === step?.id)) {
         setEmptyFields(
@@ -150,7 +161,8 @@ export const StepNode = ({
         setEmptyFields([step?.id], ActionsTypeEmptyFields.REMOVE)
       }
     }
-  }, [step, edgesLength, typebot?.edges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, edgesLength, edges])
 
   const { onClose: onModalClose } = useDisclosure({
     defaultIsOpen: true,

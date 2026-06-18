@@ -2,7 +2,7 @@ import { InputOptions, Variable } from 'models'
 import React, { useEffect } from 'react'
 import { Stack } from '@chakra-ui/react'
 import { WithVariableContent } from '../WithVariableContent'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotVariables } from 'contexts/TypebotContext'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
 import { useWorkspace } from 'contexts/WorkspaceContext'
 import { TextHtmlContent } from '../TextHtmlContent'
@@ -16,7 +16,7 @@ type Props = {
 }
 
 const InputContent = ({ step, onUpdateStep }: Props) => {
-  const { typebot } = useTypebot()
+  const variables = useTypebotVariables()
   const { createCustomField } = useWorkspace()
 
   const handleDefaultTokenNotFound = async () => {
@@ -28,7 +28,7 @@ const InputContent = ({ step, onUpdateStep }: Props) => {
         const name = splitedToken.join('-').replace(/#/g, '')
 
         if (domain) {
-          const domainVariables = typebot?.variables?.filter(v => v.domain === domain)
+          const domainVariables = variables?.filter(v => v.domain === domain)
 
           if (domainVariables) {
             const domainProperty = domainVariables.find(
@@ -57,7 +57,7 @@ const InputContent = ({ step, onUpdateStep }: Props) => {
 
   useEffect(() => {
     if (!step.options.variableId && step.options.initialVariableToken) {
-      let myVariable = typebot?.variables?.find(v => v.token === step.options.initialVariableToken)
+      let myVariable = variables?.find(v => v.token === step.options.initialVariableToken)
       if (myVariable) {
         step.options.variableId = myVariable.id
         handleVariableChange(myVariable)
@@ -65,12 +65,12 @@ const InputContent = ({ step, onUpdateStep }: Props) => {
         handleDefaultTokenNotFound()
       }
     }
-  }, [typebot?.variables])
+  }, [variables])
 
 
 
   if (!step.options.variableId && step.options.initialVariableToken) {
-    let myVariable = typebot?.variables?.find(v => v.token === step.options.initialVariableToken)
+    let myVariable = variables?.find(v => v.token === step.options.initialVariableToken)
     if (myVariable) {
       step.options.variableId = myVariable.id
       handleVariableChange(myVariable)

@@ -3,7 +3,7 @@ import React, { Fragment } from 'react'
 import { Stack, Text } from '@chakra-ui/react'
 import { ItemNodesList } from 'components/shared/Graph/Nodes/ItemNode'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotExtras } from 'contexts/TypebotContext'
 
 type Props = {
   step: WOZAssignStep
@@ -11,9 +11,9 @@ type Props = {
 }
 
 const WOZAssignContent = ({ step, indices }: Props) => {
-  const { wozProfiles } = useTypebot()
+  const { wozProfiles } = useTypebotExtras()
 
-  const agent = wozProfiles.find((d) => d.id === step?.options?.virtualAgentId)
+  const agent = wozProfiles?.find((d) => d.id === step?.options?.virtualAgentId)
 
   const agentName = () => {
     if (!agent?.name) return 'Woz'

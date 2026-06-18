@@ -1,6 +1,6 @@
 import { BoxProps, Flex } from '@chakra-ui/react'
 import { useCoordinatesReady, useGraph } from 'contexts/GraphContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotExtras } from 'contexts/TypebotContext'
 import { Source } from 'models'
 import React, { MouseEvent, useEffect, useRef, useState } from 'react'
 
@@ -11,7 +11,7 @@ export const SourceEndpoint = ({
   source: Source
 }) => {
   const [ranOnce, setRanOnce] = useState(false)
-  const { setHideEdges } = useTypebot()
+  const { setHideEdges } = useTypebotExtras()
   const { setConnectingIds, addSourceEndpoint, previewingEdge } = useGraph()
   const coordinatesReady = useCoordinatesReady()
   const ref = useRef<HTMLDivElement | null>(null)
