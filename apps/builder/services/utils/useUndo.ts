@@ -15,7 +15,7 @@ enum ActionType {
 export interface Actions<T> {
   set: (
     newPresent: T | ((current: T) => T),
-    options?: { updateDate: boolean }
+    options?: { updateDate?: boolean; skipConnectionsUpdate?: boolean }
   ) => void
   undo: () => void
   redo: () => void
@@ -129,21 +129,29 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
   }, [canRedo])
 
   const set = useCallback(
-    (newPresent: T | ((current: T) => T), options = { updateDate: true }) => {
+    (
+      newPresent: T | ((current: T) => T),
+      options: { updateDate?: boolean; skipConnectionsUpdate?: boolean } = {}
+    ) => {
+      const { updateDate = true, skipConnectionsUpdate = false } = options
       const updatedTypebot =
         'id' in newPresent
           ? newPresent
           : (newPresent as (current: T) => T)(presentRef.current)
       presentRef.current = updatedTypebot
 
-      if (updatedTypebot?.blocks) {
+      // `hasConnection` só depende de edges + estrutura de steps. Em updates que
+      // não alteram conexões (ex.: coordenadas de bloco no commit do drag), o
+      // caller passa `skipConnectionsUpdate` para evitar este recálculo
+      // O(blocks×steps×edges) no caminho quente.
+      if (updatedTypebot?.blocks && !skipConnectionsUpdate) {
         updatedTypebot.blocks = updateBlocksHasConnections(updatedTypebot)
       }
 
       dispatch({
         type: ActionType.Set,
         newPresent: updatedTypebot,
-        updateDate: options.updateDate,
+        updateDate,
       })
     },
     []

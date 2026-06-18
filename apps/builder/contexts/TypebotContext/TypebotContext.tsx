@@ -76,7 +76,8 @@ type SaveResponse = {
 }
 
 export type SetTypebot = (
-  newPresent: Typebot | ((current: Typebot) => Typebot)
+  newPresent: Typebot | ((current: Typebot) => Typebot),
+  options?: { updateDate?: boolean; skipConnectionsUpdate?: boolean }
 ) => void
 export type SetEmptyFields = (
   values: EmptyFields[] | string[],
@@ -129,6 +130,21 @@ const typebotContext = createContext<
     VariablesActions &
     EdgesActions
 >({} as any)
+
+/**
+ * Context separado só para as ações de mutação (estáveis). Permite que
+ * componentes que só precisam disparar mutações consumam `useTypebotActions()`
+ * sem assinar os dados do typebot — evitando re-render a cada edição.
+ * As mesmas ações continuam disponíveis em `useTypebot()` por compatibilidade.
+ */
+export type TypebotActions = BlocksActions &
+  StepsActions &
+  ItemsActions &
+  VariablesActions &
+  EdgesActions
+const typebotActionsContext = createContext<TypebotActions>(
+  {} as TypebotActions
+)
 
 export const TypebotContext = ({
   children,
@@ -649,6 +665,27 @@ export const TypebotContext = ({
 
   const { wozProfiles } = useWozProfiles()
 
+  // Ações memoizadas UMA vez: dependem só de setters estáveis
+  // (`setLocalTypebot` e `setEmptyFields` são `useCallback([])`). Antes eram
+  // recriadas a cada edição do typebot (estavam dentro do useMemo do value),
+  // o que invalidava deps de effects/memo em todos os ~90 consumidores.
+  const actions = useMemo(
+    () => ({
+      ...blocksActions(
+        setLocalTypebot as SetTypebot,
+        setEmptyFields as SetEmptyFields
+      ),
+      ...stepsAction(
+        setLocalTypebot as SetTypebot,
+        setEmptyFields as SetEmptyFields
+      ),
+      ...variablesAction(setLocalTypebot as SetTypebot),
+      ...edgesAction(setLocalTypebot as SetTypebot),
+      ...itemsAction(setLocalTypebot as SetTypebot),
+    }),
+    [setLocalTypebot, setEmptyFields]
+  )
+
   const contextValue = useMemo(() => {
     return {
       domain,
@@ -675,17 +712,7 @@ export const TypebotContext = ({
       restorePublishedTypebot,
       updateOnBothTypebots,
       updateWebhook,
-      ...blocksActions(
-        setLocalTypebot as SetTypebot,
-        setEmptyFields as SetEmptyFields
-      ),
-      ...stepsAction(
-        setLocalTypebot as SetTypebot,
-        setEmptyFields as SetEmptyFields
-      ),
-      ...variablesAction(setLocalTypebot as SetTypebot),
-      ...edgesAction(setLocalTypebot as SetTypebot),
-      ...itemsAction(setLocalTypebot as SetTypebot),
+      ...actions,
       octaAgents,
       octaGroups,
       botFluxesList,
@@ -716,7 +743,7 @@ export const TypebotContext = ({
     restorePublishedTypebot,
     updateOnBothTypebots,
     updateWebhook,
-    setLocalTypebot,
+    actions,
     octaAgents,
     octaGroups,
     botFluxesList,
@@ -725,12 +752,16 @@ export const TypebotContext = ({
   ])
   return (
     <typebotContext.Provider value={contextValue}>
-      {children}
+      <typebotActionsContext.Provider value={actions}>
+        {children}
+      </typebotActionsContext.Provider>
     </typebotContext.Provider>
   )
 }
 
 export const useTypebot = () => useContext(typebotContext)
+
+export const useTypebotActions = () => useContext(typebotActionsContext)
 
 export const useFetchedTypebot = ({
   typebotId,

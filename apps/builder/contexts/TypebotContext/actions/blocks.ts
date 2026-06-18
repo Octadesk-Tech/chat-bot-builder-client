@@ -65,14 +65,18 @@ const blocksActions = (
       })
     ),
   updateBlock: (blockIndex: number, updates: Partial<Omit<Block, 'id'>>) => {
-    setTypebot((typebot) =>
-      produce(typebot, (typebot) => {
-        const block = typebot.blocks[blockIndex]
-
-        typebot.blocks[blockIndex] = { ...block, ...updates }
-
-        typebot.blocks = updateBlocksHasConnections(typebot)
-      })
+    // `hasConnection` depende apenas de edges + estrutura de steps. Em updates
+    // de coordenada/título (os únicos callers atuais), pulamos o recálculo
+    // O(blocks×steps×edges) que o `set` faz centralmente — caro no caminho
+    // quente do drag (commit de posição via debounce a cada parada). Quando o
+    // update toca `steps`, deixamos o `set` recalcular.
+    setTypebot(
+      (typebot) =>
+        produce(typebot, (typebot) => {
+          const block = typebot.blocks[blockIndex]
+          typebot.blocks[blockIndex] = { ...block, ...updates }
+        }),
+      { skipConnectionsUpdate: !updates.steps }
     )
   },
   duplicateBlock: (blockIndex: number) => {
