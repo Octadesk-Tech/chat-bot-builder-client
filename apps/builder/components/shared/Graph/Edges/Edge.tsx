@@ -1,4 +1,9 @@
-import { Coordinates, useGraph } from 'contexts/GraphContext'
+import {
+  Coordinates,
+  useBlockCoordinates,
+  useGraph,
+  useGraphPosition,
+} from 'contexts/GraphContext'
 import React, { useEffect, useMemo, useState } from 'react'
 import {
   getAnchorsPosition,
@@ -33,21 +38,18 @@ export const Edge = ({
     previewingEdge,
     sourceEndpoints,
     targetEndpoints,
-    blocksCoordinates,
-    graphPosition,
     isReadOnly,
     setPreviewingEdge,
   } = useGraph()
+  const { graphPosition } = useGraphPosition()
   const [isMouseOver, setIsMouseOver] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [edgeMenuPosition, setEdgeMenuPosition] = useState({ x: 0, y: 0 })
 
   const isPreviewing = isMouseOver || previewingEdge?.id === edge.id
 
-  const sourceBlockCoordinates =
-    blocksCoordinates && blocksCoordinates[edge.from.blockId]
-  const targetBlockCoordinates =
-    blocksCoordinates && blocksCoordinates[edge.to.blockId]
+  const sourceBlockCoordinates = useBlockCoordinates(edge.from.blockId)
+  const targetBlockCoordinates = useBlockCoordinates(edge.to.blockId)
 
   const sourceTop = useMemo(() => {
     if (!sourceEndpoints || !graphPosition) return 0

@@ -53,7 +53,7 @@ export const StepNodesList = ({
     setDraggedStepType,
   } = useStepDnd()
   const { typebot, createStep, detachStepFromBlock } = useTypebot()
-  const { isReadOnly, graphPosition } = useGraph()
+  const { isReadOnly, getGraphPosition } = useGraph()
   const [expandedPlaceholderIndex, setExpandedPlaceholderIndex] = useState<
     number | undefined
   >()
@@ -240,7 +240,7 @@ export const StepNodesList = ({
             top="0"
             left="0"
             style={{
-              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg) scale(${graphPosition.scale})`,
+              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg) scale(${getGraphPosition().scale})`,
             }}
             transformOrigin="0 0 0"
           />

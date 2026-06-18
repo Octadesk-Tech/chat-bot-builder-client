@@ -55,7 +55,7 @@ export const ItemNodesList = ({
   const { typebot, createItem } = useTypebot()
   const { draggedItem, setDraggedItem, mouseOverBlock } = useStepDnd()
   const placeholderRefs = useRef<HTMLDivElement[]>([])
-  const { graphPosition } = useGraph()
+  const { getGraphPosition } = useGraph()
   const blockId = typebot?.blocks[blockIndex].id
   const isDraggingOnCurrentBlock =
     (draggedItem && mouseOverBlock?.id === blockId) ?? false
@@ -314,7 +314,7 @@ export const ItemNodesList = ({
             top="0"
             left="0"
             style={{
-              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg) scale(${graphPosition.scale})`,
+              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg) scale(${getGraphPosition().scale})`,
             }}
             transformOrigin="0 0 0"
           />

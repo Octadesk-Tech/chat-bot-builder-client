@@ -1,5 +1,9 @@
 import { VStack, Tag, Text, Tooltip } from '@chakra-ui/react'
-import { useGraph } from 'contexts/GraphContext'
+import {
+  useBlockCoordinates,
+  useGraph,
+  useGraphPosition,
+} from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext'
 import { useWorkspace } from 'contexts/WorkspaceContext'
 import React, { useMemo } from 'react'
@@ -24,8 +28,10 @@ export const DropOffEdge = ({
   onUnlockProPlanClick,
 }: Props) => {
   const { workspace } = useWorkspace()
-  const { sourceEndpoints, blocksCoordinates, graphPosition } = useGraph()
+  const { sourceEndpoints } = useGraph()
+  const { graphPosition } = useGraphPosition()
   const { publishedTypebot } = useTypebot()
+  const blockCoordinates = useBlockCoordinates(blockId)
 
   const isUserOnFreePlan = isFreePlan(workspace)
 
@@ -65,13 +71,13 @@ export const DropOffEdge = ({
         graphScale: graphPosition.scale,
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [block?.steps, sourceEndpoints, blocksCoordinates]
+    [block?.steps, sourceEndpoints, blockCoordinates]
   )
 
   const labelCoordinates = useMemo(() => {
-    if (!blocksCoordinates[blockId]) return
-    return computeSourceCoordinates(blocksCoordinates[blockId], sourceTop ?? 0)
-  }, [blocksCoordinates, blockId, sourceTop])
+    if (!blockCoordinates) return
+    return computeSourceCoordinates(blockCoordinates, sourceTop ?? 0)
+  }, [blockCoordinates, sourceTop])
 
   if (!labelCoordinates) return <></>
   return (

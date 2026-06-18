@@ -9,7 +9,7 @@ import {
 } from '@chakra-ui/react'
 import React, { memo, useEffect, useRef, useState } from 'react'
 import { Block } from 'models'
-import { useGraph } from 'contexts/GraphContext'
+import { useBlockCoordinates, useGraph } from 'contexts/GraphContext'
 import { useStepDnd } from 'contexts/GraphDndContext'
 import { StepNodesList } from '../StepNode/StepNodesList'
 import { isDefined, isNotDefined } from 'utils'
@@ -33,14 +33,15 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
     connectingIds,
     setConnectingIds,
     previewingEdge,
-    blocksCoordinates,
     updateBlockCoordinates,
     isReadOnly,
     focusedBlockId,
     setFocusedBlockId,
-    graphPosition,
+    getGraphPosition,
     setDraggingBlockId,
   } = useGraph()
+
+  const blockCoordinates = useBlockCoordinates(block.id)
 
   const { typebot, updateBlock, deleteBlock, duplicateBlock } = useTypebot()
 
@@ -64,8 +65,6 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   const isStartBlock =
     isDefined(block.steps[0]) && block.steps[0].type === 'start'
-
-  const blockCoordinates = blocksCoordinates[block.id]
 
   const blockRef = useRef<HTMLDivElement | null>(null)
 
@@ -121,9 +120,11 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
     const { deltaX, deltaY } = draggableData
 
+    const { scale } = getGraphPosition()
+
     updateBlockCoordinates(block.id, {
-      x: blockCoordinates.x + deltaX / graphPosition.scale,
-      y: blockCoordinates.y + deltaY / graphPosition.scale,
+      x: blockCoordinates.x + deltaX / scale,
+      y: blockCoordinates.y + deltaY / scale,
     })
   }
 

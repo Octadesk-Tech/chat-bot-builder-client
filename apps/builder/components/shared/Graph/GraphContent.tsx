@@ -3,7 +3,11 @@ import React, { memo, useMemo } from 'react'
 import { AnswersCount } from 'services/analytics'
 import { Edges } from './Edges'
 import { BlockNode } from './Nodes/BlockNode'
-import { useGraph } from 'contexts/GraphContext'
+import {
+  useAllBlocksCoordinates,
+  useGraph,
+  useGraphPosition,
+} from 'contexts/GraphContext'
 import { isItemVisible } from 'services/graph'
 import { Block } from 'models'
 
@@ -16,7 +20,9 @@ type Props = {
 const MyComponent = memo(
   ({ answersCounts, onUnlockProPlanClick, graphContainerRef }: Props) => {
     const { typebot, hideEdges } = useTypebot()
-    const { graphPosition, draggingBlockId, blocksCoordinates } = useGraph()
+    const { draggingBlockId } = useGraph()
+    const { graphPosition } = useGraphPosition()
+    const blocksCoordinates = useAllBlocksCoordinates()
 
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
