@@ -85,6 +85,14 @@ const MyComponent = memo(
       })
     }, [typebot?.edges, visibleItemsMap])
 
+    // Índice por id calculado uma vez — evita um findIndex O(n) por bloco visível
+    // (era O(visíveis × total) a cada re-virtualização).
+    const blockIndexById = useMemo(() => {
+      const map = new Map<string, number>()
+      typebot?.blocks.forEach((b, i) => map.set(b.id, i))
+      return map
+    }, [typebot?.blocks])
+
     return (
       <>
           <Edges
@@ -96,7 +104,7 @@ const MyComponent = memo(
           />
 
         {visibleItems.map((block) => {
-          const blockIndex = typebot?.blocks.findIndex((b) => b.id === block.id)
+          const blockIndex = blockIndexById.get(block.id)
           return (
             <BlockNode
               block={block}

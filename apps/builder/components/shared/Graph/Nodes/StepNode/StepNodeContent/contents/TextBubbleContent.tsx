@@ -3,8 +3,7 @@ import { useTypebotVariables } from 'contexts/TypebotContext'
 import { EndConversationStep, TextBubbleStep, Typebot } from 'models'
 import React from 'react'
 import { parseVariableHighlight } from 'services/utils'
-import DOMPurify from 'dompurify'
-import { textBubbleEditorContentConfig } from 'config/dompurify'
+import { sanitizeBubbleHtml } from 'services/sanitizeHtml'
 
 type Props = {
   step: TextBubbleStep | EndConversationStep
@@ -12,10 +11,7 @@ type Props = {
 
 export const TextBubbleContent = ({ step }: Props) => {
   const variables = useTypebotVariables()
-  const sanitizedHtml = DOMPurify.sanitize(
-    step.content.html,
-    textBubbleEditorContentConfig
-  )
+  const sanitizedHtml = sanitizeBubbleHtml(step.content.html)
 
   if (!variables) return <></>
   return (

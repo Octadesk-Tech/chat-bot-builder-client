@@ -1,9 +1,8 @@
 import { Flex } from '@chakra-ui/react'
-import { textBubbleEditorContentConfig } from 'config/dompurify'
 import { useTypebotVariables } from 'contexts/TypebotContext'
 import { Typebot } from 'models'
-import DOMPurify from 'dompurify'
 import { parseVariableHighlight } from 'services/utils'
+import { sanitizeBubbleHtml } from 'services/sanitizeHtml'
 
 type Props = {
   html?: string
@@ -23,7 +22,7 @@ export const TextHtmlContent = ({
   color,
 }: Props) => {
   const variables = useTypebotVariables()
-  const sanitizedHtml = DOMPurify.sanitize(html, textBubbleEditorContentConfig)
+  const sanitizedHtml = sanitizeBubbleHtml(html)
 
   return !renderIfEmpty && !sanitizedHtml ? (
     <></>

@@ -78,13 +78,12 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
 
     case ActionType.Set: {
       const { newPresent, updateDate } = action
+      // dequal direto faz comparação estrutural profunda com early-exit (para no
+      // 1º campo diferente — o caso comum de uma edição real). Antes serializava
+      // o fluxo INTEIRO 2× com JSON.stringify + parseava 2× a cada mutação.
       if (
         isNotDefined(newPresent) ||
-        (present &&
-          dequal(
-            JSON.parse(JSON.stringify(newPresent)),
-            JSON.parse(JSON.stringify(present))
-          ))
+        (present && dequal(newPresent, present))
       ) {
         return state
       }
