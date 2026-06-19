@@ -5,6 +5,7 @@ import {
   Flex,
   SlideFade,
   Stack,
+  Text,
   useOutsideClick,
 } from '@chakra-ui/react'
 import React, { memo, useEffect, useRef, useState } from 'react'
@@ -30,9 +31,10 @@ import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
 type Props = {
   block: Block
   blockIndex: number
+  simplified?: boolean
 }
 
-export const BlockNode = memo(({ block, blockIndex }: Props) => {
+export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
   const {
     connectingIds,
     setConnectingIds,
@@ -246,15 +248,28 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                 )}
               </Flex>
 
-              {hasTypebot && (
-                <StepNodesList
-                  blockId={block.id}
-                  steps={block.steps}
-                  blockIndex={blockIndex}
-                  blockRef={ref}
-                  isStartBlock={isStartBlock}
-                />
-              )}
+              {hasTypebot &&
+                (simplified ? (
+                  !isStartBlock && (
+                    <Text
+                      fontSize="sm"
+                      color="gray.500"
+                      px="1"
+                      userSelect="none"
+                    >
+                      {block.steps.length}{' '}
+                      {block.steps.length === 1 ? 'etapa' : 'etapas'}
+                    </Text>
+                  )
+                ) : (
+                  <StepNodesList
+                    blockId={block.id}
+                    steps={block.steps}
+                    blockIndex={blockIndex}
+                    blockRef={ref}
+                    isStartBlock={isStartBlock}
+                  />
+                ))}
 
               {isFocused && !isStartBlock && (
                 <SlideFade

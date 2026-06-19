@@ -1,5 +1,5 @@
 import { useTypebot } from 'contexts/TypebotContext'
-import React, { memo, useMemo } from 'react'
+import React, { memo, useDeferredValue, useMemo } from 'react'
 import { AnswersCount } from 'services/analytics'
 import { Edges } from './Edges'
 import { BlockNode } from './Nodes/BlockNode'
@@ -10,6 +10,12 @@ import {
 } from 'contexts/GraphContext'
 import { isItemVisible } from 'services/graph'
 import { Block } from 'models'
+
+// Abaixo deste zoom os blocos são renderizados em modo simplificado (LOD):
+// o conteúdo dos steps fica ilegível mesmo, então trocamos a subárvore pesada
+// (StepNodesList + previews + endpoints) por um resumo barato. É o que destrava
+// a navegação de bots gigantes em zoom-out (onde há centenas de blocos visíveis).
+export const LOD_SCALE_THRESHOLD = 0.5
 
 type Props = {
   answersCounts?: AnswersCount[]
@@ -23,6 +29,8 @@ const MyComponent = memo(
     const { draggingBlockId } = useGraph()
     const { graphPosition } = useGraphPosition()
     const blocksCoordinates = useAllBlocksCoordinates()
+
+    const isSimplified = graphPosition.scale < LOD_SCALE_THRESHOLD
 
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
@@ -66,13 +74,27 @@ const MyComponent = memo(
       blocksCoordinates,
     ])
 
+    // Renderiza a lista pesada de blocos em prioridade baixa: quando o conjunto
+    // visível muda (re-virtualização ao panar/dar zoom), o React mantém a lista
+    // antiga e monta a nova de forma interrompível, cedendo à interação — em vez
+    // de bloquear a main thread por um frame longo. `visibleItems` e
+    // `isSimplified` são deferidos juntos para o LOD e o conjunto ficarem sempre
+    // consistentes no mesmo render.
+    const { items: renderedItems, simplified: renderedSimplified } =
+      useDeferredValue(
+        useMemo(
+          () => ({ items: visibleItems, simplified: isSimplified }),
+          [visibleItems, isSimplified]
+        )
+      )
+
     const visibleItemsMap = useMemo(() => {
       const map = new Map<string, Block>()
-      visibleItems.forEach((item) => {
+      renderedItems.forEach((item) => {
         map.set(item.id, item)
       })
       return map
-    }, [visibleItems])
+    }, [renderedItems])
 
     const visibleEdges = useMemo(() => {
       if (!typebot?.edges) return []
@@ -96,19 +118,20 @@ const MyComponent = memo(
     return (
       <>
           <Edges
-            visibleItems={visibleItems}
+            visibleItems={renderedItems}
             edges={visibleEdges}
             blocks={typebot?.blocks ?? []}
             answersCounts={answersCounts}
             onUnlockProPlanClick={onUnlockProPlanClick}
           />
 
-        {visibleItems.map((block) => {
+        {renderedItems.map((block) => {
           const blockIndex = blockIndexById.get(block.id)
           return (
             <BlockNode
               block={block}
               blockIndex={blockIndex ?? 0}
+              simplified={renderedSimplified}
               key={block.id}
             />
           )

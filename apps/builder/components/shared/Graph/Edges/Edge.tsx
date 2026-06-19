@@ -72,12 +72,16 @@ export const Edge = ({
   }, [targetEndpoints, graphPosition?.y, edge?.to.stepId, graphPosition?.scale])
 
   const path = useMemo(() => {
-    if (!sourceBlockCoordinates || !targetBlockCoordinates || !sourceTop)
-      return ``
+    if (!sourceBlockCoordinates || !targetBlockCoordinates) return ``
+    // Em LOD (zoom-out) o bloco vira caixa e não registra endpoints, então
+    // `sourceTop` fica indefinido. Caímos para uma âncora no topo do bloco de
+    // origem para o edge continuar visível (bloco-a-bloco). Em zoom normal o
+    // endpoint real é usado e a ancoragem é precisa.
+    const effectiveSourceTop = sourceTop || sourceBlockCoordinates.y + 20
     const anchorsPosition = getAnchorsPosition({
       sourceBlockCoordinates,
       targetBlockCoordinates,
-      sourceTop,
+      sourceTop: effectiveSourceTop,
       targetTop,
       graphScale: graphPosition.scale,
     })
