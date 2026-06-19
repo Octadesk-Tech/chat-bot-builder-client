@@ -4,14 +4,14 @@ import {
   useGraph,
   useGraphPosition,
 } from 'contexts/GraphContext'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { memo, useEffect, useMemo, useState } from 'react'
 import {
   getAnchorsPosition,
   computeEdgePath,
   getEndpointTopOffset,
   getSourceEndpointId,
 } from 'services/graph'
-import { Block, Edge as EdgeProps } from 'models'
+import { Edge as EdgeProps } from 'models'
 import { Portal, useDisclosure } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import { EdgeMenu } from './EdgeMenu'
@@ -24,15 +24,7 @@ export type AnchorsPositionProps = {
   totalSegments: number
 }
 
-export const Edge = ({
-  edge,
-  block,
-  visibleItems,
-}: {
-  edge: EdgeProps
-  block: Block
-  visibleItems: Block[]
-}) => {
+export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
   const { deleteEdge } = useTypebot()
   const {
     previewingEdge,
@@ -150,14 +142,16 @@ export const Edge = ({
         markerEnd={isPreviewing ? 'url(#blue-arrow)' : 'url(#arrow)'}
         fill="none"
       />
-      <Portal>
-        <EdgeMenu
-          isOpen={isOpen}
-          position={edgeMenuPosition}
-          onDeleteEdge={handleDeleteEdge}
-          onClose={onClose}
-        />
-      </Portal>
+      {isOpen && (
+        <Portal>
+          <EdgeMenu
+            isOpen={isOpen}
+            position={edgeMenuPosition}
+            onDeleteEdge={handleDeleteEdge}
+            onClose={onClose}
+          />
+        </Portal>
+      )}
     </>
   )
-}
+})

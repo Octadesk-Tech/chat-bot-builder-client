@@ -5,7 +5,6 @@ import {
   Flex,
   SlideFade,
   Stack,
-  Text,
   useOutsideClick,
 } from '@chakra-ui/react'
 import React, { memo, useEffect, useRef, useState } from 'react'
@@ -191,7 +190,9 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
               rounded="xl"
               bgColor="#ffffff"
               borderWidth="2px"
-              maxWidth="313px"
+              maxWidth={simplified ? '200px' : '313px'}
+              minWidth={simplified ? '313px' : undefined}
+              minHeight={simplified ? '200px' : undefined}
               borderColor={stackBorderColor(isOpened)}
               transition="border 300ms, box-shadow 200ms"
               pos="absolute"
@@ -216,7 +217,17 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
                   : ''
               }
             >
-              <Flex justifyContent="space-between" alignItems="center" gap="2">
+              {simplified ? (
+                <div
+                  style={{
+                    backgroundColor: '#E2E8F0',
+                    borderRadius: '6px',
+                    height: '20px',
+                    width: '100%',
+                  }}
+                />
+              ) : (
+                <Flex justifyContent="space-between" alignItems="center" gap="2">
                 <Editable
                   defaultValue={block.title}
                   onSubmit={handleTitleSubmit}
@@ -247,19 +258,25 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
                   />
                 )}
               </Flex>
+            )
+            }
 
               {hasTypebot &&
                 (simplified ? (
                   !isStartBlock && (
-                    <Text
-                      fontSize="sm"
-                      color="gray.500"
-                      px="1"
-                      userSelect="none"
-                    >
-                      {block.steps.length}{' '}
-                      {block.steps.length === 1 ? 'etapa' : 'etapas'}
-                    </Text>
+                    <Stack spacing="2">
+                      {block.steps.map((step) => (
+                        <div
+                          key={step.id}
+                          style={{
+                            backgroundColor: '#E2E8F0',
+                            borderRadius: '6px',
+                            width: '100%',
+                            height: '120px',
+                          }}
+                        />
+                      ))}
+                    </Stack>
                   )
                 ) : (
                   <StepNodesList

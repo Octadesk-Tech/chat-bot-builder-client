@@ -17,6 +17,11 @@ import { Block } from 'models'
 // a navegação de bots gigantes em zoom-out (onde há centenas de blocos visíveis).
 export const LOD_SCALE_THRESHOLD = 0.5
 
+// LOD só vale a pena com muitos blocos. Abaixo deste total, manter sempre o
+// detalhe completo (não simplificar) — fluxos pequenos não têm o problema de
+// renderizar centenas de subárvores, e perder detalhe ali seria só prejuízo.
+export const LOD_MIN_BLOCKS = 50
+
 type Props = {
   answersCounts?: AnswersCount[]
   onUnlockProPlanClick?: () => void
@@ -30,7 +35,9 @@ const MyComponent = memo(
     const { graphPosition } = useGraphPosition()
     const blocksCoordinates = useAllBlocksCoordinates()
 
-    const isSimplified = graphPosition.scale < LOD_SCALE_THRESHOLD
+    const isSimplified =
+      (typebot?.blocks?.length ?? 0) > LOD_MIN_BLOCKS &&
+      graphPosition.scale < LOD_SCALE_THRESHOLD
 
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
@@ -118,9 +125,7 @@ const MyComponent = memo(
     return (
       <>
           <Edges
-            visibleItems={renderedItems}
             edges={visibleEdges}
-            blocks={typebot?.blocks ?? []}
             answersCounts={answersCounts}
             onUnlockProPlanClick={onUnlockProPlanClick}
           />
