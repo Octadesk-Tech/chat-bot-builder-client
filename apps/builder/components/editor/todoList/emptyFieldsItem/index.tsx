@@ -3,28 +3,20 @@ import { StepIcon } from 'components/editor/StepsSideBar/StepIcon'
 import { StepTitle } from '../style'
 import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
 import { colors } from 'libs/theme'
-import { useGraphPosition } from 'contexts/GraphContext'
 import { EmptyFields } from 'hooks/EmptyFields/useEmptyFields'
 import { useTypebot } from 'contexts/TypebotContext'
+import { useGraphFocus } from 'hooks/useGraphFocus'
 
 const EmptyFieldsItem = ({ item }: { item: EmptyFields }) => {
-  const { setGraphPosition } = useGraphPosition()
   const { typebot } = useTypebot()
+  const { focusOnCoordinates } = useGraphFocus()
 
   const focusOnField = () => {
     const graphCoordinates = typebot?.blocks.find((b) =>
       b.steps.find((s) => s.id === item.step.id)
     )?.graphCoordinates
 
-    if (!graphCoordinates) return
-    const centerX = window.innerWidth / 2
-    const centerY = window.innerHeight / 2
-    const averageSizeCard = 315
-
-    const calcX = centerX - averageSizeCard / 2 - graphCoordinates.x
-    const calcY = centerY - averageSizeCard / 2 - graphCoordinates.y
-
-    setGraphPosition({ x: calcX, y: calcY, scale: 1 })
+    focusOnCoordinates(graphCoordinates)
   }
 
   const hasCustomErrorMessage = item?.errorMessage && 

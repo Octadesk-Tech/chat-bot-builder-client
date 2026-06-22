@@ -4,7 +4,7 @@ import {
   useGraph,
   useGraphPosition,
 } from 'contexts/GraphContext'
-import React, { memo, useEffect, useMemo, useState } from 'react'
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react'
 import {
   getAnchorsPosition,
   computeEdgePath,
@@ -43,25 +43,49 @@ export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
   const sourceBlockCoordinates = useBlockCoordinates(edge.from.blockId)
   const targetBlockCoordinates = useBlockCoordinates(edge.to.blockId)
 
-  const sourceTop = useMemo(() => {
-    if (!sourceEndpoints || !graphPosition) return 0
-    return getEndpointTopOffset({
+  // Offset do endpoint DENTRO do bloco (em coordenadas de mundo). É invariante à
+  // posição do bloco, então o medimos via DOM apenas quando o board/endpoints
+  // mudam (bloco em repouso, DOM bate com a coordenada). Durante o arraste de um
+  // bloco o Y do edge passa a ser `coordenada-live-do-bloco + offset` — segue o
+  // card sem `getBoundingClientRect` por frame.
+  const sourceOffsetRef = useRef<number>(20)
+  const targetOffsetRef = useRef<number>(20)
+
+  useMemo(() => {
+    if (!sourceEndpoints || !graphPosition) return
+    const domTop = getEndpointTopOffset({
       endpoints: sourceEndpoints,
       graphOffsetY: graphPosition.y,
       endpointId: getSourceEndpointId(edge),
       graphScale: graphPosition.scale,
     })
+    if (domTop !== undefined && sourceBlockCoordinates)
+      sourceOffsetRef.current = domTop - sourceBlockCoordinates.y
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge])
 
-  const targetTop = useMemo(() => {
-    if (!targetEndpoints || !graphPosition) return 0
-    return getEndpointTopOffset({
+  useMemo(() => {
+    if (!targetEndpoints || !graphPosition || !edge?.to.stepId) return
+    const domTop = getEndpointTopOffset({
       endpoints: targetEndpoints,
       graphOffsetY: graphPosition.y,
-      endpointId: edge?.to.stepId,
+      endpointId: edge.to.stepId,
       graphScale: graphPosition.scale,
     })
-  }, [targetEndpoints, graphPosition?.y, edge?.to.stepId, graphPosition?.scale])
+    if (domTop !== undefined && targetBlockCoordinates)
+      targetOffsetRef.current = domTop - targetBlockCoordinates.y
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetEndpoints, graphPosition?.y, graphPosition?.scale, edge?.to.stepId])
+
+  const sourceTop = sourceBlockCoordinates
+    ? sourceBlockCoordinates.y + sourceOffsetRef.current
+    : undefined
+
+  // Sem stepId é um alvo-bloco → ancora no topo do bloco (targetTop indefinido).
+  const targetTop =
+    edge?.to.stepId && targetBlockCoordinates
+      ? targetBlockCoordinates.y + targetOffsetRef.current
+      : undefined
 
   const path = useMemo(() => {
     if (!sourceBlockCoordinates || !targetBlockCoordinates) return ``
@@ -69,7 +93,7 @@ export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
     // `sourceTop` fica indefinido. Caímos para uma âncora no topo do bloco de
     // origem para o edge continuar visível (bloco-a-bloco). Em zoom normal o
     // endpoint real é usado e a ancoragem é precisa.
-    const effectiveSourceTop = sourceTop || sourceBlockCoordinates.y + 20
+    const effectiveSourceTop = sourceTop ?? sourceBlockCoordinates.y + 20
     const anchorsPosition = getAnchorsPosition({
       sourceBlockCoordinates,
       targetBlockCoordinates,

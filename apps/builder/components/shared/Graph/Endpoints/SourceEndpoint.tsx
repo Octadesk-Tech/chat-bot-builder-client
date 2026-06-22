@@ -11,7 +11,6 @@ export const SourceEndpoint = ({
   source: Source
 }) => {
   const [ranOnce, setRanOnce] = useState(false)
-  const { setHideEdges } = useTypebotExtras()
   const { setConnectingIds, addSourceEndpoint, previewingEdge } = useGraph()
   const coordinatesReady = useCoordinatesReady()
   const ref = useRef<HTMLDivElement | null>(null)
@@ -20,7 +19,6 @@ export const SourceEndpoint = ({
     e.stopPropagation()
     e.preventDefault()
     setConnectingIds({ source })
-    setHideEdges(false)
   }
 
   useEffect(() => {

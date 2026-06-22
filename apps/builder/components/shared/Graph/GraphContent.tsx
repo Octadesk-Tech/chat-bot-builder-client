@@ -124,11 +124,11 @@ const MyComponent = memo(
 
     return (
       <>
-          <Edges
+          {!hideEdges && <Edges
             edges={visibleEdges}
             answersCounts={answersCounts}
             onUnlockProPlanClick={onUnlockProPlanClick}
-          />
+          />}
 
         {renderedItems.map((block) => {
           const blockIndex = blockIndexById.get(block.id)

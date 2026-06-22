@@ -69,7 +69,6 @@ export const Graph = memo(
       redo,
       canUndo,
       canRedo,
-      setHideEdges,
     } = useTypebot()
     const {
       setOpenedStepId,
@@ -100,11 +99,9 @@ export const Graph = memo(
 
     useEffect(() => {
       if (isMovingBoard) {
-        setHideEdges(true)
       } else {
         const timeout = setTimeout(() => {
           if (!isMovingBoardRef.current) {
-            setHideEdges(false)
           }
         }, showEdgesTimeOut)
 
