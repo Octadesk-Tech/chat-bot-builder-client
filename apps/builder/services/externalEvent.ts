@@ -29,6 +29,16 @@ export const mountUrl = async ({ blockId, botId }: IMountUrl) => {
   return `${baseUrl}/chat/external-webhook/${currentSubDomain}/${botId}/${blockId}/id-conversa`
 }
 
+export const getTriggerHost = async (): Promise<string | undefined> => {
+  const baseUrl = await getNucleusUrl()
+  if (!baseUrl) return undefined
+  try {
+    return new URL(baseUrl).host
+  } catch {
+    return undefined
+  }
+}
+
 type IMountUrl = {
   blockId: string;
   botId: string;

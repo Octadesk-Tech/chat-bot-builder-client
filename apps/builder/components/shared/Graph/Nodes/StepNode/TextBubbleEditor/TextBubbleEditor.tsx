@@ -25,6 +25,7 @@ import { VariableSearchInput } from 'components/shared/VariableSearchInput/Varia
 import { ToolBar } from './ToolBar'
 import DOMPurify from 'dompurify'
 import { textBubbleEditorConfig } from 'config/dompurify'
+import cuid from 'cuid'
 
 type TextBubbleEditorProps = {
   initialValue: TElement[]
@@ -65,7 +66,7 @@ export const TextBubbleEditor = ({
   const hasShownLimitMessage = useRef(false)
 
   const editorId = useRef(
-    `text-bubble-editor-${increment ?? ''}-${Date.now()}`
+    `text-bubble-editor-${increment ?? ''}-${cuid()}`
   ).current
 
   const editor = useMemo(() => {

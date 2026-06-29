@@ -32,6 +32,7 @@ import { VariableForTestInputs } from './VariableForTestInputs'
 import { DataVariableInputs } from './ResponseMappingInputs'
 import { SwitchWithLabel } from 'components/shared/SwitchWithLabel'
 import { sendOctaRequest } from 'util/octaRequest'
+import { getTriggerHost } from 'services/externalEvent'
 import { QueryParamsInputs } from './KeyValueInputs'
 import { Input, Textarea } from 'components/shared/Textbox'
 import { useForm } from 'react-hook-form'
@@ -45,6 +46,10 @@ type Props = {
   step: WebhookStep
   onOptionsChange: (options: WebhookOptions) => void
 }
+
+const WEBHOOK_TRIGGER_PATH = '/webhooks'
+const TRIGGER_LOOP_MESSAGE =
+  'Este endereço é um webhook de disparo de fluxo e usá-lo aqui geraria um loop de requisição.'
 
 export const WebhookSettings = React.memo(function WebhookSettings({
   step,
@@ -82,6 +87,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
 
   const { registerBeforeClose } = useContext(StepNodeContext)
   const [showCurlImport, setShowCurlImport] = useState(false)
+  const [triggerHost, setTriggerHost] = useState<string>()
 
   useEffect(() => {
     if (!registerBeforeClose) return
@@ -96,6 +102,26 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     return () => registerBeforeClose(null)
   }, [showCurlImport, registerBeforeClose])
 
+  useEffect(() => {
+    resolveTriggerHost()
+  }, [])
+
+  const resolveTriggerHost = async () => {
+    const host = await getTriggerHost()
+    if (host) setTriggerHost(host)
+  }
+
+  const isTriggerWebhookTarget = (origin?: string, path?: string) => {
+    if (!triggerHost || !origin) return false
+    try {
+      if (new URL(origin).host !== triggerHost) return false
+    } catch {
+      return false
+    }
+    const normalizedPath = path?.startsWith('/') ? path : `/${path ?? ''}`
+    return normalizedPath.startsWith(WEBHOOK_TRIGGER_PATH)
+  }
+
   const schema = z.object({
     url: z.string().url({ message: 'url inválida' }),
     pathPortion: z.string().min(1, { message: 'Campo obrigatório' }),
@@ -103,6 +129,8 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   const {
     trigger,
     setValue,
+    setError,
+    clearErrors,
     getValues,
     formState: { errors },
   } = useForm({
@@ -133,6 +161,14 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   const effectPathChange = () => {
     const pathPortion = getValues('pathPortion')
     handleVariablesHashList(pathPortion)
+
+    if (isTriggerWebhookTarget(step.options.url, pathPortion)) {
+      setError('url', { type: 'loop', message: TRIGGER_LOOP_MESSAGE })
+      return
+    }
+
+    if (errors.url?.type === 'loop') clearErrors('url')
+
     onOptionsChange({
       ...step.options,
       path: pathPortion,
@@ -172,17 +208,23 @@ export const WebhookSettings = React.memo(function WebhookSettings({
 
       if (newUrl.search) handleParams(newUrl.search.replace(/_hash_/g, '#'))
       setValue('url', newUrl.origin)
-      trigger('url')
 
       const updatedPath = newUrl.pathname?.replace(/_hash_/g, '#')
+
+      const path =
+        updatedPath.length > 1 ? updatedPath : currentPathPortion || ''
+
+      if (isTriggerWebhookTarget(newUrl.origin, path)) {
+        setError('url', { type: 'loop', message: TRIGGER_LOOP_MESSAGE })
+        return
+      }
+
+      trigger('url')
 
       if (updatedPath.length > 1) {
         setValue('pathPortion', updatedPath)
         trigger('pathPortion')
       }
-
-      const path =
-        updatedPath.length > 1 ? updatedPath : currentPathPortion || ''
 
       onOptionsChange({
         ...step.options,
@@ -386,6 +428,11 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     onOptionsChange({ ...step.options, isCustomBody })
 
   const handleCurlImport = (parsed: ParsedCurl) => {
+    if (isTriggerWebhookTarget(parsed.url, parsed.path)) {
+      errorToast({ title: TRIGGER_LOOP_MESSAGE })
+      return
+    }
+
     setValue('url', parsed.url)
     setValue('pathPortion', parsed.path || '/')
     trigger('url')
@@ -516,6 +563,11 @@ export const WebhookSettings = React.memo(function WebhookSettings({
       <DataVariableInputs {...props} dataItems={responseKeys} />,
     [responseKeys]
   )
+
+  const canTestRequest =
+    Boolean(step.options.url) &&
+    Boolean(step.options.path) &&
+    Object.keys(errors).length === 0
 
   if (showCurlImport) {
     return <CurlImportView onImport={handleCurlImport} />
@@ -711,7 +763,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
       </Stack>
       )
       <Stack>
-        {step.options.url && (
+        {canTestRequest && (
           <Button
             onClick={handleTestRequestClick}
             colorScheme="blue"
