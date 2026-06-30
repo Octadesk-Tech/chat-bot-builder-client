@@ -212,7 +212,7 @@ export const TypebotContext = ({
       new Date(typebot.updatedAt) >
       new Date(currentTypebotRef.current.updatedAt)
     ) {
-      setLocalTypebot({ ...parsedTypebot })
+      setLocalTypebot({ ...parsedTypebot }, { skipHistory: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typebot])
@@ -226,8 +226,8 @@ export const TypebotContext = ({
 
     if (localTypebot?.hasPendingIssues === hasPendingIssues) return
 
-    updateLocalTypebot({ hasPendingIssues })
-  }, [localTypebot?.edges, emptyFields])
+    setLocalTypebot({ ...localTypebot, hasPendingIssues }, { skipHistory: true })
+  }, [localTypebot, emptyFields, setLocalTypebot])
 
   const saveTypebot = async (
     personaName?: string,
@@ -258,11 +258,14 @@ export const TypebotContext = ({
     }
 
     if (!options?.disableMutation)
-      mutate({
-        typebot: typebotToSave,
-        publishedTypebot,
-        webhooks: webhooks ?? [],
-      })
+      mutate(
+        {
+          typebot: typebotToSave,
+          publishedTypebot,
+          webhooks: webhooks ?? [],
+        },
+        { revalidate: false }
+      )
     window.removeEventListener('beforeunload', preventUserFromRefreshing)
 
     return { saved: true, updateAt: typebotToSave.updatedAt }
@@ -276,11 +279,14 @@ export const TypebotContext = ({
     )
     setIsPublishing(false)
     if (error) return toast({ title: error.name, description: error.message })
-    mutate({
-      typebot: currentTypebotRef.current as Typebot,
-      publishedTypebot: newPublishedTypebot,
-      webhooks: webhooks ?? [],
-    })
+    mutate(
+      {
+        typebot: currentTypebotRef.current as Typebot,
+        publishedTypebot: newPublishedTypebot,
+        webhooks: webhooks ?? [],
+      },
+      { revalidate: false }
+    )
   }
 
   useEffect(() => {
@@ -749,6 +755,7 @@ export const useFetchedTypebot = ({
     Error
   >(`/getTypebot-${typebotId}`, fetcher, {
     dedupingInterval: 60000 * 60 * 24,
+    revalidateOnFocus: false,
   })
 
   if (error) onError(error)

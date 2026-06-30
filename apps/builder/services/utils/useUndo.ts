@@ -15,7 +15,7 @@ enum ActionType {
 export interface Actions<T> {
   set: (
     newPresent: T | ((current: T) => T),
-    options?: { updateDate: boolean }
+    options?: { updateDate?: boolean; skipHistory?: boolean }
   ) => void
   undo: () => void
   redo: () => void
@@ -29,6 +29,7 @@ interface Action<T> {
   type: ActionType
   newPresent?: T
   updateDate?: boolean
+  skipHistory?: boolean
 }
 
 export interface State<T> {
@@ -77,7 +78,7 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
     }
 
     case ActionType.Set: {
-      const { newPresent, updateDate } = action
+      const { newPresent, updateDate, skipHistory } = action
       if (
         isNotDefined(newPresent) ||
         (present &&
@@ -89,14 +90,23 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
         return state
       }
 
+      const nextPresent = {
+        ...newPresent,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        updatedAt: updateDate ? new Date() : newPresent.updatedAt,
+      }
+
+      if (skipHistory) {
+        return {
+          ...state,
+          present: nextPresent,
+        }
+      }
+
       return {
         past: [...past, present].filter(isDefined),
-        present: {
-          ...newPresent,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-ignore
-          updatedAt: updateDate ? new Date() : newPresent.updatedAt,
-        },
+        present: nextPresent,
         future: [],
       }
     }
@@ -129,21 +139,31 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
   }, [canRedo])
 
   const set = useCallback(
-    (newPresent: T | ((current: T) => T), options = { updateDate: true }) => {
+    (
+      newPresent: T | ((current: T) => T),
+      options: { updateDate?: boolean; skipHistory?: boolean } = {}
+    ) => {
+      const { updateDate = true, skipHistory = false } = options
+
       const updatedTypebot =
         'id' in newPresent
           ? newPresent
           : (newPresent as (current: T) => T)(presentRef.current)
-      presentRef.current = updatedTypebot
 
       if (updatedTypebot?.blocks) {
         updatedTypebot.blocks = updateBlocksHasConnections(updatedTypebot)
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newUpdatedAt = updateDate ? new Date() : (updatedTypebot as any)?.updatedAt
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      presentRef.current = { ...(updatedTypebot as any), updatedAt: newUpdatedAt } as T
+
       dispatch({
         type: ActionType.Set,
         newPresent: updatedTypebot,
-        updateDate: options.updateDate,
+        updateDate,
+        skipHistory,
       })
     },
     []
