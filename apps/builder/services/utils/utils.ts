@@ -162,8 +162,8 @@ export const getCookie = (name: string): string | undefined => {
 export const setCookie = (
   name: string,
   value: string,
-  maxAge: number = 31536000,
-  path: string = '/'
+  maxAge = 31536000,
+  path = '/'
 ) => {
   document.cookie = `${name}=${value}; path=${path}; max-age=${maxAge}`
 }
