@@ -218,16 +218,21 @@ export const TypebotContext = ({
   }, [typebot])
 
   useEffect(() => {
-    if (!localTypebot) return
-    const hasBlocksWithoutConection = localTypebot.blocks.some(
+    const currentTypebot = currentTypebotRef.current
+
+    if (!currentTypebot) return
+
+    const hasBlocksWithoutConection = currentTypebot.blocks.some(
       (b) => !b.hasConnection
     )
+
     const hasPendingIssues = hasBlocksWithoutConection || emptyFields.length > 0
 
-    if (localTypebot?.hasPendingIssues === hasPendingIssues) return
+    if (currentTypebot.hasPendingIssues === hasPendingIssues) return
 
-    setLocalTypebot({ ...localTypebot, hasPendingIssues }, { skipHistory: true })
-  }, [localTypebot, emptyFields, setLocalTypebot])
+    setLocalTypebot({ ...currentTypebot, hasPendingIssues }, { skipHistory: true })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localTypebot?.edges, emptyFields])
 
   const saveTypebot = async (
     personaName?: string,
