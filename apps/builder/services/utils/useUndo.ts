@@ -156,8 +156,11 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const newUpdatedAt = updateDate ? new Date() : (updatedTypebot as any)?.updatedAt
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      presentRef.current = { ...(updatedTypebot as any), updatedAt: newUpdatedAt } as T
+      presentRef.current = updatedTypebot != null
+        ? ({ ...(updatedTypebot as any), updatedAt: newUpdatedAt } as T)
+        : (updatedTypebot as T)
 
       dispatch({
         type: ActionType.Set,
