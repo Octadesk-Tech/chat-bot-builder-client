@@ -146,9 +146,10 @@ export const Graph = memo(
       if (!typebot) return
       setIsMovingBoard(true)
       goToBegining()
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsMovingBoard(false)
       }, showEdgesTimeOut)
+      return () => clearTimeout(timer)
     }, [])
 
     useEffect(() => {

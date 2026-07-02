@@ -119,6 +119,13 @@ export class CoordinatesStore {
       })
     }
   }
+
+  dispose = () => {
+    if (this.pendingFrame !== null) {
+      cancelAnimationFrame(this.pendingFrame)
+      this.pendingFrame = null
+    }
+  }
 }
 
 /**
@@ -189,6 +196,7 @@ export const GraphProvider = ({
   if (!coordinatesStoreRef.current)
     coordinatesStoreRef.current = new CoordinatesStore()
   const coordinatesStore = coordinatesStoreRef.current
+  const goToBeginingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [focusedBlockId, setFocusedBlockId] = useState<string>()
   const [draggingBlockId, setDraggingBlockId] = useState<string>()
   const { typebot } = useTypebot()
@@ -201,6 +209,13 @@ export const GraphProvider = ({
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blocks])
+
+  useEffect(() => {
+    return () => {
+      if (goToBeginingTimerRef.current) clearTimeout(goToBeginingTimerRef.current)
+      coordinatesStoreRef.current?.dispose()
+    }
+  }, [])
 
   const addSourceEndpoint = useCallback((endpoint: Endpoint) => {
     setSourceEndpoints((endpoints) => ({
@@ -253,7 +268,9 @@ export const GraphProvider = ({
     const centerY = window.innerHeight / 2
     const averageSizeCard = 315
 
-    const timer = setTimeout(() => {
+    if (goToBeginingTimerRef.current) clearTimeout(goToBeginingTimerRef.current)
+    goToBeginingTimerRef.current = setTimeout(() => {
+      goToBeginingTimerRef.current = null
       setGraphPosition((prev) => {
         let calcX = centerX - averageSizeCard / 2 - graphCoordinates.x
         let calcY = centerY - averageSizeCard / 2 - graphCoordinates.y
@@ -265,7 +282,6 @@ export const GraphProvider = ({
 
         return { x: calcX, y: calcY, scale: 1 }
       })
-      clearTimeout(timer)
     }, 300)
   }, [typebot])
 

@@ -62,6 +62,8 @@ export const TextBubbleEditor = ({
 
   const currentValueRef = useRef<TElement[]>(initialValueRef.current)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const truncationTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const truncationRafRef = useRef<number | null>(null)
   const hasShownLimitMessage = useRef(false)
 
   const editorId = useRef(
@@ -96,9 +98,9 @@ export const TextBubbleEditor = ({
 
   useEffect(() => {
     return () => {
-      if (debounceTimerRef.current) {
-        clearTimeout(debounceTimerRef.current)
-      }
+      if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current)
+      if (truncationTimerRef.current) clearTimeout(truncationTimerRef.current)
+      if (truncationRafRef.current) cancelAnimationFrame(truncationRafRef.current)
     }
   }, [])
 
@@ -175,7 +177,9 @@ export const TextBubbleEditor = ({
       if (plainText.length > maxLength) {
         const truncatedText = plainText.slice(0, maxLength)
 
-        setTimeout(() => {
+        if (truncationTimerRef.current) clearTimeout(truncationTimerRef.current)
+        truncationTimerRef.current = setTimeout(() => {
+          truncationTimerRef.current = null
           try {
             const truncatedValue: TElement[] = [
               {
@@ -203,7 +207,9 @@ export const TextBubbleEditor = ({
               onKeyUp(truncatedContent)
             }
 
-            requestAnimationFrame(() => {
+            if (truncationRafRef.current) cancelAnimationFrame(truncationRafRef.current)
+            truncationRafRef.current = requestAnimationFrame(() => {
+              truncationRafRef.current = null
               try {
                 const textLength = Node.string(editor.children[0]).length
                 Transforms.select(editor as BaseEditor, {

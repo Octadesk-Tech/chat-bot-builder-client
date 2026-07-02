@@ -54,6 +54,7 @@ export const SubmissionsTable = ({
     }
     const observer = new IntersectionObserver(handleObserver, options)
     if (bottomElement.current) observer.observe(bottomElement.current)
+    return () => observer.disconnect()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bottomElement.current])
 
