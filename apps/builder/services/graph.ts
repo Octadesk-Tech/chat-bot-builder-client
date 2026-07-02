@@ -340,11 +340,14 @@ export const isItemVisible = (
 ) => {
   const { x, y, scale } = graphPosition
 
-  const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 50 : 100
-  const scaleBuffer = Math.max(50, baseBuffer / scale)
-  
-  const bufferX = scaleBuffer + baseBuffer
-  const bufferY = scaleBuffer + baseBuffer
+  const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 30 : 80
+  const scaleBuffer = Math.max(40, baseBuffer / scale)
+
+  // Cap proporcional ao container: evita que em zoom muito baixo o buffer
+  // inclua blocos excessivamente distantes da viewport em coordenadas de mundo.
+  const rawBuffer = scaleBuffer + baseBuffer
+  const bufferX = Math.min(rawBuffer, containerWidth * 0.10)
+  const bufferY = Math.min(rawBuffer, containerHeight * 0.10)
 
   const scaledItemX = Math.abs(
     item.graphCoordinates.x * scale + x - containerWidth / 2
@@ -353,8 +356,8 @@ export const isItemVisible = (
     item.graphCoordinates.y * scale + y - containerHeight / 2
   )
 
-  const itemWidth = (313 + bufferX) * scale // Considerando a largura do item
-  const itemHeight = (computedItemHeight(item) + bufferY) * scale // Considerando a altura do item
+  const itemWidth = (313 + bufferX) * scale
+  const itemHeight = (computedItemHeight(item) + bufferY) * scale
 
   const isHorizontallyVisible = scaledItemX - itemWidth < containerWidth / 2
 

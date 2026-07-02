@@ -77,6 +77,7 @@ export class CoordinatesStore {
   private coordinates: BlocksCoordinates = {}
   private listeners = new Set<CoordinatesListener>()
   private ready = false
+  private pendingFrame: number | null = null
 
   getSnapshot = (): BlocksCoordinates => this.coordinates
 
@@ -97,6 +98,10 @@ export class CoordinatesStore {
   }
 
   setAll = (coordinates: BlocksCoordinates) => {
+    if (this.pendingFrame !== null) {
+      cancelAnimationFrame(this.pendingFrame)
+      this.pendingFrame = null
+    }
     this.coordinates = coordinates
     this.ready = true
     this.emit()
@@ -106,7 +111,13 @@ export class CoordinatesStore {
     const current = this.coordinates[blockId]
     if (current && current.x === newCoord.x && current.y === newCoord.y) return
     this.coordinates = { ...this.coordinates, [blockId]: newCoord }
-    this.emit()
+
+    if (this.pendingFrame === null) {
+      this.pendingFrame = requestAnimationFrame(() => {
+        this.pendingFrame = null
+        this.emit()
+      })
+    }
   }
 }
 

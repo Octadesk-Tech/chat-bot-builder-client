@@ -27,7 +27,7 @@ import {
   StepType,
   WOZStepType,
 } from 'models'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StepNode } from './StepNode/StepNode'
 import { StepNodeOverlay } from './StepNodeOverlay'
 
@@ -138,7 +138,7 @@ export const StepNodesList = ({
     setHasBlockEndedIndex(endedIndex)
   }, [steps])
 
-  const handleStepMouseDown =
+  const handleStepMouseDown = useCallback(
     (stepIndex: number) =>
       (
         { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
@@ -150,7 +150,27 @@ export const StepNodesList = ({
         setPosition(absolute)
         setMousePositionInElement(relative)
         setDraggedStep(step)
-      }
+      },
+    // setDraggedStep é um setter estável do useState; incluso para satisfazer o linter.
+    // setPosition e setMousePositionInElement também são setters estáveis, omitidos
+    // pois não afetam a identidade da função entre renders.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isReadOnly, detachStepFromBlock, blockIndex, setDraggedStep]
+  )
+
+  // Dep intencional: só recria quando steps são adicionados/removidos (length),
+  // não quando o conteúdo de um step muda — evitaria o ganho do memo em StepNode.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableIndices = useMemo(
+    () => steps.map((_, idx) => ({ blockIndex, stepIndex: idx })),
+    [blockIndex, steps.length]
+  )
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableOnMouseDown = useMemo(
+    () => steps.map((_, idx) => handleStepMouseDown(idx)),
+    [handleStepMouseDown, steps.length]
+  )
 
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
@@ -200,9 +220,9 @@ export const StepNodesList = ({
           <Fragment key={step.id}>
             <StepNode
               step={step}
-              indices={{ blockIndex, stepIndex: idx }}
+              indices={stableIndices[idx]}
               isConnectable={steps.length - 1 === idx}
-              onMouseDown={handleStepMouseDown(idx)}
+              onMouseDown={stableOnMouseDown[idx]}
               isStartBlock={isStartBlock}
               unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
             />

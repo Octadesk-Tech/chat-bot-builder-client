@@ -4,7 +4,6 @@ import { AnswersCount } from 'services/analytics'
 import { Edges } from './Edges'
 import { BlockNode } from './Nodes/BlockNode'
 import {
-  useAllBlocksCoordinates,
   useGraph,
   useGraphPosition,
 } from 'contexts/GraphContext'
@@ -33,7 +32,6 @@ const MyComponent = memo(
     const { typebot, hideEdges } = useTypebot()
     const { draggingBlockId } = useGraph()
     const { graphPosition } = useGraphPosition()
-    const blocksCoordinates = useAllBlocksCoordinates()
 
     const isSimplified =
       (typebot?.blocks?.length ?? 0) > LOD_MIN_BLOCKS &&
@@ -46,13 +44,10 @@ const MyComponent = memo(
       const containerHeight = graphContainerRef.current.offsetHeight
 
       const baseVisible = typebot.blocks.filter((block) => {
-        const liveCoordinates =
-          blocksCoordinates[block.id] ?? block.graphCoordinates
-
-        if (!liveCoordinates) return false
+        if (!block.graphCoordinates) return false
 
         return isItemVisible(
-          { ...block, graphCoordinates: liveCoordinates },
+          block,
           graphPosition,
           containerWidth,
           containerHeight,
@@ -78,7 +73,6 @@ const MyComponent = memo(
       graphPosition,
       graphContainerRef,
       draggingBlockId,
-      blocksCoordinates,
     ])
 
     // Renderiza a lista pesada de blocos em prioridade baixa: quando o conjunto

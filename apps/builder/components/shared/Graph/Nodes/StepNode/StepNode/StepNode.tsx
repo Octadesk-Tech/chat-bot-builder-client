@@ -49,7 +49,7 @@ import {
   WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useRef, useState } from 'react'
+import React, { createContext, memo, useEffect, useRef, useState } from 'react'
 import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
@@ -76,7 +76,7 @@ type StepNodeContextProps = {
 
 export const StepNodeContext = createContext<StepNodeContextProps>({})
 
-export const StepNode = ({
+const StepNodeBase = ({
   step,
   isConnectable,
   indices,
@@ -450,6 +450,17 @@ export const StepNode = ({
     </StepNodeContext.Provider>
   )
 }
+
+export const StepNode = memo(
+  StepNodeBase,
+  (prev, next) =>
+    prev.step === next.step &&
+    prev.isConnectable === next.isConnectable &&
+    prev.unreachableNode === next.unreachableNode &&
+    prev.indices.blockIndex === next.indices.blockIndex &&
+    prev.indices.stepIndex === next.indices.stepIndex &&
+    prev.onMouseDown === next.onMouseDown
+)
 
 const isEndConversationStep = (
   step: Step

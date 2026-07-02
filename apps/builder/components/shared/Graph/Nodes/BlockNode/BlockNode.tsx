@@ -219,13 +219,19 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
             >
               {simplified ? (
                 <div
+                  title={block.title}
                   style={{
-                    backgroundColor: '#E2E8F0',
-                    borderRadius: '6px',
-                    height: '20px',
-                    width: '100%',
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    padding: '0 4px',
+                    color: '#1B2A4A',
                   }}
-                />
+                >
+                  {block.title || 'Sem título'}
+                </div>
               ) : (
                 <Flex justifyContent="space-between" alignItems="center" gap="2">
                 <Editable
