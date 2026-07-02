@@ -54,6 +54,17 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
 
   const { setMouseOverBlock, mouseOverBlock } = useStepDnd()
 
+  // Quando o bloco sai da viewport (virtualização), garante que mouseOverBlock
+  // seja zerado. Sem isso, o useEventListener em StepNodesList de OUTROS blocos
+  // mantém uma closure sobre a div deste bloco (já desanexada do documento),
+  // impedindo o GC até o próximo re-render daqueles componentes.
+  useEffect(() => {
+    return () => {
+      setMouseOverBlock((prev) => (prev?.id === block.id ? undefined : prev))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const [isMouseDown, setIsMouseDown] = useState(false)
 
   const [isConnecting, setIsConnecting] = useState(false)
@@ -222,7 +233,7 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
                   title={block.title}
                   style={{
                     fontWeight: 600,
-                    fontSize: '14px',
+                    fontSize: '16px',
                     overflow: 'hidden',
                     whiteSpace: 'nowrap',
                     textOverflow: 'ellipsis',
@@ -269,21 +280,19 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
 
               {hasTypebot &&
                 (simplified ? (
-                  !isStartBlock && (
-                    <Stack spacing="2">
-                      {block.steps.map((step) => (
-                        <div
-                          key={step.id}
-                          style={{
-                            backgroundColor: '#E2E8F0',
-                            borderRadius: '6px',
-                            width: '100%',
-                            height: '120px',
-                          }}
-                        />
-                      ))}
-                    </Stack>
-                  )
+                  <Stack spacing="2">
+                    {block.steps.map((step) => (
+                      <div
+                        key={step.id}
+                        style={{
+                          backgroundColor: '#E2E8F0',
+                          borderRadius: '6px',
+                          width: '100%',
+                          height: '120px',
+                        }}
+                      />
+                    ))}
+                  </Stack>
                 ) : (
                   <StepNodesList
                     blockId={block.id}

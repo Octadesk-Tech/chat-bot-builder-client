@@ -145,8 +145,10 @@ const graphContext = createContext<{
   setPreviewingEdge: Dispatch<SetStateAction<Edge | undefined>>
   sourceEndpoints: IdMap<Endpoint>
   addSourceEndpoint: (endpoint: Endpoint) => void
+  removeSourceEndpoint: (id: string) => void
   targetEndpoints: IdMap<Endpoint>
   addTargetEndpoint: (endpoint: Endpoint) => void
+  removeTargetEndpoint: (id: string) => void
   openedStepId?: string
   setOpenedStepId: Dispatch<SetStateAction<string | undefined>>
   isReadOnly: boolean
@@ -158,6 +160,8 @@ const graphContext = createContext<{
   //@ts-ignore
   coordinatesStore: CoordinatesStore
   getBlockCoordinates: (blockId?: string) => Coordinates | undefined
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — default value intencional incompleto; o contexto só é consumido dentro de GraphProvider
 }>({
   connectingIds: null,
 })
@@ -205,11 +209,27 @@ export const GraphProvider = ({
     }))
   }, [])
 
+  const removeSourceEndpoint = useCallback((id: string) => {
+    setSourceEndpoints((endpoints) => {
+      const next = { ...endpoints }
+      delete next[id]
+      return next
+    })
+  }, [])
+
   const addTargetEndpoint = useCallback((endpoint: Endpoint) => {
     setTargetEndpoints((endpoints) => ({
       ...endpoints,
       [endpoint.id]: endpoint,
     }))
+  }, [])
+
+  const removeTargetEndpoint = useCallback((id: string) => {
+    setTargetEndpoints((endpoints) => {
+      const next = { ...endpoints }
+      delete next[id]
+      return next
+    })
   }, [])
 
   const updateBlockCoordinates = useCallback(
@@ -260,7 +280,9 @@ export const GraphProvider = ({
       sourceEndpoints,
       targetEndpoints,
       addSourceEndpoint,
+      removeSourceEndpoint,
       addTargetEndpoint,
+      removeTargetEndpoint,
       openedStepId,
       setOpenedStepId,
       coordinatesStore,
@@ -282,7 +304,9 @@ export const GraphProvider = ({
       sourceEndpoints,
       targetEndpoints,
       addSourceEndpoint,
+      removeSourceEndpoint,
       addTargetEndpoint,
+      removeTargetEndpoint,
       openedStepId,
       setOpenedStepId,
       coordinatesStore,

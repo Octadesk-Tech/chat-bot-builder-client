@@ -133,10 +133,16 @@ const StepNodeBase = ({
   })
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [modalMounted, setModalMounted] = useState<boolean>(false)
   const beforeCloseRef = useRef<(() => boolean) | null>(null)
 
   const registerBeforeClose = (handler: (() => boolean) | null) => {
     beforeCloseRef.current = handler
+  }
+
+  const handleSetIsModalOpen = (open: boolean) => {
+    if (open) setModalMounted(true)
+    setIsModalOpen(open)
   }
 
   const [validationMessages, setValidationMessages] =
@@ -192,13 +198,14 @@ const StepNodeBase = ({
     if (beforeCloseRef.current?.()) return
 
     updateStep(indices, { ...step })
-    
+
     refreshConnections(step)
-    
+
     onModalClose()
     setIsModalOpen(false)
     setIsEditing(false)
     setIsPopoverOpened(false)
+    // modalMounted is cleared by onCloseComplete after exit animation
   }
 
   const handleKeyUp = (content: TextBubbleContent) => {
@@ -208,7 +215,7 @@ const StepNodeBase = ({
 
   const handleCloseEditor = () => {
     setIsEditing(false)
-    setIsModalOpen(false)
+    handleSetIsModalOpen(false)
     setIsPopoverOpened(false)
   }
 
@@ -217,11 +224,11 @@ const StepNodeBase = ({
     e.stopPropagation()
 
     if (step.type === OctaBubbleStepType.END_CONVERSATION) {
-      setIsModalOpen(true)
+      handleSetIsModalOpen(true)
     } else if (isOctaBubbleStep(step)) {
       setIsEditing(true)
     } else if (!isWozSuggestionStep(step)) {
-      setIsModalOpen(true)
+      handleSetIsModalOpen(true)
     }
 
     setOpenedStepId(step.id)
@@ -267,7 +274,7 @@ const StepNodeBase = ({
       menuPosition="absolute"
     />
   ) : (
-    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen, registerBeforeClose }}>
+    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen: handleSetIsModalOpen, registerBeforeClose }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
       >
@@ -432,18 +439,21 @@ const StepNodeBase = ({
                 </Stack>
               </Flex>
             </PopoverTrigger>
-            <SettingsModal
-              id="settings-modal"
-              isOpen={isModalOpen}
-              onClose={handleModalClose}
-              stepType={step.type}
-            >
-              <StepSettings
-                step={step}
-                indices={indices}
-                onStepChange={handleStepUpdate}
-              />
-            </SettingsModal>
+            {modalMounted && (
+              <SettingsModal
+                id="settings-modal"
+                isOpen={isModalOpen}
+                onClose={handleModalClose}
+                onCloseComplete={() => setModalMounted(false)}
+                stepType={step.type}
+              >
+                <StepSettings
+                  step={step}
+                  indices={indices}
+                  onStepChange={handleStepUpdate}
+                />
+              </SettingsModal>
+            )}
           </Popover>
         )}
       </ContextMenu>

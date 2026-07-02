@@ -11,7 +11,7 @@ export const SourceEndpoint = ({
   source: Source
 }) => {
   const [ranOnce, setRanOnce] = useState(false)
-  const { setConnectingIds, addSourceEndpoint, previewingEdge } = useGraph()
+  const { setConnectingIds, addSourceEndpoint, removeSourceEndpoint, previewingEdge } = useGraph()
   const coordinatesReady = useCoordinatesReady()
   const ref = useRef<HTMLDivElement | null>(null)
 
@@ -24,11 +24,9 @@ export const SourceEndpoint = ({
   useEffect(() => {
     if (ranOnce || !ref.current || !coordinatesReady) return
     const id = source.itemId ?? source.stepId
-    addSourceEndpoint({
-      id,
-      ref,
-    })
+    addSourceEndpoint({ id, ref })
     setRanOnce(true)
+    return () => removeSourceEndpoint(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref.current, coordinatesReady])
 
