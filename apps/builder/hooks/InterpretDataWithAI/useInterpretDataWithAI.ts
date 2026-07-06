@@ -110,7 +110,7 @@ export const useInterpretDataWithAI = ({
     const block = whoIsConnectedOnMyBlock[0]
     if (block?.steps?.[0]?.type !== IntegrationStepType.WEBHOOK) return false
     const method = block?.steps?.[0]?.options?.method
-    return !!method && method !== 'GET'
+    return !!method && method !== HttpMethodsWebhook.GET
   }, [whoIsConnectedOnMyBlock])
 
   const shouldFetch = !!requestParams
