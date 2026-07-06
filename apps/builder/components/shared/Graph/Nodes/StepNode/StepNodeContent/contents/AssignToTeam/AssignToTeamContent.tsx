@@ -25,19 +25,19 @@ export const AssignToTeamContent = ({
 
   React.useEffect(() => {
     if (
-      !verifyFeatureToggle('customer-recontact') 
+      !verifyFeatureToggle('customer-recontact')
       || typeof onUpdateStep !== 'function'
     ) return
-    
+
     const showChatReturnOption = hasAnyChatReturnInItsTree(typebot, step.blockId)
-    let options = {} as AssignToTeamOptions
-    if (!showChatReturnOption && step.options?.assignType === '@CHAT-RETURN') {
-      options.assignTo = ''
-      options.assignType = ''
-    }
-    
+    const needsAssignClear = !showChatReturnOption && step.options?.assignType === '@CHAT-RETURN'
+
+    if (step.options?.showChatReturnOption === showChatReturnOption && !needsAssignClear) return
+
     onUpdateStep({
-      ...step.options, ... options, showChatReturnOption
+      ...step.options,
+      ...(needsAssignClear ? { assignTo: '', assignType: '' } : {}),
+      showChatReturnOption,
     })
   }, [typebot?.edges])
 
