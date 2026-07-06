@@ -8,6 +8,7 @@ import {
   Session,
   IntegrationStepType,
   Webhook,
+  HttpMethodsWebhook,
 } from 'models'
 import { useTypebot } from 'contexts/TypebotContext'
 import { fetchInterpretDataWithAI, testReturnService } from './service'
@@ -87,6 +88,8 @@ export const useInterpretDataWithAI = ({
     if (block?.steps?.[0]?.type !== IntegrationStepType.WEBHOOK) return null
 
     const options = block?.steps?.[0]?.options
+    if (options?.method && options.method !== HttpMethodsWebhook.GET)
+      return null
     if (!options) return null
 
     const parameters = options.parameters?.concat(options.headers) || []
@@ -101,6 +104,14 @@ export const useInterpretDataWithAI = ({
     const session = resolveSession(options.variablesForTest, typebot.variables)
     return { session, localWebhook }
   }, [whoIsConnectedOnMyBlock, typebot])
+
+  const isNonGetMethod = useMemo(() => {
+    if (whoIsConnectedOnMyBlock?.length !== 1) return false
+    const block = whoIsConnectedOnMyBlock[0]
+    if (block?.steps?.[0]?.type !== IntegrationStepType.WEBHOOK) return false
+    const method = block?.steps?.[0]?.options?.method
+    return !!method && method !== 'GET'
+  }, [whoIsConnectedOnMyBlock])
 
   const shouldFetch = !!requestParams
   const { data, isValidating, mutate } = useSWR(
@@ -132,6 +143,7 @@ export const useInterpretDataWithAI = ({
     success: data?.success,
     isLoading: isValidating,
     whoIsConnectedOnMyBlock,
+    isNonGetMethod,
     testReturn,
     refetch: mutate,
   }
