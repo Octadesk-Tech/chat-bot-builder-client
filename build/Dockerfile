@@ -1,4 +1,4 @@
-# https://github.com/vercel/turborepo/issues/215#issuecomment-1027058056
+﻿# https://github.com/vercel/turborepo/issues/215#issuecomment-1027058056
 #FROM node:18-slim AS base
 FROM node:18-bullseye-slim AS base
 WORKDIR /app
@@ -52,8 +52,10 @@ COPY entrypoint.sh ./
 COPY ${SCOPE}-entrypoint.sh ./
 RUN chmod +x ./${SCOPE}-entrypoint.sh
 RUN chmod +x ./entrypoint.sh
+RUN chown -R node:node /app
+USER node
 ENTRYPOINT ./${SCOPE}-entrypoint.sh
 
-EXPOSE 80
-ENV PORT 80
+EXPOSE 3000
+ENV PORT 3000
 
