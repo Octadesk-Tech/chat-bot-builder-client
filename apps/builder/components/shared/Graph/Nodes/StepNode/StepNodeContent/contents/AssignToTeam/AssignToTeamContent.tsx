@@ -5,7 +5,11 @@ import { SourceEndpoint } from '../../../../../Endpoints'
 import { TableListOcta } from 'components/shared/TableListOcta'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
 import { ASSIGN_TO } from 'enums/assign-to'
-import { useTypebot } from 'contexts/TypebotContext'
+import {
+  useGetTypebot,
+  useTypebotEdges,
+  useTypebotExtras,
+} from 'contexts/TypebotContext'
 import { parseVariableHighlight } from 'services/utils'
 import { TextHtmlContent } from '../TextHtmlContent'
 import { hasAnyChatReturnInItsTree } from './hasAnyChatReturnInItsTree'
@@ -20,7 +24,9 @@ type Props = {
 export const AssignToTeamContent = ({
   step, onUpdateStep
 }: Props) => {
-  const { octaAgents, typebot } = useTypebot();
+  const { octaAgents } = useTypebotExtras();
+  const getTypebot = useGetTypebot()
+  const edges = useTypebotEdges()
   const { verifyFeatureToggle } = useUser()
 
   React.useEffect(() => {
@@ -29,7 +35,7 @@ export const AssignToTeamContent = ({
       || typeof onUpdateStep !== 'function'
     ) return
 
-    const showChatReturnOption = hasAnyChatReturnInItsTree(typebot, step.blockId)
+    const showChatReturnOption = hasAnyChatReturnInItsTree(getTypebot(), step.blockId)
     const needsAssignClear = !showChatReturnOption && step.options?.assignType === '@CHAT-RETURN'
 
     if (step.options?.showChatReturnOption === showChatReturnOption && !needsAssignClear) return
@@ -39,7 +45,8 @@ export const AssignToTeamContent = ({
       ...(needsAssignClear ? { assignTo: '', assignType: '' } : {}),
       showChatReturnOption,
     })
-  }, [typebot?.edges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [edges])
 
   const resolveAssignTo = (assignTo: string) => {
     const value = octaAgents.find(s => s.id === assignTo)

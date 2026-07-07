@@ -15,7 +15,7 @@ enum ActionType {
 export interface Actions<T> {
   set: (
     newPresent: T | ((current: T) => T),
-    options?: { updateDate?: boolean; skipHistory?: boolean }
+    options?: { updateDate?: boolean; skipHistory?: boolean; skipConnectionsUpdate?: boolean  }
   ) => void
   undo: () => void
   redo: () => void
@@ -79,13 +79,13 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
 
     case ActionType.Set: {
       const { newPresent, updateDate, skipHistory } = action
+      // dequal direto faz comparação estrutural profunda com early-exit (para no
+      // 1º campo diferente — o caso comum de uma edição real). Antes serializava
+      // o fluxo INTEIRO 2× com JSON.stringify + parseava 2× a cada mutação.
+
       if (
         isNotDefined(newPresent) ||
-        (present &&
-          dequal(
-            JSON.parse(JSON.stringify(newPresent)),
-            JSON.parse(JSON.stringify(present))
-          ))
+        (present && dequal(newPresent, present))
       ) {
         return state
       }
@@ -141,16 +141,20 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
   const set = useCallback(
     (
       newPresent: T | ((current: T) => T),
-      options: { updateDate?: boolean; skipHistory?: boolean } = {}
+      options: { updateDate?: boolean; skipHistory?: boolean; skipConnectionsUpdate?: boolean } = {}
     ) => {
-      const { updateDate = true, skipHistory = false } = options
+      const { updateDate = true, skipHistory = false, skipConnectionsUpdate = false } = options
 
       const updatedTypebot =
         'id' in newPresent
           ? newPresent
           : (newPresent as (current: T) => T)(presentRef.current)
 
-      if (updatedTypebot?.blocks) {
+      // `hasConnection` só depende de edges + estrutura de steps. Em updates que
+      // não alteram conexões (ex.: coordenadas de bloco no commit do drag), o
+      // caller passa `skipConnectionsUpdate` para evitar este recálculo
+      // O(blocks×steps×edges) no caminho quente.
+      if (updatedTypebot?.blocks && !skipConnectionsUpdate) {
         updatedTypebot.blocks = updateBlocksHasConnections(updatedTypebot)
       }
 
@@ -166,7 +170,7 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
         type: ActionType.Set,
         newPresent: updatedTypebot,
         updateDate,
-        skipHistory,
+        skipHistory
       })
     },
     []

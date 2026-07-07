@@ -18,7 +18,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Box, HStack, IconButton, Stack, Flex, Icon } from '@chakra-ui/react';
 import { DragHandleIcon } from '@chakra-ui/icons';
 import { Item, ItemIndices, StepWithItems, Step, ChoiceInputStep } from 'models';
-import { useTypebot } from 'contexts/TypebotContext';
+import { useTypebotActions, useTypebotSelector } from 'contexts/TypebotContext';
 import { ItemNodeContent } from '../ItemNodeContent';
 import { SourceEndpoint } from '../../../Endpoints/SourceEndpoint';
 import { MdClose } from 'react-icons/md';
@@ -50,14 +50,13 @@ const SortableItem = ({
   onUpdateItem,
   renderItemContent,
 }: SortableItemProps) => {
-  const { typebot } = useTypebot();
-  
-  const isConnectable = !(
-    (typebot?.blocks?.[indices.blockIndex]?.steps?.[
-      indices.stepIndex
-    ] as ChoiceInputStep | undefined)
-  )?.options?.isMultipleChoice;
-  const showConnection = typebot && isConnectable && isReadOnly;
+  const liveStep = useTypebotSelector(
+    (t) => t?.blocks?.[indices.blockIndex]?.steps?.[indices.stepIndex]
+  );
+
+  const isConnectable = !(liveStep as ChoiceInputStep | undefined)?.options
+    ?.isMultipleChoice;
+  const showConnection = !!liveStep && isConnectable && isReadOnly;
 
   const {
     attributes,
@@ -136,7 +135,7 @@ const SortableItem = ({
                 {showConnection && (
                   <SourceEndpoint
                     source={{
-                      blockId: typebot.blocks[indices.blockIndex].id,
+                      blockId: liveStep?.blockId ?? '',
                       stepId: item.stepId,
                       itemId: item.id,
                     }}
@@ -198,7 +197,7 @@ export const ItemDraggableList = ({
   renderItemContent,
 }: ItemDraggableListProps) => {
   const { blockIndex, stepIndex } = indices;
-  const { reorderItem, deleteItem } = useTypebot();
+  const { reorderItem, deleteItem } = useTypebotActions();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {

@@ -306,17 +306,27 @@ export const getEndpointTopOffset = ({
 export const getSourceEndpointId = (edge?: Edge) =>
   edge?.from.itemId ?? edge?.from.stepId
 
-export const computedItemHeight = (item) => {
-  const base = (item.steps.length - 1) * 269 + 500
-  const items = item.steps.filter((item) => item.hasOwnProperty('items'))
-  const itemsLenght = items.reduce((a, c) => {
+// Cache pela referência do array `steps` (estável sob immer enquanto o bloco não
+// muda). isItemVisible chama isto para TODO bloco a cada re-virtualização; sem
+// cache é O(total blocos × steps) por parada de pan.
+const itemHeightCache = new WeakMap<object, number>()
+
+export const computedItemHeight = (item: any) => {
+  const steps = item?.steps
+  if (steps && itemHeightCache.has(steps)) {
+    return itemHeightCache.get(steps) as number
+  }
+
+  const base = (steps.length - 1) * 269 + 500
+  const items = steps.filter((item: any) => item.hasOwnProperty('items'))
+  const itemsLenght = items.reduce((a: number, c: any) => {
     return a + c.items?.length
   }, 0)
 
-  if (itemsLenght > 4) {
-    return (itemsLenght - 4) * 52 + base
-  }
-  return base
+  const result = itemsLenght > 4 ? (itemsLenght - 4) * 52 + base : base
+
+  if (steps) itemHeightCache.set(steps, result)
+  return result
 }
 
 const MAX_BLOCKS_BUFFER = 50
@@ -330,11 +340,14 @@ export const isItemVisible = (
 ) => {
   const { x, y, scale } = graphPosition
 
-  const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 50 : 100
-  const scaleBuffer = Math.max(50, baseBuffer / scale)
-  
-  const bufferX = scaleBuffer + baseBuffer
-  const bufferY = scaleBuffer + baseBuffer
+  const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 30 : 80
+  const scaleBuffer = Math.max(40, baseBuffer / scale)
+
+  // Cap proporcional ao container: evita que em zoom muito baixo o buffer
+  // inclua blocos excessivamente distantes da viewport em coordenadas de mundo.
+  const rawBuffer = scaleBuffer + baseBuffer
+  const bufferX = Math.min(rawBuffer, containerWidth * 0.10)
+  const bufferY = Math.min(rawBuffer, containerHeight * 0.10)
 
   const scaledItemX = Math.abs(
     item.graphCoordinates.x * scale + x - containerWidth / 2
@@ -343,8 +356,8 @@ export const isItemVisible = (
     item.graphCoordinates.y * scale + y - containerHeight / 2
   )
 
-  const itemWidth = (313 + bufferX) * scale // Considerando a largura do item
-  const itemHeight = (computedItemHeight(item) + bufferY) * scale // Considerando a altura do item
+  const itemWidth = (313 + bufferX) * scale
+  const itemHeight = (computedItemHeight(item) + bufferY) * scale
 
   const isHorizontallyVisible = scaledItemX - itemWidth < containerWidth / 2
 

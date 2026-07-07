@@ -16,7 +16,13 @@ import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
 import { ContextMenu } from 'components/shared/ContextMenu'
 import { useGraph } from 'contexts/GraphContext'
 import { NodePosition, useDragDistance } from 'contexts/GraphDndContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import {
+  useGetEmptyFields,
+  useTypebotActions,
+  useTypebotAvailableFor,
+  useTypebotEdges,
+  useTypebotExtras,
+} from 'contexts/TypebotContext'
 import { ActionsTypeEmptyFields } from 'hooks/EmptyFields/useEmptyFields'
 import { useRefreshGraphConnections } from 'hooks/useRefreshGraphConnections'
 import { colors } from 'libs/theme'
@@ -44,7 +50,7 @@ import {
   WhatsAppOptionsListStep,
 } from 'models'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useRef, useState } from 'react'
+import React, { createContext, memo, useEffect, useRef, useState } from 'react'
 import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 import { hasDefaultConnector } from 'services/typebots'
 import { setMultipleRefs } from 'services/utils'
@@ -71,7 +77,7 @@ type StepNodeContextProps = {
 
 export const StepNodeContext = createContext<StepNodeContextProps>({})
 
-export const StepNode = ({
+const StepNodeBase = ({
   step,
   isConnectable,
   indices,
@@ -93,12 +99,16 @@ export const StepNode = ({
     setFocusedBlockId,
     previewingEdge,
   } = useGraph()
-  const { updateStep, emptyFields, setEmptyFields, typebot } = useTypebot()
+  const { updateStep } = useTypebotActions()
+  const { setEmptyFields } = useTypebotExtras()
+  const getEmptyFields = useGetEmptyFields()
+  const availableFor = useTypebotAvailableFor()
+  const edges = useTypebotEdges()
   const { refreshConnections, cleanup } = useRefreshGraphConnections()
   const [isConnecting, setIsConnecting] = useState(false)
 
   const availableOnlyForEvent =
-    typebot?.availableFor?.length == 1 && typebot.availableFor.includes('event')
+    availableFor?.length == 1 && availableFor.includes('event')
 
   const showWarning = !availableOnlyForEvent
 
@@ -124,20 +134,27 @@ export const StepNode = ({
   })
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
+  const [modalMounted, setModalMounted] = useState<boolean>(false)
   const beforeCloseRef = useRef<(() => boolean) | null>(null)
 
   const registerBeforeClose = (handler: (() => boolean) | null) => {
     beforeCloseRef.current = handler
   }
 
+  const handleSetIsModalOpen = (open: boolean) => {
+    if (open) setModalMounted(true)
+    setIsModalOpen(open)
+  }
+
   const [validationMessages, setValidationMessages] =
     useState<Array<ValidationMessage>>()
 
-  const edgesLength = typebot?.edges?.length ?? 0
+  const edgesLength = edges?.length ?? 0
 
   useEffect(() => {
-    const currentMessages = getValidationMessages(step, typebot?.edges)
+    const currentMessages = getValidationMessages(step, edges)
     setValidationMessages(currentMessages)
+    const emptyFields = getEmptyFields()
     if (currentMessages.length > 0) {
       if (!emptyFields.find((field) => field?.step.id === step?.id)) {
         setEmptyFields(
@@ -151,7 +168,8 @@ export const StepNode = ({
         setEmptyFields([step?.id], ActionsTypeEmptyFields.REMOVE)
       }
     }
-  }, [step, edgesLength, typebot?.edges])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, edgesLength, edges])
 
   const { onClose: onModalClose } = useDisclosure({
     defaultIsOpen: true,
@@ -188,6 +206,7 @@ export const StepNode = ({
     setIsModalOpen(false)
     setIsEditing(false)
     setIsPopoverOpened(false)
+    // modalMounted is cleared by onCloseComplete after exit animation
   }
 
   const handleKeyUp = (content: TextBubbleContent) => {
@@ -197,7 +216,7 @@ export const StepNode = ({
 
   const handleCloseEditor = () => {
     setIsEditing(false)
-    setIsModalOpen(false)
+    handleSetIsModalOpen(false)
     setIsPopoverOpened(false)
   }
 
@@ -206,11 +225,11 @@ export const StepNode = ({
     e.stopPropagation()
 
     if (step.type === OctaBubbleStepType.END_CONVERSATION) {
-      setIsModalOpen(true)
+      handleSetIsModalOpen(true)
     } else if (isOctaBubbleStep(step)) {
       setIsEditing(true)
     } else if (!isWozSuggestionStep(step)) {
-      setIsModalOpen(true)
+      handleSetIsModalOpen(true)
     }
 
     setOpenedStepId(step.id)
@@ -257,9 +276,7 @@ export const StepNode = ({
       menuPosition="absolute"
     />
   ) : (
-    <StepNodeContext.Provider
-      value={{ setIsPopoverOpened, setIsModalOpen, registerBeforeClose }}
-    >
+    <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen: handleSetIsModalOpen, registerBeforeClose }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
       >
@@ -424,24 +441,38 @@ export const StepNode = ({
                 </Stack>
               </Flex>
             </PopoverTrigger>
-            <SettingsModal
-              id="settings-modal"
-              isOpen={isModalOpen}
-              onClose={handleModalClose}
-              stepType={step.type}
-            >
-              <StepSettings
-                step={step}
-                indices={indices}
-                onStepChange={handleStepUpdate}
-              />
-            </SettingsModal>
+            {modalMounted && (
+              <SettingsModal
+                id="settings-modal"
+                isOpen={isModalOpen}
+                onClose={handleModalClose}
+                onCloseComplete={() => setModalMounted(false)}
+                stepType={step.type}
+              >
+                <StepSettings
+                  step={step}
+                  indices={indices}
+                  onStepChange={handleStepUpdate}
+                />
+              </SettingsModal>
+            )}
           </Popover>
         )}
       </ContextMenu>
     </StepNodeContext.Provider>
   )
 }
+
+export const StepNode = memo(
+  StepNodeBase,
+  (prev, next) =>
+    prev.step === next.step &&
+    prev.isConnectable === next.isConnectable &&
+    prev.unreachableNode === next.unreachableNode &&
+    prev.indices.blockIndex === next.indices.blockIndex &&
+    prev.indices.stepIndex === next.indices.stepIndex &&
+    prev.onMouseDown === next.onMouseDown
+)
 
 const isEndConversationStep = (
   step: Step

@@ -5,10 +5,13 @@ import {
   MutableRefObject,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
+  useSyncExternalStore,
 } from 'react'
 import { useTypebot } from './TypebotContext'
 
@@ -59,20 +62,100 @@ export type Endpoint = {
 
 export type BlocksCoordinates = IdMap<Coordinates>
 
-const graphContext = createContext<{
-  blocksCoordinates: BlocksCoordinates
-  updateBlockCoordinates: (blockId: string, newCoord: Coordinates) => void
+type CoordinatesListener = () => void
+
+/**
+ * Store externo das coordenadas dos blocos.
+ *
+ * Mantém as coordenadas fora do `value` do React context para que arrastar um
+ * bloco não recrie o context e re-renderize TODOS os consumidores. Cada
+ * componente assina via `useSyncExternalStore` e só re-renderiza quando a fatia
+ * que ele lê muda de identidade (a coordenada do seu próprio bloco, ou o objeto
+ * inteiro para quem precisa de todas).
+ */
+export class CoordinatesStore {
+  private coordinates: BlocksCoordinates = {}
+  private listeners = new Set<CoordinatesListener>()
+  private ready = false
+  private pendingFrame: number | null = null
+
+  getSnapshot = (): BlocksCoordinates => this.coordinates
+
+  getBlock = (blockId?: string): Coordinates | undefined =>
+    blockId ? this.coordinates[blockId] : undefined
+
+  isReady = (): boolean => this.ready
+
+  subscribe = (listener: CoordinatesListener): (() => void) => {
+    this.listeners.add(listener)
+    return () => {
+      this.listeners.delete(listener)
+    }
+  }
+
+  private emit() {
+    this.listeners.forEach((listener) => listener())
+  }
+
+  setAll = (coordinates: BlocksCoordinates) => {
+    if (this.pendingFrame !== null) {
+      cancelAnimationFrame(this.pendingFrame)
+      this.pendingFrame = null
+    }
+    this.coordinates = coordinates
+    this.ready = true
+    this.emit()
+  }
+
+  update = (blockId: string, newCoord: Coordinates) => {
+    const current = this.coordinates[blockId]
+    if (current && current.x === newCoord.x && current.y === newCoord.y) return
+    this.coordinates = { ...this.coordinates, [blockId]: newCoord }
+
+    if (this.pendingFrame === null) {
+      this.pendingFrame = requestAnimationFrame(() => {
+        this.pendingFrame = null
+        this.emit()
+      })
+    }
+  }
+
+  dispose = () => {
+    if (this.pendingFrame !== null) {
+      cancelAnimationFrame(this.pendingFrame)
+      this.pendingFrame = null
+    }
+  }
+}
+
+/**
+ * Context isolado para a posição do grafo (pan/zoom). Separado do `graphContext`
+ * para que mudanças de pan/zoom NÃO recriem o value do context principal e
+ * re-renderizem todos os consumidores. Quem só precisa do `scale` em handlers
+ * de drag deve usar `getGraphPosition()` (leitura imperativa, sem assinatura).
+ */
+const graphPositionContext = createContext<{
   graphPosition: Position
-  goToBegining: () => void
   setGraphPosition: Dispatch<SetStateAction<Position>>
+}>({
+  graphPosition: graphPositionDefaultValue,
+  setGraphPosition: () => undefined,
+})
+
+const graphContext = createContext<{
+  updateBlockCoordinates: (blockId: string, newCoord: Coordinates) => void
+  goToBegining: () => void
+  getGraphPosition: () => Position
   connectingIds: ConnectingIds | null
   setConnectingIds: Dispatch<SetStateAction<ConnectingIds | null>>
   previewingEdge?: Edge
   setPreviewingEdge: Dispatch<SetStateAction<Edge | undefined>>
   sourceEndpoints: IdMap<Endpoint>
   addSourceEndpoint: (endpoint: Endpoint) => void
+  removeSourceEndpoint: (id: string) => void
   targetEndpoints: IdMap<Endpoint>
   addTargetEndpoint: (endpoint: Endpoint) => void
+  removeTargetEndpoint: (id: string) => void
   openedStepId?: string
   setOpenedStepId: Dispatch<SetStateAction<string | undefined>>
   isReadOnly: boolean
@@ -82,8 +165,11 @@ const graphContext = createContext<{
   setDraggingBlockId: Dispatch<SetStateAction<string | undefined>>
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   //@ts-ignore
+  coordinatesStore: CoordinatesStore
+  getBlockCoordinates: (blockId?: string) => Coordinates | undefined
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore — default value intencional incompleto; o contexto só é consumido dentro de GraphProvider
 }>({
-  graphPosition: graphPositionDefaultValue,
   connectingIds: null,
 })
 
@@ -97,53 +183,82 @@ export const GraphProvider = ({
   isReadOnly?: boolean
 }) => {
   const [graphPosition, setGraphPosition] = useState(graphPositionDefaultValue)
+  // Espelho síncrono da posição para leitura imperativa (sem assinatura).
+  const graphPositionRef = useRef(graphPosition)
+  graphPositionRef.current = graphPosition
+  const getGraphPosition = useCallback(() => graphPositionRef.current, [])
   const [connectingIds, setConnectingIds] = useState<ConnectingIds | null>(null)
   const [previewingEdge, setPreviewingEdge] = useState<Edge>()
   const [sourceEndpoints, setSourceEndpoints] = useState<IdMap<Endpoint>>({})
   const [targetEndpoints, setTargetEndpoints] = useState<IdMap<Endpoint>>({})
   const [openedStepId, setOpenedStepId] = useState<string>()
-  const [blocksCoordinates, setBlocksCoordinates] = useState<BlocksCoordinates>(
-    {}
-  )
+  const coordinatesStoreRef = useRef<CoordinatesStore>()
+  if (!coordinatesStoreRef.current)
+    coordinatesStoreRef.current = new CoordinatesStore()
+  const coordinatesStore = coordinatesStoreRef.current
+  const goToBeginingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [focusedBlockId, setFocusedBlockId] = useState<string>()
   const [draggingBlockId, setDraggingBlockId] = useState<string>()
   const { typebot } = useTypebot()
 
   useEffect(() => {
-    setBlocksCoordinates(
-      blocks.reduce(
-        (coords, block) => ({
-          ...coords,
-          [block.id]: block.graphCoordinates,
-        }),
-        {}
+    coordinatesStore.setAll(
+      Object.fromEntries(
+        blocks.map((block) => [block.id, block.graphCoordinates])
       )
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blocks])
 
-  const addSourceEndpoint = (endpoint: Endpoint) => {
+  useEffect(() => {
+    return () => {
+      if (goToBeginingTimerRef.current) clearTimeout(goToBeginingTimerRef.current)
+      coordinatesStoreRef.current?.dispose()
+    }
+  }, [])
+
+  const addSourceEndpoint = useCallback((endpoint: Endpoint) => {
     setSourceEndpoints((endpoints) => ({
       ...endpoints,
       [endpoint.id]: endpoint,
     }))
-  }
+  }, [])
 
-  const addTargetEndpoint = (endpoint: Endpoint) => {
+  const removeSourceEndpoint = useCallback((id: string) => {
+    setSourceEndpoints((endpoints) => {
+      const next = { ...endpoints }
+      delete next[id]
+      return next
+    })
+  }, [])
+
+  const addTargetEndpoint = useCallback((endpoint: Endpoint) => {
     setTargetEndpoints((endpoints) => ({
       ...endpoints,
       [endpoint.id]: endpoint,
     }))
-  }
+  }, [])
 
-  const updateBlockCoordinates = (blockId: string, newCoord: Coordinates) =>
-    setBlocksCoordinates((blocksCoordinates) => ({
-      ...blocksCoordinates,
-      [blockId]: newCoord,
-    }))
+  const removeTargetEndpoint = useCallback((id: string) => {
+    setTargetEndpoints((endpoints) => {
+      const next = { ...endpoints }
+      delete next[id]
+      return next
+    })
+  }, [])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const goToBegining = () => {
+  const updateBlockCoordinates = useCallback(
+    (blockId: string, newCoord: Coordinates) =>
+      coordinatesStore.update(blockId, newCoord),
+    [coordinatesStore]
+  )
+
+  const getBlockCoordinates = useCallback(
+    (blockId?: string) => coordinatesStore.getBlock(blockId),
+    [coordinatesStore]
+  )
+
+  const goToBegining = useCallback(() => {
     const stepStart = typebot?.blocks.find((block) =>
       block.steps.find((step) => step.type === 'start')
     )
@@ -153,25 +268,27 @@ export const GraphProvider = ({
     const centerY = window.innerHeight / 2
     const averageSizeCard = 315
 
-    let calcX = centerX - averageSizeCard / 2 - graphCoordinates.x
-    let calcY = centerY - averageSizeCard / 2 - graphCoordinates.y
+    if (goToBeginingTimerRef.current) clearTimeout(goToBeginingTimerRef.current)
+    goToBeginingTimerRef.current = setTimeout(() => {
+      goToBeginingTimerRef.current = null
+      setGraphPosition((prev) => {
+        let calcX = centerX - averageSizeCard / 2 - graphCoordinates.x
+        let calcY = centerY - averageSizeCard / 2 - graphCoordinates.y
 
-    if (graphPosition.x === calcX && graphPosition.y === calcY) {
-      calcX = calcX + 1
-      calcY = calcY + 1
-    }
+        if (prev.x === calcX && prev.y === calcY) {
+          calcX = calcX + 1
+          calcY = calcY + 1
+        }
 
-    const timer = setTimeout(() => {
-      setGraphPosition({ x: calcX, y: calcY, scale: 1 })
-      clearTimeout(timer)
+        return { x: calcX, y: calcY, scale: 1 }
+      })
     }, 300)
-  }
+  }, [typebot])
 
   const contextValue = useMemo(
     () => ({
-      graphPosition,
-      setGraphPosition,
       goToBegining,
+      getGraphPosition,
       connectingIds,
       setConnectingIds,
       previewingEdge,
@@ -179,11 +296,14 @@ export const GraphProvider = ({
       sourceEndpoints,
       targetEndpoints,
       addSourceEndpoint,
+      removeSourceEndpoint,
       addTargetEndpoint,
+      removeTargetEndpoint,
       openedStepId,
       setOpenedStepId,
-      blocksCoordinates,
+      coordinatesStore,
       updateBlockCoordinates,
+      getBlockCoordinates,
       isReadOnly,
       focusedBlockId,
       setFocusedBlockId,
@@ -191,9 +311,8 @@ export const GraphProvider = ({
       setDraggingBlockId,
     }),
     [
-      graphPosition,
-      setGraphPosition,
       goToBegining,
+      getGraphPosition,
       connectingIds,
       setConnectingIds,
       previewingEdge,
@@ -201,11 +320,14 @@ export const GraphProvider = ({
       sourceEndpoints,
       targetEndpoints,
       addSourceEndpoint,
+      removeSourceEndpoint,
       addTargetEndpoint,
+      removeTargetEndpoint,
       openedStepId,
       setOpenedStepId,
-      blocksCoordinates,
+      coordinatesStore,
       updateBlockCoordinates,
+      getBlockCoordinates,
       isReadOnly,
       focusedBlockId,
       setFocusedBlockId,
@@ -214,11 +336,63 @@ export const GraphProvider = ({
     ]
   )
 
+  const graphPositionValue = useMemo(
+    () => ({ graphPosition, setGraphPosition }),
+    [graphPosition]
+  )
+
   return (
-    <graphContext.Provider value={contextValue}>
-      {children}
-    </graphContext.Provider>
+    <graphPositionContext.Provider value={graphPositionValue}>
+      <graphContext.Provider value={contextValue}>
+        {children}
+      </graphContext.Provider>
+    </graphPositionContext.Provider>
   )
 }
 
 export const useGraph = () => useContext(graphContext)
+
+export const useGraphPosition = () => useContext(graphPositionContext)
+
+/**
+ * Assina a coordenada de UM bloco. O componente só re-renderiza quando a
+ * coordenada desse bloco muda — arrastar outro bloco não o afeta.
+ */
+export const useBlockCoordinates = (blockId?: string) => {
+  const { coordinatesStore } = useContext(graphContext)
+  const getSnapshot = useCallback(
+    () => coordinatesStore.getBlock(blockId),
+    [coordinatesStore, blockId]
+  )
+  return useSyncExternalStore(
+    coordinatesStore.subscribe,
+    getSnapshot,
+    getSnapshot
+  )
+}
+
+/**
+ * Assina o mapa completo de coordenadas. Use apenas onde realmente é preciso
+ * conhecer todas (ex.: cálculo de visibilidade). Re-renderiza a cada mudança.
+ */
+export const useAllBlocksCoordinates = (): BlocksCoordinates => {
+  const { coordinatesStore } = useContext(graphContext)
+  return useSyncExternalStore(
+    coordinatesStore.subscribe,
+    coordinatesStore.getSnapshot,
+    coordinatesStore.getSnapshot
+  )
+}
+
+/**
+ * Booleano que vira `true` quando as coordenadas iniciais foram carregadas.
+ * Estável: só dispara re-render na transição false → true.
+ */
+export const useCoordinatesReady = (): boolean => {
+  const { coordinatesStore } = useContext(graphContext)
+  return useSyncExternalStore(
+    coordinatesStore.subscribe,
+    coordinatesStore.isReady,
+    coordinatesStore.isReady
+  )
+}

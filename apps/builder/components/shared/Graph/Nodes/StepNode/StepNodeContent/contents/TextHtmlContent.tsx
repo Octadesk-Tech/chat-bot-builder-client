@@ -1,8 +1,8 @@
 import { Flex } from '@chakra-ui/react'
-import { textBubbleEditorContentConfig } from 'config/dompurify'
-import { useTypebot } from 'contexts/TypebotContext'
-import DOMPurify from 'dompurify'
+import { useTypebotVariables } from 'contexts/TypebotContext'
+import { Typebot } from 'models'
 import { parseVariableHighlight } from 'services/utils'
+import { sanitizeBubbleHtml } from 'services/sanitizeHtml'
 
 type Props = {
   html?: string
@@ -21,8 +21,8 @@ export const TextHtmlContent = ({
   fontWeight,
   color,
 }: Props) => {
-  const { typebot } = useTypebot()
-  const sanitizedHtml = DOMPurify.sanitize(html, textBubbleEditorContentConfig)
+  const variables = useTypebotVariables()
+  const sanitizedHtml = sanitizeBubbleHtml(html)
 
   return !renderIfEmpty && !sanitizedHtml ? (
     <></>
@@ -34,8 +34,8 @@ export const TextHtmlContent = ({
       className="slate-html-container"
       dangerouslySetInnerHTML={{
         __html:
-          sanitizedHtml && typebot
-            ? parseVariableHighlight(sanitizedHtml, typebot)
+          sanitizedHtml && variables
+            ? parseVariableHighlight(sanitizedHtml, { variables } as Typebot)
             : `<p>${defaultPlaceholder || 'Configurar...'}</p>`,
       }}
       fontSize={fontSize}

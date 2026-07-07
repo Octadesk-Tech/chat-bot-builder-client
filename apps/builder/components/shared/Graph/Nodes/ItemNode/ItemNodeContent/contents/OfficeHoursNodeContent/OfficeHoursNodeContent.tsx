@@ -1,5 +1,4 @@
 import { Stack, Tag, Text, Flex, Wrap } from '@chakra-ui/react'
-import { useTypebot } from 'contexts/TypebotContext'
 import {
   Comparison,
   ConditionItem,
@@ -14,8 +13,6 @@ type Props = {
 }
 
 export const OfficeHoursNodeContent = ({ item }: Props) => {
-  const { typebot } = useTypebot()
-
   return (
     <Container>
       {item.content.values.map((value, idx) => (
