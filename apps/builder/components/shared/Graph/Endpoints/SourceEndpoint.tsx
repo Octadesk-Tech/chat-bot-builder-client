@@ -1,8 +1,7 @@
 import { BoxProps, Flex } from '@chakra-ui/react'
 import { useCoordinatesReady, useGraph } from 'contexts/GraphContext'
-import { useTypebotExtras } from 'contexts/TypebotContext'
 import { Source } from 'models'
-import React, { MouseEvent, useEffect, useRef, useState } from 'react'
+import React, { MouseEvent, useEffect, useRef } from 'react'
 
 export const SourceEndpoint = ({
   source,
@@ -10,7 +9,6 @@ export const SourceEndpoint = ({
 }: BoxProps & {
   source: Source
 }) => {
-  const [ranOnce, setRanOnce] = useState(false)
   const { setConnectingIds, addSourceEndpoint, removeSourceEndpoint, previewingEdge } = useGraph()
   const coordinatesReady = useCoordinatesReady()
   const ref = useRef<HTMLDivElement | null>(null)
@@ -22,13 +20,12 @@ export const SourceEndpoint = ({
   }
 
   useEffect(() => {
-    if (ranOnce || !ref.current || !coordinatesReady) return
+    if (!ref.current || !coordinatesReady) return
     const id = source.itemId ?? source.stepId
     addSourceEndpoint({ id, ref })
-    setRanOnce(true)
     return () => removeSourceEndpoint(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref.current, coordinatesReady])
+  }, [coordinatesReady])
 
   return (
     <Flex
