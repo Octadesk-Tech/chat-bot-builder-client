@@ -158,7 +158,7 @@ export const WhatsAppButtonsListSettingsBody = ({
     index: number
   ) => {
     return (
-      <Box>
+      <Box key={(message as any)?.id ?? `fallback-${index}`}>
         <FormLabel mb="0" htmlFor="placeholder" fontWeight="bold" fontSize="sm">
           Mensagem para resposta inválida - Tentativa {index + 1}
         </FormLabel>

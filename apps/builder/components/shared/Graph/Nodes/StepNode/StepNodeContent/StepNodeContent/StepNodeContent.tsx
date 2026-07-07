@@ -186,7 +186,7 @@ export const StepNodeContent = ({ step, indices }: Props) => {
       return <WOZSuggestionContent step={step} />
     }
     case WOZStepType.INTERPRET_DATA_WITH_AI: {
-      return <WOZInterpretDataWithAIContent step={step} />
+      return <WOZInterpretDataWithAIContent step={step} indices={indices} />
     }
     case WOZStepType.ASSIGN: {
       return <WOZAssignContent step={step} indices={indices} />

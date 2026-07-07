@@ -15,7 +15,7 @@ enum ActionType {
 export interface Actions<T> {
   set: (
     newPresent: T | ((current: T) => T),
-    options?: { updateDate?: boolean; skipConnectionsUpdate?: boolean }
+    options?: { updateDate?: boolean; skipHistory?: boolean; skipConnectionsUpdate?: boolean  }
   ) => void
   undo: () => void
   redo: () => void
@@ -29,6 +29,7 @@ interface Action<T> {
   type: ActionType
   newPresent?: T
   updateDate?: boolean
+  skipHistory?: boolean
 }
 
 export interface State<T> {
@@ -77,10 +78,11 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
     }
 
     case ActionType.Set: {
-      const { newPresent, updateDate } = action
+      const { newPresent, updateDate, skipHistory } = action
       // dequal direto faz comparação estrutural profunda com early-exit (para no
       // 1º campo diferente — o caso comum de uma edição real). Antes serializava
       // o fluxo INTEIRO 2× com JSON.stringify + parseava 2× a cada mutação.
+
       if (
         isNotDefined(newPresent) ||
         (present && dequal(newPresent, present))
@@ -88,14 +90,23 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
         return state
       }
 
+      const nextPresent = {
+        ...newPresent,
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        //@ts-ignore
+        updatedAt: updateDate ? new Date() : newPresent.updatedAt,
+      }
+
+      if (skipHistory) {
+        return {
+          ...state,
+          present: nextPresent,
+        }
+      }
+
       return {
         past: [...past, present].filter(isDefined),
-        present: {
-          ...newPresent,
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          //@ts-ignore
-          updatedAt: updateDate ? new Date() : newPresent.updatedAt,
-        },
+        present: nextPresent,
         future: [],
       }
     }
@@ -130,14 +141,14 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
   const set = useCallback(
     (
       newPresent: T | ((current: T) => T),
-      options: { updateDate?: boolean; skipConnectionsUpdate?: boolean } = {}
+      options: { updateDate?: boolean; skipHistory?: boolean; skipConnectionsUpdate?: boolean } = {}
     ) => {
-      const { updateDate = true, skipConnectionsUpdate = false } = options
+      const { updateDate = true, skipHistory = false, skipConnectionsUpdate = false } = options
+
       const updatedTypebot =
         'id' in newPresent
           ? newPresent
           : (newPresent as (current: T) => T)(presentRef.current)
-      presentRef.current = updatedTypebot
 
       // `hasConnection` só depende de edges + estrutura de steps. Em updates que
       // não alteram conexões (ex.: coordenadas de bloco no commit do drag), o
@@ -147,10 +158,19 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
         updatedTypebot.blocks = updateBlocksHasConnections(updatedTypebot)
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const newUpdatedAt = updateDate ? new Date() : (updatedTypebot as any)?.updatedAt
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      presentRef.current = updatedTypebot != null
+        ? ({ ...(updatedTypebot as any), updatedAt: newUpdatedAt } as T)
+        : (updatedTypebot as T)
+
       dispatch({
         type: ActionType.Set,
         newPresent: updatedTypebot,
         updateDate,
+        skipHistory
       })
     },
     []

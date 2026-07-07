@@ -42,6 +42,7 @@ import {
   Step,
   TextBubbleContent,
   WOZAssignStep,
+  WOZInterpretDataWithAI,
   WOZSuggestionStep,
   WOZStepType,
   WebhookStep,
@@ -262,7 +263,8 @@ const StepNodeBase = ({
       !isWhatsAppButtonsListStep(step) &&
       !isWozAssignStep(step) &&
       !isChatReturn(step) &&
-      !isWozSuggestionStep(step)
+      !isWozSuggestionStep(step) &&
+      !isInterpretDataWithAIWithItems(step)
     )
   }
 
@@ -530,4 +532,14 @@ const hasStepRedirectCheckAvailability = (
 
 const isChatReturn = (step: Step): step is ChatReturnStep => {
   return step.type === LogicStepType.CHAT_RETURN
+}
+
+const isInterpretDataWithAIWithItems = (
+  step: Step
+): step is WOZInterpretDataWithAI => {
+  return (
+    step.type === WOZStepType.INTERPRET_DATA_WITH_AI &&
+    Array.isArray((step as WOZInterpretDataWithAI).items) &&
+    (step as WOZInterpretDataWithAI).items.length > 0
+  )
 }

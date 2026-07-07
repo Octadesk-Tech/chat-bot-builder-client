@@ -286,21 +286,26 @@ export const TypebotContext = ({
       new Date(typebot.updatedAt) >
       new Date(currentTypebotRef.current.updatedAt)
     ) {
-      setLocalTypebot({ ...parsedTypebot })
+      setLocalTypebot({ ...parsedTypebot }, { skipHistory: true })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [typebot])
 
   useEffect(() => {
-    if (!localTypebot) return
-    const hasBlocksWithoutConection = localTypebot.blocks.some(
+    const currentTypebot = currentTypebotRef.current
+
+    if (!currentTypebot) return
+
+    const hasBlocksWithoutConection = currentTypebot.blocks.some(
       (b) => !b.hasConnection
     )
+
     const hasPendingIssues = hasBlocksWithoutConection || emptyFields.length > 0
 
-    if (localTypebot?.hasPendingIssues === hasPendingIssues) return
+    if (currentTypebot.hasPendingIssues === hasPendingIssues) return
 
-    updateLocalTypebot({ hasPendingIssues })
+    setLocalTypebot({ ...currentTypebot, hasPendingIssues }, { skipHistory: true })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localTypebot?.edges, emptyFields])
 
   const saveTypebot = async (
@@ -332,11 +337,14 @@ export const TypebotContext = ({
     }
 
     if (!options?.disableMutation)
-      mutate({
-        typebot: typebotToSave,
-        publishedTypebot,
-        webhooks: webhooks ?? [],
-      })
+      mutate(
+        {
+          typebot: typebotToSave,
+          publishedTypebot,
+          webhooks: webhooks ?? [],
+        },
+        { revalidate: false }
+      )
     window.removeEventListener('beforeunload', preventUserFromRefreshing)
 
     return { saved: true, updateAt: typebotToSave.updatedAt }
@@ -350,11 +358,14 @@ export const TypebotContext = ({
     )
     setIsPublishing(false)
     if (error) return toast({ title: error.name, description: error.message })
-    mutate({
-      typebot: currentTypebotRef.current as Typebot,
-      publishedTypebot: newPublishedTypebot,
-      webhooks: webhooks ?? [],
-    })
+    mutate(
+      {
+        typebot: currentTypebotRef.current as Typebot,
+        publishedTypebot: newPublishedTypebot,
+        webhooks: webhooks ?? [],
+      },
+      { revalidate: false }
+    )
   }
 
   useEffect(() => {
@@ -928,6 +939,7 @@ export const useFetchedTypebot = ({
     Error
   >(`/getTypebot-${typebotId}`, fetcher, {
     dedupingInterval: 60000 * 60 * 24,
+    revalidateOnFocus: false,
   })
 
   if (error) onError(error)

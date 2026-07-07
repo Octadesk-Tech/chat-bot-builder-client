@@ -28,7 +28,7 @@ import {
   StepWithItems,
   WOZAssignStep,
   WOZStepType,
-  TimeTypeValue
+  TimeTypeValue,
 } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
 import { SourceEndpoint } from '../../../Endpoints'
@@ -230,20 +230,22 @@ export const ItemNodesList = ({
       )}
       {step.type === IntegrationStepType.EXTERNAL_EVENT && (
         <Container>
-          <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">{step?.options?.url || "Clique para editar..."}</Text>
+          <Text whiteSpace="nowrap" overflow="hidden" textOverflow="ellipsis">
+            {step?.options?.url || 'Clique para editar...'}
+          </Text>
         </Container>
       )}
       {step.type === LogicStepType.CHAT_RETURN && (
         <ChatReturnContainer>
-          {chatReturn?.time && chatReturn?.timeType && !chatReturn?.validationError ?
-            (
-              <Text noOfLines={0}>{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
-            )
-            :
-            (
-              <Text noOfLines={0}>{'Configurar...'}</Text>
-            )
-          }
+          {chatReturn?.time &&
+          chatReturn?.timeType &&
+          !chatReturn?.validationError ? (
+            <Text
+              noOfLines={0}
+            >{`Tempo máximo: ${chatReturn.time} ${chatReturn.timeType}`}</Text>
+          ) : (
+            <Text noOfLines={0}>{'Configurar...'}</Text>
+          )}
         </ChatReturnContainer>
       )}
       {isStepWithItems && (
@@ -280,6 +282,7 @@ export const ItemNodesList = ({
         step.type !== OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
         step.type !== OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
         step.type !== WOZStepType.ASSIGN &&
+        step.type !== WOZStepType.INTERPRET_DATA_WITH_AI &&
         step.type !== LogicStepType.CHAT_RETURN && (
           <Flex
             px="4"
