@@ -160,7 +160,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
 
   const effectPathChange = () => {
     const pathPortion = getValues('pathPortion')
-    handleVariablesHashList(pathPortion)
+    rebuildVariablesForTest({ path: pathPortion })
 
     if (isTriggerWebhookTarget(step.options.url, pathPortion)) {
       setError('url', { type: 'loop', message: TRIGGER_LOOP_MESSAGE })
@@ -242,10 +242,49 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     }
   }
 
-  const handleVariablesHashList = (variablesHashList: string) => {
-    const webhookUrlVariables = variablesHashList.split('/')
+  const rebuildVariablesForTest = (
+    overrides: {
+      path?: string
+      headers?: QueryParameters[]
+      parameters?: QueryParameters[]
+    } = {}
+  ) => {
+    const currentPath = overrides.path ?? step.options.path ?? ''
+    const currentHeaders = overrides.headers ?? step.options.headers ?? []
+    const currentParameters = overrides.parameters ?? step.options.parameters ?? []
+    const currentBody = step.options.body ?? ''
 
-    handleAddedVariables(webhookUrlVariables)
+    const pathTokens = currentPath
+      .split('/')
+      .filter((segment) => typebot?.variables.some((v) => v.token === segment))
+
+    const headerTokens = currentHeaders
+      .filter((h) => h.properties?.token)
+      .map((h) => h.properties!.token)
+
+    const paramTokens = currentParameters
+      .filter((p) => p.properties?.token)
+      .map((p) => p.properties!.token)
+
+    const bodyTokens = (typebot?.variables ?? [])
+      .filter((v) => currentBody.includes(v.token))
+      .map((v) => v.token)
+
+    const allTokens = new Set([
+      ...pathTokens,
+      ...headerTokens,
+      ...paramTokens,
+      ...bodyTokens,
+    ])
+
+    const existing = step.options.variablesForTest ?? []
+    step.options.variablesForTest = [...allTokens]
+      .map(
+        (token) =>
+          existing.find((e) => e.token === token) ??
+          (typebot?.variables.find((v) => v.token === token) as VariableForTest)
+      )
+      .filter(Boolean)
   }
 
   const handleParams = (url: string) => {
@@ -311,11 +350,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   }
 
   const handleQueryParamsChange = (parameters: QueryParameters[]) => {
-    const properties = parameters.flatMap((p) => p.properties).filter((s) => s)
-
-    if (properties?.length) {
-      handleAddedVariables(properties.map((s) => s?.token))
-    }
+    rebuildVariablesForTest({ parameters })
 
     onOptionsChange({
       ...step.options,
@@ -324,11 +359,7 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   }
 
   const handleHeadersChange = (headers: QueryParameters[]) => {
-    const properties = headers.flatMap((p) => p.properties).filter((s) => s)
-
-    if (properties?.length) {
-      handleAddedVariables(properties.map((s) => s?.token))
-    }
+    rebuildVariablesForTest({ headers })
 
     onOptionsChange({
       ...step.options,
@@ -343,7 +374,13 @@ export const WebhookSettings = React.memo(function WebhookSettings({
   ) => {
     setPrevSelectedVariablesForTest(step.options.variablesForTest)
 
-    handleAddedVariables([variable?.token])
+    const existing = step.options.variablesForTest ?? []
+    if (!existing.some((e) => e.token === variable.token)) {
+      step.options.variablesForTest = [
+        ...existing,
+        variable as unknown as VariableForTest,
+      ]
+    }
   }
 
   const getUnusedParams = (body: string) => {
@@ -381,41 +418,10 @@ export const WebhookSettings = React.memo(function WebhookSettings({
     setPrevSelectedVariablesForTest(undefined)
   }
 
-  const handleAddedVariables = (addedVariables: Array<string | undefined>) => {
-    const selectedVariables = addedVariables
-      .flatMap((addedVar: string | undefined) => {
-        return typebot?.variables.filter(
-          (variable) => variable.token === addedVar
-        )
-      })
-      .filter((s: Variable | undefined) => s) as Array<VariableForTest>
-
-    handleVariablesForTestChange(selectedVariables)
-  }
-
-  type aggregate = {
-    keys: Array<string>
-    variables: Array<VariableForTest>
-  }
-
   const handleVariablesForTestChange = (
     variablesForTest: VariableForTest[]
   ) => {
-    const toTest = [
-      ...variablesForTest,
-      ...(step.options.variablesForTest || []),
-    ].reduce(
-      (agg: aggregate, curr: VariableForTest) => {
-        if (!agg.keys.includes(curr.token)) {
-          agg.keys.push(curr.token)
-          agg.variables.push(curr)
-        }
-        return agg
-      },
-      { keys: [], variables: [] }
-    )
-
-    step.options.variablesForTest = toTest.variables
+    step.options.variablesForTest = variablesForTest
   }
 
   const handleResponseMappingChange = (
@@ -742,23 +748,25 @@ export const WebhookSettings = React.memo(function WebhookSettings({
               </AccordionPanel>
             </AccordionItem>
           )}
-          <AccordionItem>
-            <AccordionButton justifyContent="space-between">
-              Valores variáveis para teste
-              <AccordionIcon />
-            </AccordionButton>
-            <AccordionPanel pb={4} as={Stack} spacing="6">
-              <TableList<VariableForTest>
-                initialItems={step.options?.variablesForTest as any}
-                onItemsChange={handleVariablesForTestChange}
-                itemsList={step.options.variablesForTest}
-                Item={VariableForTestInputs}
-                addLabel="Adicionar variável"
-                shouldHideButton={true}
-                debounceTimeout={5}
-              />
-            </AccordionPanel>
-          </AccordionItem>
+          {!!step.options.variablesForTest?.length && (
+            <AccordionItem>
+              <AccordionButton justifyContent="space-between">
+                Valores variáveis para teste
+                <AccordionIcon />
+              </AccordionButton>
+              <AccordionPanel pb={4} as={Stack} spacing="6">
+                <TableList<VariableForTest>
+                  initialItems={step.options?.variablesForTest as any}
+                  onItemsChange={handleVariablesForTestChange}
+                  itemsList={step.options.variablesForTest}
+                  Item={VariableForTestInputs}
+                  addLabel="Adicionar variável"
+                  shouldHideButton={true}
+                  debounceTimeout={5}
+                />
+              </AccordionPanel>
+            </AccordionItem>
+          )}
         </Accordion>
       </Stack>
       )
