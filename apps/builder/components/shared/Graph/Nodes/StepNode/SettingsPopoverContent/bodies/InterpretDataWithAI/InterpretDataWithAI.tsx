@@ -48,6 +48,7 @@ export const InterpretDataWithAI = ({
     success,
     isLoading,
     whoIsConnectedOnMyBlock,
+    isNonGetMethod,
     testReturn,
     refetch,
   } = useInterpretDataWithAI({ step })
@@ -262,7 +263,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
       )
     }
 
-    if (!success && isAutomatedTasksBot) {
+    if (!success && isAutomatedTasksBot && !isNonGetMethod) {
       return (
         <Stack>
           <Text color="red">
@@ -407,7 +408,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
         />
       </Stack>
     )
-  }, [data, success, isLoading, whoIsConnectedOnMyBlock, isTesting, step])
+  }, [data, success, isLoading, whoIsConnectedOnMyBlock, isNonGetMethod, isTesting, step])
 
   return (
     <Stack>
