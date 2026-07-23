@@ -1,12 +1,17 @@
-import { Coordinates, useGraph } from 'contexts/GraphContext'
-import React, { useEffect, useMemo, useState } from 'react'
+import {
+  Coordinates,
+  useBlockCoordinates,
+  useGraph,
+  useGraphPosition,
+} from 'contexts/GraphContext'
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react'
 import {
   getAnchorsPosition,
   computeEdgePath,
   getEndpointTopOffset,
   getSourceEndpointId,
 } from 'services/graph'
-import { Block, Edge as EdgeProps } from 'models'
+import { Edge as EdgeProps } from 'models'
 import { Portal, useDisclosure } from '@chakra-ui/react'
 import { useTypebot } from 'contexts/TypebotContext'
 import { EdgeMenu } from './EdgeMenu'
@@ -19,63 +24,70 @@ export type AnchorsPositionProps = {
   totalSegments: number
 }
 
-export const Edge = ({
-  edge,
-  block,
-  visibleItems,
-}: {
-  edge: EdgeProps
-  block: Block
-  visibleItems: Block[]
-}) => {
+export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
   const { deleteEdge } = useTypebot()
   const {
     previewingEdge,
     sourceEndpoints,
     targetEndpoints,
-    blocksCoordinates,
-    graphPosition,
     isReadOnly,
     setPreviewingEdge,
   } = useGraph()
+  const { graphPosition } = useGraphPosition()
   const [isMouseOver, setIsMouseOver] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [edgeMenuPosition, setEdgeMenuPosition] = useState({ x: 0, y: 0 })
 
   const isPreviewing = isMouseOver || previewingEdge?.id === edge.id
 
-  const sourceBlockCoordinates =
-    blocksCoordinates && blocksCoordinates[edge.from.blockId]
-  const targetBlockCoordinates =
-    blocksCoordinates && blocksCoordinates[edge.to.blockId]
+  const sourceBlockCoordinates = useBlockCoordinates(edge.from.blockId)
+  const targetBlockCoordinates = useBlockCoordinates(edge.to.blockId)
 
-  const sourceTop = useMemo(() => {
-    if (!sourceEndpoints || !graphPosition) return 0
-    return getEndpointTopOffset({
+  const sourceOffsetRef = useRef<number>(20)
+  const targetOffsetRef = useRef<number>(20)
+
+  useMemo(() => {
+    if (!sourceEndpoints || !graphPosition) return
+    const domTop = getEndpointTopOffset({
       endpoints: sourceEndpoints,
       graphOffsetY: graphPosition.y,
       endpointId: getSourceEndpointId(edge),
       graphScale: graphPosition.scale,
     })
+    if (domTop !== undefined && sourceBlockCoordinates)
+      sourceOffsetRef.current = domTop - sourceBlockCoordinates.y
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sourceEndpoints, graphPosition?.y, graphPosition?.scale, edge])
 
-  const targetTop = useMemo(() => {
-    if (!targetEndpoints || !graphPosition) return 0
-    return getEndpointTopOffset({
+  useMemo(() => {
+    if (!targetEndpoints || !graphPosition || !edge?.to.stepId) return
+    const domTop = getEndpointTopOffset({
       endpoints: targetEndpoints,
       graphOffsetY: graphPosition.y,
-      endpointId: edge?.to.stepId,
+      endpointId: edge.to.stepId,
       graphScale: graphPosition.scale,
     })
-  }, [targetEndpoints, graphPosition?.y, edge?.to.stepId, graphPosition?.scale])
+    if (domTop !== undefined && targetBlockCoordinates)
+      targetOffsetRef.current = domTop - targetBlockCoordinates.y
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetEndpoints, graphPosition?.y, graphPosition?.scale, edge?.to.stepId])
+
+  const sourceTop = sourceBlockCoordinates
+    ? sourceBlockCoordinates.y + sourceOffsetRef.current
+    : undefined
+
+  const targetTop =
+    edge?.to.stepId && targetBlockCoordinates
+      ? targetBlockCoordinates.y + targetOffsetRef.current
+      : undefined
 
   const path = useMemo(() => {
-    if (!sourceBlockCoordinates || !targetBlockCoordinates || !sourceTop)
-      return ``
+    if (!sourceBlockCoordinates || !targetBlockCoordinates) return ``
+    const effectiveSourceTop = sourceTop ?? sourceBlockCoordinates.y + 20
     const anchorsPosition = getAnchorsPosition({
       sourceBlockCoordinates,
       targetBlockCoordinates,
-      sourceTop,
+      sourceTop: effectiveSourceTop,
       targetTop,
       graphScale: graphPosition.scale,
     })
@@ -144,14 +156,16 @@ export const Edge = ({
         markerEnd={isPreviewing ? 'url(#blue-arrow)' : 'url(#arrow)'}
         fill="none"
       />
-      <Portal>
-        <EdgeMenu
-          isOpen={isOpen}
-          position={edgeMenuPosition}
-          onDeleteEdge={handleDeleteEdge}
-          onClose={onClose}
-        />
-      </Portal>
+      {isOpen && (
+        <Portal>
+          <EdgeMenu
+            isOpen={isOpen}
+            position={edgeMenuPosition}
+            onDeleteEdge={handleDeleteEdge}
+            onClose={onClose}
+          />
+        </Portal>
+      )}
     </>
   )
-}
+})

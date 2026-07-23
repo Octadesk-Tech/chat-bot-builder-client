@@ -13,10 +13,14 @@ import {
   Dispatch,
   ReactNode,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
+  useSyncExternalStore,
 } from 'react'
 import {
   createPublishedTypebot,
@@ -76,7 +80,8 @@ type SaveResponse = {
 }
 
 export type SetTypebot = (
-  newPresent: Typebot | ((current: Typebot) => Typebot)
+  newPresent: Typebot | ((current: Typebot) => Typebot),
+  options?: { updateDate?: boolean; skipConnectionsUpdate?: boolean }
 ) => void
 export type SetEmptyFields = (
   values: EmptyFields[] | string[],
@@ -129,6 +134,55 @@ const typebotContext = createContext<
     VariablesActions &
     EdgesActions
 >({} as any)
+
+export type TypebotActions = BlocksActions &
+  StepsActions &
+  ItemsActions &
+  VariablesActions &
+  EdgesActions
+const typebotActionsContext = createContext<TypebotActions>(
+  {} as TypebotActions
+)
+
+class TypebotStore {
+  private typebot?: Typebot
+  private emptyFields: EmptyFields[] = []
+  private listeners = new Set<() => void>()
+
+  setSnapshot = (typebot: Typebot | undefined, emptyFields: EmptyFields[]) => {
+    this.typebot = typebot
+    this.emptyFields = emptyFields
+  }
+
+  getTypebot = (): Typebot | undefined => this.typebot
+  getEmptyFields = (): EmptyFields[] => this.emptyFields
+
+  subscribe = (listener: () => void): (() => void) => {
+    this.listeners.add(listener)
+    return () => {
+      this.listeners.delete(listener)
+    }
+  }
+
+  emit = () => {
+    this.listeners.forEach((listener) => listener())
+  }
+}
+
+const typebotStoreContext = createContext<TypebotStore>(new TypebotStore())
+
+type TypebotExtras = {
+  octaAgents: Array<any>
+  octaGroups: Array<any>
+  botFluxesList: Array<any>
+  tagsList: Array<any>
+  wozProfiles?: Array<any>
+  customVariables: ICustomVariable[]
+  linkedTypebots?: Typebot[]
+  setHideEdges: Dispatch<SetStateAction<boolean>>
+  setEmptyFields: SetEmptyFields
+}
+const typebotExtrasContext = createContext<TypebotExtras>({} as TypebotExtras)
 
 export const TypebotContext = ({
   children,
@@ -660,6 +714,56 @@ export const TypebotContext = ({
 
   const { wozProfiles } = useWozProfiles()
 
+  const typebotStoreRef = useRef<TypebotStore>()
+  if (!typebotStoreRef.current) typebotStoreRef.current = new TypebotStore()
+  const typebotStore = typebotStoreRef.current
+  typebotStore.setSnapshot(localTypebot, emptyFields)
+  useLayoutEffect(() => {
+    typebotStore.emit()
+  }, [localTypebot, typebotStore])
+
+  const extrasValue = useMemo<TypebotExtras>(
+    () => ({
+      octaAgents,
+      octaGroups,
+      botFluxesList,
+      tagsList,
+      wozProfiles,
+      customVariables,
+      linkedTypebots,
+      setHideEdges,
+      setEmptyFields,
+    }),
+    [
+      octaAgents,
+      octaGroups,
+      botFluxesList,
+      tagsList,
+      wozProfiles,
+      customVariables,
+      linkedTypebots,
+      setHideEdges,
+      setEmptyFields,
+    ]
+  )
+
+  const actions = useMemo(
+    () => ({
+      ...blocksActions(
+        setLocalTypebot as SetTypebot,
+        setEmptyFields as SetEmptyFields
+      ),
+      ...stepsAction(
+        setLocalTypebot as SetTypebot,
+        setEmptyFields as SetEmptyFields
+      ),
+      ...variablesAction(setLocalTypebot as SetTypebot),
+      ...edgesAction(setLocalTypebot as SetTypebot),
+      ...itemsAction(setLocalTypebot as SetTypebot),
+    }),
+    [setLocalTypebot, setEmptyFields]
+  )
+
   const contextValue = useMemo(() => {
     return {
       domain,
@@ -686,17 +790,7 @@ export const TypebotContext = ({
       restorePublishedTypebot,
       updateOnBothTypebots,
       updateWebhook,
-      ...blocksActions(
-        setLocalTypebot as SetTypebot,
-        setEmptyFields as SetEmptyFields
-      ),
-      ...stepsAction(
-        setLocalTypebot as SetTypebot,
-        setEmptyFields as SetEmptyFields
-      ),
-      ...variablesAction(setLocalTypebot as SetTypebot),
-      ...edgesAction(setLocalTypebot as SetTypebot),
-      ...itemsAction(setLocalTypebot as SetTypebot),
+      ...actions,
       octaAgents,
       octaGroups,
       botFluxesList,
@@ -727,7 +821,7 @@ export const TypebotContext = ({
     restorePublishedTypebot,
     updateOnBothTypebots,
     updateWebhook,
-    setLocalTypebot,
+    actions,
     octaAgents,
     octaGroups,
     botFluxesList,
@@ -736,12 +830,58 @@ export const TypebotContext = ({
   ])
   return (
     <typebotContext.Provider value={contextValue}>
-      {children}
+      <typebotStoreContext.Provider value={typebotStore}>
+        <typebotExtrasContext.Provider value={extrasValue}>
+          <typebotActionsContext.Provider value={actions}>
+            {children}
+          </typebotActionsContext.Provider>
+        </typebotExtrasContext.Provider>
+      </typebotStoreContext.Provider>
     </typebotContext.Provider>
   )
 }
 
 export const useTypebot = () => useContext(typebotContext)
+
+export const useTypebotActions = () => useContext(typebotActionsContext)
+
+export const useTypebotExtras = () => useContext(typebotExtrasContext)
+
+export const useGetTypebot = () => {
+  const store = useContext(typebotStoreContext)
+  return store.getTypebot
+}
+
+export const useGetEmptyFields = () => {
+  const store = useContext(typebotStoreContext)
+  return store.getEmptyFields
+}
+
+export function useTypebotSelector<T>(
+  selector: (typebot: Typebot | undefined) => T
+): T {
+  const store = useContext(typebotStoreContext)
+  const lastTypebot = useRef<Typebot | undefined>(undefined)
+  const lastSelected = useRef<T>(undefined as unknown as T)
+  const hasValue = useRef(false)
+  const getSnapshot = () => {
+    const current = store.getTypebot()
+    if (!hasValue.current || lastTypebot.current !== current) {
+      lastTypebot.current = current
+      lastSelected.current = selector(current)
+      hasValue.current = true
+    }
+    return lastSelected.current
+  }
+  return useSyncExternalStore(store.subscribe, getSnapshot, getSnapshot)
+}
+
+export const useTypebotVariables = () =>
+  useTypebotSelector((t) => t?.variables)
+export const useTypebotEdges = () => useTypebotSelector((t) => t?.edges)
+export const useTypebotAvailableFor = () =>
+  useTypebotSelector((t) => t?.availableFor)
+export const useHasTypebot = () => useTypebotSelector((t) => !!t)
 
 export const useFetchedTypebot = ({
   typebotId,

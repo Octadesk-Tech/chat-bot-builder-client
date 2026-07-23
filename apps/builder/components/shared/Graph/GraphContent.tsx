@@ -1,11 +1,18 @@
 import { useTypebot } from 'contexts/TypebotContext'
-import React, { memo, useMemo } from 'react'
+import React, { memo, useDeferredValue, useMemo } from 'react'
 import { AnswersCount } from 'services/analytics'
 import { Edges } from './Edges'
 import { BlockNode } from './Nodes/BlockNode'
-import { useGraph } from 'contexts/GraphContext'
+import {
+  useGraph,
+  useGraphPosition,
+} from 'contexts/GraphContext'
 import { isItemVisible } from 'services/graph'
 import { Block } from 'models'
+
+export const LOD_SCALE_THRESHOLD = 0.5
+
+export const LOD_MIN_BLOCKS = 50
 
 type Props = {
   answersCounts?: AnswersCount[]
@@ -16,7 +23,12 @@ type Props = {
 const MyComponent = memo(
   ({ answersCounts, onUnlockProPlanClick, graphContainerRef }: Props) => {
     const { typebot, hideEdges } = useTypebot()
-    const { graphPosition, draggingBlockId, blocksCoordinates } = useGraph()
+    const { draggingBlockId } = useGraph()
+    const { graphPosition } = useGraphPosition()
+
+    const isSimplified =
+      (typebot?.blocks?.length ?? 0) > LOD_MIN_BLOCKS &&
+      graphPosition.scale < LOD_SCALE_THRESHOLD
 
     const visibleItems = useMemo(() => {
       if (!typebot?.blocks || !graphContainerRef.current) return []
@@ -25,13 +37,10 @@ const MyComponent = memo(
       const containerHeight = graphContainerRef.current.offsetHeight
 
       const baseVisible = typebot.blocks.filter((block) => {
-        const liveCoordinates =
-          blocksCoordinates[block.id] ?? block.graphCoordinates
-
-        if (!liveCoordinates) return false
+        if (!block.graphCoordinates) return false
 
         return isItemVisible(
-          { ...block, graphCoordinates: liveCoordinates },
+          block,
           graphPosition,
           containerWidth,
           containerHeight,
@@ -57,16 +66,23 @@ const MyComponent = memo(
       graphPosition,
       graphContainerRef,
       draggingBlockId,
-      blocksCoordinates,
     ])
+
+    const { items: renderedItems, simplified: renderedSimplified } =
+      useDeferredValue(
+        useMemo(
+          () => ({ items: visibleItems, simplified: isSimplified }),
+          [visibleItems, isSimplified]
+        )
+      )
 
     const visibleItemsMap = useMemo(() => {
       const map = new Map<string, Block>()
-      visibleItems.forEach((item) => {
+      renderedItems.forEach((item) => {
         map.set(item.id, item)
       })
       return map
-    }, [visibleItems])
+    }, [renderedItems])
 
     const visibleEdges = useMemo(() => {
       if (!typebot?.edges) return []
@@ -79,24 +95,27 @@ const MyComponent = memo(
       })
     }, [typebot?.edges, visibleItemsMap])
 
+    const blockIndexById = useMemo(() => {
+      const map = new Map<string, number>()
+      typebot?.blocks.forEach((b, i) => map.set(b.id, i))
+      return map
+    }, [typebot?.blocks])
+
     return (
       <>
-        {!hideEdges && (
-          <Edges
-            visibleItems={visibleItems}
+          {!hideEdges && <Edges
             edges={visibleEdges}
-            blocks={typebot?.blocks ?? []}
             answersCounts={answersCounts}
             onUnlockProPlanClick={onUnlockProPlanClick}
-          />
-        )}
+          />}
 
-        {visibleItems.map((block) => {
-          const blockIndex = typebot?.blocks.findIndex((b) => b.id === block.id)
+        {renderedItems.map((block) => {
+          const blockIndex = blockIndexById.get(block.id)
           return (
             <BlockNode
               block={block}
               blockIndex={blockIndex ?? 0}
+              simplified={renderedSimplified}
               key={block.id}
             />
           )

@@ -1,4 +1,4 @@
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotExtras } from 'contexts/TypebotContext'
 import { Options } from 'got'
 import { PreReserveStep } from 'models'
 import React, { useEffect, useState } from 'react'
@@ -11,7 +11,7 @@ type Props = {
 }
 
 const PreReserveContent = ({ step }: Props) => {
-  const { octaGroups } = useTypebot();
+  const { octaGroups } = useTypebotExtras();
 
   const [selectedGroup, setSelectedGroup] = useState<any>();
 

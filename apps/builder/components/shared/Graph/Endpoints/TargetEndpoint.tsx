@@ -10,15 +10,13 @@ export const TargetEndpoint = ({
   stepId: string
   isVisible?: boolean
 }) => {
-  const { addTargetEndpoint } = useGraph()
+  const { addTargetEndpoint, removeTargetEndpoint } = useGraph()
   const ref = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     if (!ref.current) return
-    addTargetEndpoint({
-      id: stepId,
-      ref,
-    })
+    addTargetEndpoint({ id: stepId, ref })
+    return () => removeTargetEndpoint(stepId)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ref])
 

@@ -9,11 +9,15 @@ import {
 } from '@chakra-ui/react'
 import React, { memo, useEffect, useRef, useState } from 'react'
 import { Block } from 'models'
-import { useGraph } from 'contexts/GraphContext'
+import { useBlockCoordinates, useGraph } from 'contexts/GraphContext'
 import { useStepDnd } from 'contexts/GraphDndContext'
 import { StepNodesList } from '../StepNode/StepNodesList'
 import { isDefined, isNotDefined } from 'utils'
-import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
+import {
+  useTypebotActions,
+  useTypebotAvailableFor,
+  useHasTypebot,
+} from 'contexts/TypebotContext/TypebotContext'
 import { ContextMenu } from 'components/shared/ContextMenu'
 import { BlockNodeContextMenu } from './BlockNodeContextMenu'
 import { useDebounce } from 'use-debounce'
@@ -26,25 +30,36 @@ import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
 type Props = {
   block: Block
   blockIndex: number
+  simplified?: boolean
 }
 
-export const BlockNode = memo(({ block, blockIndex }: Props) => {
+export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
   const {
     connectingIds,
     setConnectingIds,
     previewingEdge,
-    blocksCoordinates,
     updateBlockCoordinates,
     isReadOnly,
     focusedBlockId,
     setFocusedBlockId,
-    graphPosition,
+    getGraphPosition,
     setDraggingBlockId,
   } = useGraph()
 
-  const { typebot, updateBlock, deleteBlock, duplicateBlock } = useTypebot()
+  const blockCoordinates = useBlockCoordinates(block.id)
+
+  const { updateBlock, deleteBlock, duplicateBlock } = useTypebotActions()
+  const availableFor = useTypebotAvailableFor()
+  const hasTypebot = useHasTypebot()
 
   const { setMouseOverBlock, mouseOverBlock } = useStepDnd()
+
+  useEffect(() => {
+    return () => {
+      setMouseOverBlock((prev) => (prev?.id === block.id ? undefined : prev))
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const [isMouseDown, setIsMouseDown] = useState(false)
 
@@ -53,7 +68,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
   const [isFocused, setIsFocused] = useState(false)
 
   const availableOnlyForEvent =
-    typebot?.availableFor?.length == 1 && typebot.availableFor.includes('event')
+    availableFor?.length == 1 && availableFor.includes('event')
 
   const showWarning = !availableOnlyForEvent
 
@@ -64,8 +79,6 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   const isStartBlock =
     isDefined(block.steps[0]) && block.steps[0].type === 'start'
-
-  const blockCoordinates = blocksCoordinates[block.id]
 
   const blockRef = useRef<HTMLDivElement | null>(null)
 
@@ -119,11 +132,15 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
   const onDrag = (_: DraggableEvent, draggableData: DraggableData) => {
     _.preventDefault()
 
+    if (!blockCoordinates) return
+
     const { deltaX, deltaY } = draggableData
 
+    const { scale } = getGraphPosition()
+
     updateBlockCoordinates(block.id, {
-      x: blockCoordinates.x + deltaX / graphPosition.scale,
-      y: blockCoordinates.y + deltaY / graphPosition.scale,
+      x: blockCoordinates.x + deltaX / scale,
+      y: blockCoordinates.y + deltaY / scale,
     })
   }
 
@@ -155,7 +172,7 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
 
   const hasWarning = !block.hasConnection && showWarning
   const showEmptyConnectionAlert = () => !block.hasConnection && showWarning
-  const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
+  const isAutomatedTasksBot = availableFor?.includes('automated-tasks')
   const emptyConnectionMessage = `Este bloco precisa se conectar e/ou receber uma conexão de outro bloco.`
 
   return (
@@ -180,7 +197,9 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
               rounded="xl"
               bgColor="#ffffff"
               borderWidth="2px"
-              maxWidth="313px"
+              maxWidth={simplified ? '200px' : '313px'}
+              minWidth={simplified ? '313px' : undefined}
+              minHeight={simplified ? '200px' : undefined}
               borderColor={stackBorderColor(isOpened)}
               transition="border 300ms, box-shadow 200ms"
               pos="absolute"
@@ -205,7 +224,23 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                   : ''
               }
             >
-              <Flex justifyContent="space-between" alignItems="center" gap="2">
+              {simplified ? (
+                <div
+                  title={block.title}
+                  style={{
+                    fontWeight: 600,
+                    fontSize: '16px',
+                    overflow: 'hidden',
+                    whiteSpace: 'nowrap',
+                    textOverflow: 'ellipsis',
+                    padding: '0 4px',
+                    color: '#1B2A4A',
+                  }}
+                >
+                  {block.title || 'Sem título'}
+                </div>
+              ) : (
+                <Flex justifyContent="space-between" alignItems="center" gap="2">
                 <Editable
                   defaultValue={block.title}
                   onSubmit={handleTitleSubmit}
@@ -236,16 +271,33 @@ export const BlockNode = memo(({ block, blockIndex }: Props) => {
                   />
                 )}
               </Flex>
+            )
+            }
 
-              {typebot && (
-                <StepNodesList
-                  blockId={block.id}
-                  steps={block.steps}
-                  blockIndex={blockIndex}
-                  blockRef={ref}
-                  isStartBlock={isStartBlock}
-                />
-              )}
+              {hasTypebot &&
+                (simplified ? (
+                  <Stack spacing="2">
+                    {block.steps.map((step) => (
+                      <div
+                        key={step.id}
+                        style={{
+                          backgroundColor: '#E2E8F0',
+                          borderRadius: '6px',
+                          width: '100%',
+                          height: '120px',
+                        }}
+                      />
+                    ))}
+                  </Stack>
+                ) : (
+                  <StepNodesList
+                    blockId={block.id}
+                    steps={block.steps}
+                    blockIndex={blockIndex}
+                    blockRef={ref}
+                    isStartBlock={isStartBlock}
+                  />
+                ))}
 
               {isFocused && !isStartBlock && (
                 <SlideFade

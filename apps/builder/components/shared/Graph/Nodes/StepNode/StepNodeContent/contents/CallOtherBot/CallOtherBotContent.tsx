@@ -1,6 +1,6 @@
 import React from 'react'
 import { CallOtherBotOptions, CallOtherBotStep } from 'models'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotExtras } from 'contexts/TypebotContext'
 import { Stack, Text, chakra } from '@chakra-ui/react'
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 }
 
 export const CallOtherBotContent = ({ options }: Props) => {
-  const { botFluxesList } = useTypebot()
+  const { botFluxesList } = useTypebotExtras()
   const selectedBot = botFluxesList?.filter((item) => item.id === options)[0]
 
   return (

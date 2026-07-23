@@ -65,14 +65,13 @@ const blocksActions = (
       })
     ),
   updateBlock: (blockIndex: number, updates: Partial<Omit<Block, 'id'>>) => {
-    setTypebot((typebot) =>
-      produce(typebot, (typebot) => {
-        const block = typebot.blocks[blockIndex]
-
-        typebot.blocks[blockIndex] = { ...block, ...updates }
-
-        typebot.blocks = updateBlocksHasConnections(typebot)
-      })
+    setTypebot(
+      (typebot) =>
+        produce(typebot, (typebot) => {
+          const block = typebot.blocks[blockIndex]
+          typebot.blocks[blockIndex] = { ...block, ...updates }
+        }),
+      { skipConnectionsUpdate: !updates.steps }
     )
   },
   duplicateBlock: (blockIndex: number) => {

@@ -1,10 +1,10 @@
 import { Flex } from '@chakra-ui/react'
 import { StepTitle } from '../style'
 import { Block } from 'models'
-import { useGraph } from 'contexts/GraphContext'
+import { useGraphPosition } from 'contexts/GraphContext'
 
 const GroupsWithoutConnectionItem = ({ item }: { item: Block }) => {
-  const { setGraphPosition } = useGraph()
+  const { setGraphPosition } = useGraphPosition()
 
   const focusOnField = () => {
     if (!item.graphCoordinates) return
