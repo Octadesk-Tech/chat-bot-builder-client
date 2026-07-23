@@ -39,14 +39,11 @@ export const BoardMenuButtonSearch = (props: BoxProps) => {
   const [searchValue, setSearchValue] = useState('')
   const [debouncedValue] = useDebounce(searchValue, 300)
 
-  // Limpa a busca ao fechar — disparado por clique fora, Esc ou seleção.
   const handleClose = () => {
     setSearchValue('')
     onClose()
   }
 
-  // O painel flutua no centro-superior da tela, mas continua sendo um
-  // descendente DOM do container — então clicar nele não conta como "fora".
   useOutsideClick({
     ref: containerRef,
     handler: handleClose,

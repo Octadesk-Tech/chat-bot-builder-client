@@ -135,12 +135,6 @@ const typebotContext = createContext<
     EdgesActions
 >({} as any)
 
-/**
- * Context separado só para as ações de mutação (estáveis). Permite que
- * componentes que só precisam disparar mutações consumam `useTypebotActions()`
- * sem assinar os dados do typebot — evitando re-render a cada edição.
- * As mesmas ações continuam disponíveis em `useTypebot()` por compatibilidade.
- */
 export type TypebotActions = BlocksActions &
   StepsActions &
   ItemsActions &
@@ -150,14 +144,6 @@ const typebotActionsContext = createContext<TypebotActions>(
   {} as TypebotActions
 )
 
-/**
- * Store externo que espelha o `localTypebot` (+ `emptyFields`) para permitir
- * subscrição POR FATIA via `useSyncExternalStore`. Assim os componentes da
- * subárvore do nó (BlockNode/StepNode/conteúdos) assinam só o que usam
- * (ex.: `variables`, `edges`, um bloco) e não re-renderizam a cada edição do
- * typebot. Sob o immer, fatias não alteradas mantêm a mesma referência, então
- * o seletor faz bail-out por `Object.is`.
- */
 class TypebotStore {
   private typebot?: Typebot
   private emptyFields: EmptyFields[] = []
@@ -185,12 +171,6 @@ class TypebotStore {
 
 const typebotStoreContext = createContext<TypebotStore>(new TypebotStore())
 
-/**
- * Dados estáveis / de baixa frequência (listas auxiliares, variáveis custom,
- * typebots vinculados, setter de hideEdges...). Mudam só quando seus fetches
- * resolvem — não a cada edição do typebot. Componentes que leem apenas isto
- * deixam de re-renderizar ao editar steps.
- */
 type TypebotExtras = {
   octaAgents: Array<any>
   octaGroups: Array<any>
@@ -734,9 +714,6 @@ export const TypebotContext = ({
 
   const { wozProfiles } = useWozProfiles()
 
-  // Store que espelha o typebot para subscrição por fatia. Atualizamos a snapshot
-  // de forma síncrona em todo render (barato) para `getSnapshot` nunca ler stale,
-  // e notificamos os assinantes após o commit (layout effect) quando muda.
   const typebotStoreRef = useRef<TypebotStore>()
   if (!typebotStoreRef.current) typebotStoreRef.current = new TypebotStore()
   const typebotStore = typebotStoreRef.current
@@ -770,10 +747,6 @@ export const TypebotContext = ({
     ]
   )
 
-  // Ações memoizadas UMA vez: dependem só de setters estáveis
-  // (`setLocalTypebot` e `setEmptyFields` são `useCallback([])`). Antes eram
-  // recriadas a cada edição do typebot (estavam dentro do useMemo do value),
-  // o que invalidava deps de effects/memo em todos os ~90 consumidores.
   const actions = useMemo(
     () => ({
       ...blocksActions(
@@ -874,27 +847,16 @@ export const useTypebotActions = () => useContext(typebotActionsContext)
 
 export const useTypebotExtras = () => useContext(typebotExtrasContext)
 
-/**
- * Acessor NÃO-reativo do typebot atual — para uso em handlers/effects sem
- * assinar (não causa re-render). Para ler dados em render, use
- * `useTypebotSelector`.
- */
 export const useGetTypebot = () => {
   const store = useContext(typebotStoreContext)
   return store.getTypebot
 }
 
-/** Acessor não-reativo de emptyFields (uso em effects de validação). */
 export const useGetEmptyFields = () => {
   const store = useContext(typebotStoreContext)
   return store.getEmptyFields
 }
 
-/**
- * Subscreve uma FATIA do typebot. O componente só re-renderiza quando o valor
- * selecionado muda de identidade (`Object.is`). O seletor DEVE retornar uma
- * referência existente (fatia) ou primitivo — nunca um objeto recém-criado.
- */
 export function useTypebotSelector<T>(
   selector: (typebot: Typebot | undefined) => T
 ): T {
@@ -914,7 +876,6 @@ export function useTypebotSelector<T>(
   return useSyncExternalStore(store.subscribe, getSnapshot, getSnapshot)
 }
 
-/** Atalhos comuns construídos sobre `useTypebotSelector`. */
 export const useTypebotVariables = () =>
   useTypebotSelector((t) => t?.variables)
 export const useTypebotEdges = () => useTypebotSelector((t) => t?.edges)

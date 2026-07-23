@@ -43,11 +43,6 @@ export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
   const sourceBlockCoordinates = useBlockCoordinates(edge.from.blockId)
   const targetBlockCoordinates = useBlockCoordinates(edge.to.blockId)
 
-  // Offset do endpoint DENTRO do bloco (em coordenadas de mundo). É invariante à
-  // posição do bloco, então o medimos via DOM apenas quando o board/endpoints
-  // mudam (bloco em repouso, DOM bate com a coordenada). Durante o arraste de um
-  // bloco o Y do edge passa a ser `coordenada-live-do-bloco + offset` — segue o
-  // card sem `getBoundingClientRect` por frame.
   const sourceOffsetRef = useRef<number>(20)
   const targetOffsetRef = useRef<number>(20)
 
@@ -81,7 +76,6 @@ export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
     ? sourceBlockCoordinates.y + sourceOffsetRef.current
     : undefined
 
-  // Sem stepId é um alvo-bloco → ancora no topo do bloco (targetTop indefinido).
   const targetTop =
     edge?.to.stepId && targetBlockCoordinates
       ? targetBlockCoordinates.y + targetOffsetRef.current
@@ -89,10 +83,6 @@ export const Edge = memo(({ edge }: { edge: EdgeProps }) => {
 
   const path = useMemo(() => {
     if (!sourceBlockCoordinates || !targetBlockCoordinates) return ``
-    // Em LOD (zoom-out) o bloco vira caixa e não registra endpoints, então
-    // `sourceTop` fica indefinido. Caímos para uma âncora no topo do bloco de
-    // origem para o edge continuar visível (bloco-a-bloco). Em zoom normal o
-    // endpoint real é usado e a ancoragem é precisa.
     const effectiveSourceTop = sourceTop ?? sourceBlockCoordinates.y + 20
     const anchorsPosition = getAnchorsPosition({
       sourceBlockCoordinates,

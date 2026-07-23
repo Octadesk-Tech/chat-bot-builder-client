@@ -54,10 +54,6 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
 
   const { setMouseOverBlock, mouseOverBlock } = useStepDnd()
 
-  // Quando o bloco sai da viewport (virtualização), garante que mouseOverBlock
-  // seja zerado. Sem isso, o useEventListener em StepNodesList de OUTROS blocos
-  // mantém uma closure sobre a div deste bloco (já desanexada do documento),
-  // impedindo o GC até o próximo re-render daqueles componentes.
   useEffect(() => {
     return () => {
       setMouseOverBlock((prev) => (prev?.id === block.id ? undefined : prev))

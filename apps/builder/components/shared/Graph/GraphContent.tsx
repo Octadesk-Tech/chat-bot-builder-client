@@ -10,15 +10,8 @@ import {
 import { isItemVisible } from 'services/graph'
 import { Block } from 'models'
 
-// Abaixo deste zoom os blocos são renderizados em modo simplificado (LOD):
-// o conteúdo dos steps fica ilegível mesmo, então trocamos a subárvore pesada
-// (StepNodesList + previews + endpoints) por um resumo barato. É o que destrava
-// a navegação de bots gigantes em zoom-out (onde há centenas de blocos visíveis).
 export const LOD_SCALE_THRESHOLD = 0.5
 
-// LOD só vale a pena com muitos blocos. Abaixo deste total, manter sempre o
-// detalhe completo (não simplificar) — fluxos pequenos não têm o problema de
-// renderizar centenas de subárvores, e perder detalhe ali seria só prejuízo.
 export const LOD_MIN_BLOCKS = 50
 
 type Props = {
@@ -75,12 +68,6 @@ const MyComponent = memo(
       draggingBlockId,
     ])
 
-    // Renderiza a lista pesada de blocos em prioridade baixa: quando o conjunto
-    // visível muda (re-virtualização ao panar/dar zoom), o React mantém a lista
-    // antiga e monta a nova de forma interrompível, cedendo à interação — em vez
-    // de bloquear a main thread por um frame longo. `visibleItems` e
-    // `isSimplified` são deferidos juntos para o LOD e o conjunto ficarem sempre
-    // consistentes no mesmo render.
     const { items: renderedItems, simplified: renderedSimplified } =
       useDeferredValue(
         useMemo(
@@ -108,8 +95,6 @@ const MyComponent = memo(
       })
     }, [typebot?.edges, visibleItemsMap])
 
-    // Índice por id calculado uma vez — evita um findIndex O(n) por bloco visível
-    // (era O(visíveis × total) a cada re-virtualização).
     const blockIndexById = useMemo(() => {
       const map = new Map<string, number>()
       typebot?.blocks.forEach((b, i) => map.set(b.id, i))

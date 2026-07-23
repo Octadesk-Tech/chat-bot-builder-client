@@ -206,7 +206,6 @@ const StepNodeBase = ({
     setIsModalOpen(false)
     setIsEditing(false)
     setIsPopoverOpened(false)
-    // modalMounted is cleared by onCloseComplete after exit animation
   }
 
   const handleKeyUp = (content: TextBubbleContent) => {
