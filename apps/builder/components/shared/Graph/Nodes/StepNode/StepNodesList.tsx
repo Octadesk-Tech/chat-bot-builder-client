@@ -151,15 +151,10 @@ export const StepNodesList = ({
         setMousePositionInElement(relative)
         setDraggedStep(step)
       },
-    // setDraggedStep é um setter estável do useState; incluso para satisfazer o linter.
-    // setPosition e setMousePositionInElement também são setters estáveis, omitidos
-    // pois não afetam a identidade da função entre renders.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [isReadOnly, detachStepFromBlock, blockIndex, setDraggedStep]
   )
 
-  // Dep intencional: só recria quando steps são adicionados/removidos (length),
-  // não quando o conteúdo de um step muda — evitaria o ganho do memo em StepNode.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const stableIndices = useMemo(
     () => steps.map((_, idx) => ({ blockIndex, stepIndex: idx })),

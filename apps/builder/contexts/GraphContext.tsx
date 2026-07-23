@@ -64,15 +64,6 @@ export type BlocksCoordinates = IdMap<Coordinates>
 
 type CoordinatesListener = () => void
 
-/**
- * Store externo das coordenadas dos blocos.
- *
- * Mantém as coordenadas fora do `value` do React context para que arrastar um
- * bloco não recrie o context e re-renderize TODOS os consumidores. Cada
- * componente assina via `useSyncExternalStore` e só re-renderiza quando a fatia
- * que ele lê muda de identidade (a coordenada do seu próprio bloco, ou o objeto
- * inteiro para quem precisa de todas).
- */
 export class CoordinatesStore {
   private coordinates: BlocksCoordinates = {}
   private listeners = new Set<CoordinatesListener>()
@@ -128,12 +119,6 @@ export class CoordinatesStore {
   }
 }
 
-/**
- * Context isolado para a posição do grafo (pan/zoom). Separado do `graphContext`
- * para que mudanças de pan/zoom NÃO recriem o value do context principal e
- * re-renderizem todos os consumidores. Quem só precisa do `scale` em handlers
- * de drag deve usar `getGraphPosition()` (leitura imperativa, sem assinatura).
- */
 const graphPositionContext = createContext<{
   graphPosition: Position
   setGraphPosition: Dispatch<SetStateAction<Position>>
@@ -168,7 +153,7 @@ const graphContext = createContext<{
   coordinatesStore: CoordinatesStore
   getBlockCoordinates: (blockId?: string) => Coordinates | undefined
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore — default value intencional incompleto; o contexto só é consumido dentro de GraphProvider
+// @ts-ignore
 }>({
   connectingIds: null,
 })
@@ -183,7 +168,6 @@ export const GraphProvider = ({
   isReadOnly?: boolean
 }) => {
   const [graphPosition, setGraphPosition] = useState(graphPositionDefaultValue)
-  // Espelho síncrono da posição para leitura imperativa (sem assinatura).
   const graphPositionRef = useRef(graphPosition)
   graphPositionRef.current = graphPosition
   const getGraphPosition = useCallback(() => graphPositionRef.current, [])
@@ -354,10 +338,6 @@ export const useGraph = () => useContext(graphContext)
 
 export const useGraphPosition = () => useContext(graphPositionContext)
 
-/**
- * Assina a coordenada de UM bloco. O componente só re-renderiza quando a
- * coordenada desse bloco muda — arrastar outro bloco não o afeta.
- */
 export const useBlockCoordinates = (blockId?: string) => {
   const { coordinatesStore } = useContext(graphContext)
   const getSnapshot = useCallback(
@@ -371,10 +351,6 @@ export const useBlockCoordinates = (blockId?: string) => {
   )
 }
 
-/**
- * Assina o mapa completo de coordenadas. Use apenas onde realmente é preciso
- * conhecer todas (ex.: cálculo de visibilidade). Re-renderiza a cada mudança.
- */
 export const useAllBlocksCoordinates = (): BlocksCoordinates => {
   const { coordinatesStore } = useContext(graphContext)
   return useSyncExternalStore(
@@ -384,10 +360,6 @@ export const useAllBlocksCoordinates = (): BlocksCoordinates => {
   )
 }
 
-/**
- * Booleano que vira `true` quando as coordenadas iniciais foram carregadas.
- * Estável: só dispara re-render na transição false → true.
- */
 export const useCoordinatesReady = (): boolean => {
   const { coordinatesStore } = useContext(graphContext)
   return useSyncExternalStore(

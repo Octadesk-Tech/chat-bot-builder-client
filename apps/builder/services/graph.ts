@@ -306,9 +306,6 @@ export const getEndpointTopOffset = ({
 export const getSourceEndpointId = (edge?: Edge) =>
   edge?.from.itemId ?? edge?.from.stepId
 
-// Cache pela referência do array `steps` (estável sob immer enquanto o bloco não
-// muda). isItemVisible chama isto para TODO bloco a cada re-virtualização; sem
-// cache é O(total blocos × steps) por parada de pan.
 const itemHeightCache = new WeakMap<object, number>()
 
 export const computedItemHeight = (item: any) => {
@@ -343,8 +340,6 @@ export const isItemVisible = (
   const baseBuffer = totalBlocks > MAX_BLOCKS_BUFFER ? 30 : 80
   const scaleBuffer = Math.max(40, baseBuffer / scale)
 
-  // Cap proporcional ao container: evita que em zoom muito baixo o buffer
-  // inclua blocos excessivamente distantes da viewport em coordenadas de mundo.
   const rawBuffer = scaleBuffer + baseBuffer
   const bufferX = Math.min(rawBuffer, containerWidth * 0.10)
   const bufferY = Math.min(rawBuffer, containerHeight * 0.10)

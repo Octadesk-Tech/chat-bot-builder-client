@@ -468,9 +468,6 @@ export const Graph = memo(
             position="absolute"
             style={{
               transform,
-              // Sem easing ao arrastar bloco OU ao dar pan no board (arraste):
-              // o transform segue o cursor 1:1. Mantém o easing de 0.1s só para
-              // o scroll, onde ele suaviza os passos discretos da roda.
               transition: draggingBlockId || isMovingBoard ? '0s' : '0.1s',
             }}
             willChange="transform"
