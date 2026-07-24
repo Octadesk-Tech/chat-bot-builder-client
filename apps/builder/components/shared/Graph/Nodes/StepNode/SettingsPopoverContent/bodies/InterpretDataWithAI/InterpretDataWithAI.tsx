@@ -20,7 +20,9 @@ import {
   WOZInterpretDataWithAIOptions,
   WOZInterpretDataWithAIResponseFormat,
 } from 'models'
-import { useMemo, useState, useRef } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
+import { useDebouncedCallback } from 'use-debounce'
+import { isEmpty } from 'utils'
 import { useInterpretDataWithAI } from 'hooks/InterpretDataWithAI/useInterpretDataWithAI'
 import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
@@ -35,6 +37,92 @@ type Props = {
   indices: StepIndices
   onStepChange: (updates: Partial<Step>) => void
   onContentChange: (content: WOZInterpretDataWithAIOptions) => void
+}
+
+const INSTRUCTIONS_DEBOUNCE_MS = 500
+
+type InstructionsTextareaProps = {
+  initialValue: string
+  placeholder: string
+  responseKeys: string[]
+  responseKeyMenuItems: { id: number; label: string }[]
+  onChange: (value: string) => void
+}
+
+const InstructionsTextarea = ({
+  initialValue,
+  placeholder,
+  responseKeys,
+  responseKeyMenuItems,
+  onChange,
+}: InstructionsTextareaProps) => {
+  const [value, setValue] = useState<string>(initialValue)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const debouncedOnChange = useDebouncedCallback(
+    onChange,
+    isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? INSTRUCTIONS_DEBOUNCE_MS : 0
+  )
+
+  useEffect(() => () => debouncedOnChange.flush(), [debouncedOnChange])
+
+  const handleChange = (newValue: string) => {
+    setValue(newValue)
+    debouncedOnChange(newValue)
+  }
+
+  const handleVariableSelected = (variable: string) => {
+    if (!textareaRef.current) return
+
+    const textarea = textareaRef.current
+    const currentCursorPos = textarea.selectionStart
+
+    const beforeCursor = value.substring(0, currentCursorPos)
+    const afterCursor = value.substring(currentCursorPos)
+
+    const formattedVariable = `{{ ${variable} }}`
+    const newValue = beforeCursor + formattedVariable + afterCursor
+    const newCursorPosition = currentCursorPos + formattedVariable.length
+
+    setValue(newValue)
+    debouncedOnChange(newValue)
+
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(newCursorPosition, newCursorPosition)
+    }, 0)
+  }
+
+  return (
+    <Box w="full">
+      <Box position="relative" w="full">
+        <Textarea
+          ref={textareaRef}
+          placeholder={placeholder}
+          resize="none"
+          maxLength={5000}
+          minLength={1}
+          value={value}
+          onChange={(e) => handleChange(e.target.value)}
+          onBlur={() => debouncedOnChange.flush()}
+          rows={10}
+          paddingRight="45px"
+          className="scrollbar-custom flex-1"
+        />
+
+        {responseKeys.length > 0 && (
+          <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
+            <VariablesMenu
+              size="sm"
+              items={responseKeyMenuItems}
+              getLabel={(item) => item.label}
+              onSelect={(item) => handleVariableSelected(item.label)}
+            />
+          </Box>
+        )}
+      </Box>
+    </Box>
+  )
 }
 
 export const InterpretDataWithAI = ({
@@ -64,40 +152,6 @@ export const InterpretDataWithAI = ({
     position: 'top-right',
     status: 'error',
   })
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-
-  const handleInstructionsChange = (value: string) => {
-    onContentChange({
-      ...step.content,
-      systemMessage: value,
-    })
-  }
-
-  const handleVariableSelected = (variable: string) => {
-    if (!textareaRef.current) return
-
-    const textarea = textareaRef.current
-    const currentValue = textarea.value
-    const currentCursorPos = textarea.selectionStart
-
-    const beforeCursor = currentValue.substring(0, currentCursorPos)
-    const afterCursor = currentValue.substring(currentCursorPos)
-
-    const formattedVariable = `{{ ${variable} }}`
-    const newValue = beforeCursor + formattedVariable + afterCursor
-    const newCursorPosition = currentCursorPos + formattedVariable.length
-
-    onContentChange({
-      ...step.content,
-      systemMessage: newValue,
-    })
-
-    setTimeout(() => {
-      textarea.focus()
-      textarea.setSelectionRange(newCursorPosition, newCursorPosition)
-    }, 0)
-  }
 
   const stepDescription = useMemo(() => {
     if (isAutomatedTasksBot) {
@@ -176,7 +230,10 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
         data: JSON.stringify(data?.response) || '',
       })
 
-      setResultOfInterpretWithAi(result)
+      const normalizedResult =
+        typeof result === 'string' ? result : JSON.stringify(result)
+
+      setResultOfInterpretWithAi(normalizedResult || '')
     } catch (error) {
       toastError({
         title: 'Erro ao testar retorno',
@@ -336,37 +393,19 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
           <Text>{step?.content?.systemMessage?.length || 0}/5000</Text>
         </Stack>
         <VStack gap={4} w="full">
-          <Box w="full">
-            <Box position="relative" w="full">
-              <Textarea
-                ref={textareaRef}
-                placeholder={
-                  isAutomatedTasksBot
-                    ? placeholderInstructions
-                    : placeholderInstructionsEvents
-                }
-                resize="none"
-                maxLength={5000}
-                minLength={1}
-                value={step?.content?.systemMessage || ''}
-                onChange={(e) => handleInstructionsChange(e.target.value)}
-                rows={10}
-                paddingRight="45px"
-                className="scrollbar-custom flex-1"
-              />
-
-              {responseKeys.length > 0 && (
-                <Box position="absolute" bottom="14px" right="14px" zIndex={1}>
-                  <VariablesMenu
-                    size="sm"
-                    items={responseKeyMenuItems}
-                    getLabel={(item) => item.label}
-                    onSelect={(item) => handleVariableSelected(item.label)}
-                  />
-                </Box>
-              )}
-            </Box>
-          </Box>
+          <InstructionsTextarea
+            initialValue={step?.content?.systemMessage || ''}
+            placeholder={
+              isAutomatedTasksBot
+                ? placeholderInstructions
+                : placeholderInstructionsEvents
+            }
+            responseKeys={responseKeys}
+            responseKeyMenuItems={responseKeyMenuItems}
+            onChange={(value) =>
+              onContentChange({ ...step.content, systemMessage: value })
+            }
+          />
           {resultOfInterpretWithAi.length > 0 && (
             <Box
               w="full"
