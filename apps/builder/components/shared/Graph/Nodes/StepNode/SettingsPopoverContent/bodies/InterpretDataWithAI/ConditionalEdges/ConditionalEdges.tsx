@@ -16,6 +16,8 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { MdAdd, MdInfoOutline, MdClose } from 'react-icons/md'
 
 import { useTypebot } from 'contexts/TypebotContext'
+import { useDebouncedCallback } from 'use-debounce'
+import { isEmpty } from 'utils'
 
 type Props = {
   step: WOZInterpretDataWithAI
@@ -40,6 +42,8 @@ const createEmptyItem = (stepId: string): ConditionalEdgeItem => ({
   content: '',
 })
 
+const INSTRUCTIONS_DEBOUNCE_MS = 500
+
 const ConditionalEdges = ({ step, indices }: Props) => {
   const { deleteEdge, updateStep } = useTypebot()
   const initialItems = (step.items ?? []) as unknown as ConditionalEdgeItem[]
@@ -55,7 +59,14 @@ const ConditionalEdges = ({ step, indices }: Props) => {
 
   const isEnabled = items.length > 0
 
+  const debouncedUpdateStep = useDebouncedCallback(
+    (nextItems: ConditionalEdgeItem[]) =>
+      updateStep(indices, { items: nextItems } as unknown as Partial<Step>),
+    isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? INSTRUCTIONS_DEBOUNCE_MS : 0
+  )
+
   const persist = (nextItems: ConditionalEdgeItem[]) => {
+    debouncedUpdateStep.cancel()
     setItems(nextItems)
     updateStep(indices, { items: nextItems } as unknown as Partial<Step>)
   }
@@ -69,6 +80,9 @@ const ConditionalEdges = ({ step, indices }: Props) => {
   const indicesRef = useRef(indices)
   indicesRef.current = indices
 
+  const debouncedUpdateStepRef = useRef(debouncedUpdateStep)
+  debouncedUpdateStepRef.current = debouncedUpdateStep
+
   const handleToggle = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
       const existingEdgeId = stepRef.current.outgoingEdgeId
@@ -78,6 +92,7 @@ const ConditionalEdges = ({ step, indices }: Props) => {
       )
       persist(newItems)
     } else {
+      debouncedUpdateStep.cancel()
       items.forEach((it) => {
         if (it.outgoingEdgeId) deleteEdge(it.outgoingEdgeId)
       })
@@ -88,7 +103,8 @@ const ConditionalEdges = ({ step, indices }: Props) => {
 
   const handleUpdateItem = (index: number, content: string) => {
     const next = items.map((it, i) => (i === index ? { ...it, content } : it))
-    persist(next)
+    setItems(next)
+    debouncedUpdateStep(next)
   }
 
   const handleAddItem = () => {
@@ -118,6 +134,7 @@ const ConditionalEdges = ({ step, indices }: Props) => {
 
   useEffect(() => {
     return () => {
+      debouncedUpdateStepRef.current.flush()
       const filled = itemsRef.current.filter(
         (it) => (it.content ?? '').trim() !== ''
       )
