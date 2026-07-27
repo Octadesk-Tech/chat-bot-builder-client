@@ -1,6 +1,6 @@
 import { chakra, Flex, Text } from '@chakra-ui/react'
 import React, { useEffect, useState } from 'react'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotVariables } from 'contexts/TypebotContext'
 import { OctaProperty, Variable } from 'models'
 import { useWorkspace } from 'contexts/WorkspaceContext'
 
@@ -10,7 +10,7 @@ type Props = {
 }
 
 export const WithVariableContent = ({ variableId, property }: Props) => {
-  const { typebot } = useTypebot()
+  const variables = useTypebotVariables()
   const { createChatField } = useWorkspace()
 
   const [variableName, setVariableName] = useState<string>('')
@@ -23,8 +23,8 @@ export const WithVariableContent = ({ variableId, property }: Props) => {
       return
     }
 
-    if (typebot?.variables) {
-      const variable = typebot.variables.find(
+    if (variables) {
+      const variable = variables.find(
         (v) => v.variableId === variableId || v.id === variableId || v.token === variableId
       )
 
@@ -39,7 +39,7 @@ export const WithVariableContent = ({ variableId, property }: Props) => {
     } else {
       setVariableName('')
     }
-  }, [typebot?.variables, variableId, property])
+  }, [variables, variableId, property])
 
   if (!variableName || variableName.trim() === '') {
     return null

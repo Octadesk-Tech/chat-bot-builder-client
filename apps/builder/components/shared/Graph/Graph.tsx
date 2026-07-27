@@ -20,6 +20,7 @@ import {
   Coordinates,
   graphPositionDefaultValue,
   useGraph,
+  useGraphPosition,
 } from 'contexts/GraphContext'
 import { useStepDnd } from 'contexts/GraphDndContext'
 import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
@@ -68,19 +69,20 @@ export const Graph = memo(
       redo,
       canUndo,
       canRedo,
-      setHideEdges,
     } = useTypebot()
     const {
-      setGraphPosition: setGlobalGraphPosition,
-      graphPosition: globalGraphPosition,
       setOpenedStepId,
       updateBlockCoordinates,
-      blocksCoordinates,
+      getBlockCoordinates,
       setPreviewingEdge,
       connectingIds,
       goToBegining,
       draggingBlockId,
     } = useGraph()
+    const {
+      setGraphPosition: setGlobalGraphPosition,
+      graphPosition: globalGraphPosition,
+    } = useGraphPosition()
 
     const [graphPosition, setGraphPosition] = useState(
       graphPositionDefaultValue
@@ -97,11 +99,9 @@ export const Graph = memo(
 
     useEffect(() => {
       if (isMovingBoard) {
-        setHideEdges(true)
       } else {
         const timeout = setTimeout(() => {
           if (!isMovingBoardRef.current) {
-            setHideEdges(false)
           }
         }, showEdgesTimeOut)
 
@@ -146,9 +146,10 @@ export const Graph = memo(
       if (!typebot) return
       setIsMovingBoard(true)
       goToBegining()
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setIsMovingBoard(false)
       }, showEdgesTimeOut)
+      return () => clearTimeout(timer)
     }, [])
 
     useEffect(() => {
@@ -165,7 +166,7 @@ export const Graph = memo(
         return
 
       const blockCoordinates =
-        blocksCoordinates[draggingBlockId] ??
+        getBlockCoordinates(draggingBlockId) ??
         typebot?.blocks.find((block) => block.id === draggingBlockId)
           ?.graphCoordinates
 
@@ -181,7 +182,8 @@ export const Graph = memo(
         y: mouseWorld.y - blockCoordinates.y,
       }
       prevDraggingIdRef.current = draggingBlockId
-    }, [blocksCoordinates, draggingBlockId, typebot?.blocks, graphPosition])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [draggingBlockId, typebot?.blocks, graphPosition])
 
     useEffect(() => {
       editorContainerRef.current = document.getElementById(
@@ -350,11 +352,12 @@ export const Graph = memo(
     const onDrag = (_: DraggableEvent, draggableData: DraggableData) => {
       const { deltaX, deltaY } = draggableData
 
-      setGraphPosition({
-        ...graphPosition,
-        x: graphPosition.x + deltaX,
-        y: graphPosition.y + deltaY,
-      })
+
+      setGraphPosition((prev) => ({
+        ...prev,
+        x: prev.x + deltaX,
+        y: prev.y + deltaY,
+      }))
     }
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -465,7 +468,7 @@ export const Graph = memo(
             position="absolute"
             style={{
               transform,
-              transition: draggingBlockId ? '0s' : '0.1s',
+              transition: draggingBlockId || isMovingBoard ? '0s' : '0.1s',
             }}
             willChange="transform"
             transformOrigin="0px 0px 0px"

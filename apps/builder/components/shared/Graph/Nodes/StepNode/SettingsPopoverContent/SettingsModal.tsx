@@ -21,12 +21,14 @@ import { useIframeOverlayEvent } from 'hooks/useIframeOverlayEvent'
 type Props = {
   isOpen: boolean
   onClose: () => void
+  onCloseComplete?: () => void
   stepType: StepType
 }
 
 export const SettingsModal = ({
   isOpen,
   onClose,
+  onCloseComplete,
   stepType,
   ...props
 }: Props & ModalBodyProps) => {
@@ -40,6 +42,7 @@ export const SettingsModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
+      onCloseComplete={onCloseComplete}
       size={stepType === WOZStepType.MESSAGE ? 'full' : 'xl'}
     >
       <ModalOverlay />

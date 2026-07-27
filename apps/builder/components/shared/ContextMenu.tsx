@@ -40,9 +40,10 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
   const { readonly = false } = props
   useEffect(() => {
     if (isOpened) {
-      setTimeout(() => {
+      let innerTimer: ReturnType<typeof setTimeout> | undefined
+      const outerTimer = setTimeout(() => {
         setIsRendered(true)
-        setTimeout(() => {
+        innerTimer = setTimeout(() => {
           setIsDeferredOpen(true)
         })
       })
@@ -56,6 +57,8 @@ export function ContextMenu<T extends HTMLElement = HTMLElement>(
       document.addEventListener('contextmenu', handleGlobalContextMenu, true)
 
       return () => {
+        clearTimeout(outerTimer)
+        clearTimeout(innerTimer)
         document.removeEventListener('contextmenu', handleGlobalContextMenu, true)
       }
     } else {

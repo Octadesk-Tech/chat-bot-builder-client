@@ -1,8 +1,7 @@
 import { BoxProps, Flex } from '@chakra-ui/react'
-import { useGraph } from 'contexts/GraphContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useCoordinatesReady, useGraph } from 'contexts/GraphContext'
 import { Source } from 'models'
-import React, { MouseEvent, useEffect, useRef, useState } from 'react'
+import React, { MouseEvent, useEffect, useRef } from 'react'
 
 export const SourceEndpoint = ({
   source,
@@ -10,36 +9,24 @@ export const SourceEndpoint = ({
 }: BoxProps & {
   source: Source
 }) => {
-  const [ranOnce, setRanOnce] = useState(false)
-  const { setHideEdges } = useTypebot()
-  const {
-    setConnectingIds,
-    addSourceEndpoint,
-    blocksCoordinates,
-    previewingEdge,
-  } = useGraph()
+  const { setConnectingIds, addSourceEndpoint, removeSourceEndpoint, previewingEdge } = useGraph()
+  const coordinatesReady = useCoordinatesReady()
   const ref = useRef<HTMLDivElement | null>(null)
 
   const handleMouseDown = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation()
     e.preventDefault()
     setConnectingIds({ source })
-    setHideEdges(false)
   }
 
   useEffect(() => {
-    if (ranOnce || !ref.current || Object.keys(blocksCoordinates).length === 0)
-      return
+    if (!ref.current || !coordinatesReady) return
     const id = source.itemId ?? source.stepId
-    addSourceEndpoint({
-      id,
-      ref,
-    })
-    setRanOnce(true)
+    addSourceEndpoint({ id, ref })
+    return () => removeSourceEndpoint(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ref.current, blocksCoordinates])
+  }, [coordinatesReady])
 
-  if (!blocksCoordinates) return <></>
   return (
     <Flex
       ref={ref}

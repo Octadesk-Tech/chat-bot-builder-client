@@ -1,5 +1,5 @@
 import { Stack, Tag, Text, Flex, Wrap } from '@chakra-ui/react'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotExtras, useTypebotVariables } from 'contexts/TypebotContext'
 import {
   Comparison,
   ConditionItem,
@@ -17,7 +17,8 @@ type Props = {
 }
 
 export const ConditionNodeContent = ({ item }: Props) => {
-  const { typebot, customVariables } = useTypebot()
+  const variables = useTypebotVariables()
+  const { customVariables } = useTypebotExtras()
   const basicOptions = useContactStatus()
 
   const getComparisonValue = (
@@ -49,7 +50,7 @@ export const ConditionNodeContent = ({ item }: Props) => {
     return (
       <Stack maxW="170px">
         {item.content.comparisons.map((comparison, idx) => {
-          const variable = typebot?.variables.find(
+          const variable = variables?.find(
             byIdOrToken(comparison.variableId)
           )
           return (

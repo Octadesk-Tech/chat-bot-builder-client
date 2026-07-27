@@ -7,6 +7,7 @@ import {
 } from 'contexts/EditorContext'
 import { useEffect } from 'react'
 import { BoardMenuButton } from 'components/editor/BoardMenuButton'
+import { BoardMenuButtonSearch } from 'components/editor/BoardMenuButtonSearch'
 import { ToDoList } from 'components/editor/todoList'
 import { StepsSideBar } from 'components/editor/StepsSideBar'
 import { Graph } from 'components/shared/Graph'
@@ -136,7 +137,8 @@ function TypebotEditPage() {
             >
               {typebot && <Graph flex="1" typebot={typebot} />}
 
-              <BoardMenuButton pos="absolute" right="40px" top="20px" />
+              <BoardMenuButton pos="absolute" right="40px" top="20px" aria-label='Lista de pendências' />
+              <BoardMenuButtonSearch pos="absolute" right="40px" top="60px" />
 
               <RightPanel />
             </GraphProvider>

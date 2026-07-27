@@ -28,7 +28,7 @@ import { WhatsAppButtonsContent } from '../contents/WhatsApp/WhatsAppButtons'
 import { WhatsAppOptionsContent } from '../contents/WhatsApp/WhatsAppOptions'
 // import { PaymentInputContent } from './contents/PaymentInputContent'
 // import { SendEmailContent } from './contents/SendEmailContent'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotActions } from 'contexts/TypebotContext'
 import { ConversationTagContent } from '../contents/ConversationTag'
 import { InputContent } from '../contents/Input'
 import { InputItemsContent } from '../contents/InputItemsContent'
@@ -44,7 +44,7 @@ type Props = {
   indices: StepIndices
 }
 export const StepNodeContent = ({ step, indices }: Props) => {
-  const { updateStep } = useTypebot()
+  const { updateStep } = useTypebotActions()
   const handleStepUpdate = (options: StepOptions): void => {
     const stepWithOptions = step as StepWithOptions
     if (stepWithOptions.options) {

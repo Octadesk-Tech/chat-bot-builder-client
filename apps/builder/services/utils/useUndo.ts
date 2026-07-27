@@ -15,7 +15,7 @@ enum ActionType {
 export interface Actions<T> {
   set: (
     newPresent: T | ((current: T) => T),
-    options?: { updateDate?: boolean; skipHistory?: boolean }
+    options?: { updateDate?: boolean; skipHistory?: boolean; skipConnectionsUpdate?: boolean  }
   ) => void
   undo: () => void
   redo: () => void
@@ -81,11 +81,7 @@ const reducer = <T>(state: State<T>, action: Action<T>) => {
       const { newPresent, updateDate, skipHistory } = action
       if (
         isNotDefined(newPresent) ||
-        (present &&
-          dequal(
-            JSON.parse(JSON.stringify(newPresent)),
-            JSON.parse(JSON.stringify(present))
-          ))
+        (present && dequal(newPresent, present))
       ) {
         return state
       }
@@ -141,16 +137,16 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
   const set = useCallback(
     (
       newPresent: T | ((current: T) => T),
-      options: { updateDate?: boolean; skipHistory?: boolean } = {}
+      options: { updateDate?: boolean; skipHistory?: boolean; skipConnectionsUpdate?: boolean } = {}
     ) => {
-      const { updateDate = true, skipHistory = false } = options
+      const { updateDate = true, skipHistory = false, skipConnectionsUpdate = false } = options
 
       const updatedTypebot =
         'id' in newPresent
           ? newPresent
           : (newPresent as (current: T) => T)(presentRef.current)
 
-      if (updatedTypebot?.blocks) {
+      if (updatedTypebot?.blocks && !skipConnectionsUpdate) {
         updatedTypebot.blocks = updateBlocksHasConnections(updatedTypebot)
       }
 
@@ -166,7 +162,7 @@ const useUndo = <T>(initialPresent: T): [State<T>, Actions<T>] => {
         type: ActionType.Set,
         newPresent: updatedTypebot,
         updateDate,
-        skipHistory,
+        skipHistory
       })
     },
     []

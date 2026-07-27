@@ -13,7 +13,7 @@ import {
   computeNearestPlaceholderIndex,
   useStepDnd,
 } from 'contexts/GraphDndContext'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useHasTypebot, useTypebotActions } from 'contexts/TypebotContext'
 import {
   DraggableStep,
   DraggableStepType,
@@ -27,7 +27,7 @@ import {
   StepType,
   WOZStepType,
 } from 'models'
-import { Fragment, useEffect, useRef, useState } from 'react'
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StepNode } from './StepNode/StepNode'
 import { StepNodeOverlay } from './StepNodeOverlay'
 
@@ -52,8 +52,9 @@ export const StepNodesList = ({
     mouseOverBlock,
     setDraggedStepType,
   } = useStepDnd()
-  const { typebot, createStep, detachStepFromBlock } = useTypebot()
-  const { isReadOnly, graphPosition } = useGraph()
+  const { createStep, detachStepFromBlock } = useTypebotActions()
+  const hasTypebot = useHasTypebot()
+  const { isReadOnly, getGraphPosition } = useGraph()
   const [expandedPlaceholderIndex, setExpandedPlaceholderIndex] = useState<
     number | undefined
   >()
@@ -137,7 +138,7 @@ export const StepNodesList = ({
     setHasBlockEndedIndex(endedIndex)
   }, [steps])
 
-  const handleStepMouseDown =
+  const handleStepMouseDown = useCallback(
     (stepIndex: number) =>
       (
         { absolute, relative }: { absolute: Coordinates; relative: Coordinates },
@@ -149,7 +150,22 @@ export const StepNodesList = ({
         setPosition(absolute)
         setMousePositionInElement(relative)
         setDraggedStep(step)
-      }
+      },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [isReadOnly, detachStepFromBlock, blockIndex, setDraggedStep]
+  )
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableIndices = useMemo(
+    () => steps.map((_, idx) => ({ blockIndex, stepIndex: idx })),
+    [blockIndex, steps.length]
+  )
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableOnMouseDown = useMemo(
+    () => steps.map((_, idx) => handleStepMouseDown(idx)),
+    [handleStepMouseDown, steps.length]
+  )
 
   const handlePushElementRef =
     (idx: number) => (elem: HTMLDivElement | null) => {
@@ -194,14 +210,14 @@ export const StepNodesList = ({
           </HStack>
         </Center>
       </Flex>
-      {typebot &&
+      {hasTypebot &&
         steps.map((step, idx) => (
           <Fragment key={step.id}>
             <StepNode
               step={step}
-              indices={{ blockIndex, stepIndex: idx }}
+              indices={stableIndices[idx]}
               isConnectable={steps.length - 1 === idx}
-              onMouseDown={handleStepMouseDown(idx)}
+              onMouseDown={stableOnMouseDown[idx]}
               isStartBlock={isStartBlock}
               unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
             />
@@ -240,7 +256,7 @@ export const StepNodesList = ({
             top="0"
             left="0"
             style={{
-              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg) scale(${graphPosition.scale})`,
+              transform: `translate(${position.x}px, ${position.y}px) rotate(-2deg) scale(${getGraphPosition().scale})`,
             }}
             transformOrigin="0 0 0"
           />
