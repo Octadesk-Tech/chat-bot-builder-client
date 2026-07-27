@@ -1,14 +1,16 @@
 import {
+  Box,
   Editable,
   EditableInput,
   EditablePreview,
   Flex,
   SlideFade,
   Stack,
+  Tooltip,
   useOutsideClick,
 } from '@chakra-ui/react'
 import React, { memo, useEffect, useRef, useState } from 'react'
-import { Block } from 'models'
+import { Block, StepType } from 'models'
 import { useBlockCoordinates, useGraph } from 'contexts/GraphContext'
 import { useStepDnd } from 'contexts/GraphDndContext'
 import { StepNodesList } from '../StepNode/StepNodesList'
@@ -26,6 +28,8 @@ import { DraggableCore, DraggableData, DraggableEvent } from 'react-draggable'
 import { BlockFocusToolbar } from './BlockFocusToolbar'
 import { WarningTwoIcon } from '@chakra-ui/icons'
 import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
+import { StepIcon } from 'components/editor/StepsSideBar/StepIcon'
+import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
 
 type Props = {
   block: Block
@@ -225,20 +229,27 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
               }
             >
               {simplified ? (
-                <div
-                  title={block.title}
-                  style={{
-                    fontWeight: 600,
-                    fontSize: '16px',
-                    overflow: 'hidden',
-                    whiteSpace: 'nowrap',
-                    textOverflow: 'ellipsis',
-                    padding: '0 4px',
-                    color: '#1B2A4A',
-                  }}
+                <Tooltip
+                  label={block.title || 'Sem título'}
+                  hasArrow
+                  placement="top"
+                  isDisabled={!simplified}
                 >
-                  {block.title || 'Sem título'}
-                </div>
+                  <div
+                    title={block.title}
+                    style={{
+                      fontWeight: 600,
+                      fontSize: '16px',
+                      overflow: 'hidden',
+                      whiteSpace: 'nowrap',
+                      textOverflow: 'ellipsis',
+                      padding: '0 4px',
+                      color: '#1B2A4A',
+                    }}
+                  >
+                    {block.title || 'Sem título'}
+                  </div>
+                </Tooltip>
               ) : (
                 <Flex justifyContent="space-between" alignItems="center" gap="2">
                 <Editable
@@ -278,15 +289,30 @@ export const BlockNode = memo(({ block, blockIndex, simplified }: Props) => {
                 (simplified ? (
                   <Stack spacing="2">
                     {block.steps.map((step) => (
-                      <div
+                      <Tooltip
                         key={step.id}
-                        style={{
-                          backgroundColor: '#E2E8F0',
-                          borderRadius: '6px',
-                          width: '100%',
-                          height: '120px',
-                        }}
-                      />
+                        label={
+                          <Box>
+                            <StepTypeLabel type={step.type as StepType} />
+                          </Box>
+                        }
+                        hasArrow
+                        placement="bottom"
+                      >
+                        <div
+                          style={{
+                            backgroundColor: '#E2E8F0',
+                            borderRadius: '6px',
+                            width: '100%',
+                            height: '120px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                        >
+                          <StepIcon type={step.type} fontSize="52px" />
+                        </div>
+                      </Tooltip>
                     ))}
                   </Stack>
                 ) : (

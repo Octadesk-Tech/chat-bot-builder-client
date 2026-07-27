@@ -12,7 +12,7 @@ import { Block } from 'models'
 
 export const LOD_SCALE_THRESHOLD = 0.5
 
-export const LOD_MIN_BLOCKS = 50
+export const LOD_MIN_BLOCKS = 20
 
 type Props = {
   answersCounts?: AnswersCount[]

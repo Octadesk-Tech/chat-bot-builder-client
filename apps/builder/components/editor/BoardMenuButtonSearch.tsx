@@ -83,9 +83,9 @@ export const BoardMenuButtonSearch = (props: BoxProps) => {
 
   return (
     <Box ref={containerRef} w="fit-content" {...props}>
-      <Tooltip label="Pesquisar bloco">
+      <Tooltip label="Pesquisar grupo">
         <IconButton
-          aria-label="Pesquisar bloco"
+          aria-label="Pesquisar grupo"
           onClick={handleToggle}
           bgColor="white"
           icon={<MdSearch />}
@@ -121,7 +121,7 @@ export const BoardMenuButtonSearch = (props: BoxProps) => {
                 setSearchValue(e.target.value)
               }
               onKeyDown={handleKeyDown}
-              placeholder="Pesquisar bloco pelo título"
+              placeholder="Pesquisar grupo pelo título"
               rounded="md"
             />
           </InputGroup>
@@ -156,7 +156,7 @@ export const BoardMenuButtonSearch = (props: BoxProps) => {
                 ))
               ) : (
                 <Text fontSize="sm" color="gray.500" px="2" py="1">
-                  Nenhum bloco encontrado
+                  Nenhum grupo encontrado
                 </Text>
               )}
             </Flex>
