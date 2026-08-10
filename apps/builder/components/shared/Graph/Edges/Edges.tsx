@@ -1,38 +1,20 @@
 import { chakra } from '@chakra-ui/react'
 import { colors } from 'libs/theme'
-import { Block, Edge as EdgeProps } from 'models'
-import React, { memo, useMemo } from 'react'
+import { Edge as EdgeProps } from 'models'
+import React, { memo } from 'react'
 import { AnswersCount } from 'services/analytics'
 import { DrawingEdge } from './DrawingEdge'
 import { DropOffEdge } from './DropOffEdge'
 import { Edge } from './Edge'
 
-const getBlockMap = (blocks: Block[]) => {
-  const map = new Map<string, Block>()
-  for (const block of blocks) {
-    map.set(block.id, block)
-  }
-  return map
-}
-
 type Props = {
-  visibleItems: Block[]
   edges: EdgeProps[]
-  blocks: Block[]
   answersCounts?: AnswersCount[]
   onUnlockProPlanClick?: () => void
 }
 
 export const Edges = memo(
-  ({
-    edges,
-    blocks,
-    answersCounts,
-    onUnlockProPlanClick,
-    visibleItems,
-  }: Props) => {
-    const blockMap = useMemo(() => getBlockMap(blocks), [blocks])
-
+  ({ edges, answersCounts, onUnlockProPlanClick }: Props) => {
     return (
       <chakra.svg
         width="full"
@@ -45,18 +27,9 @@ export const Edges = memo(
         shapeRendering="geometricPrecision"
       >
         <DrawingEdge />
-        {edges.map((edge) => {
-          const block = blockMap.get(edge.from.blockId)
-
-          return (
-            <Edge
-              visibleItems={visibleItems ?? []}
-              block={block || ({} as Block)}
-              key={edge.id}
-              edge={edge}
-            />
-          )
-        })}
+        {edges.map((edge) => (
+          <Edge key={edge.id} edge={edge} />
+        ))}
         {answersCounts?.slice(1)?.map((answerCount) => (
           <DropOffEdge
             key={answerCount.blockId}

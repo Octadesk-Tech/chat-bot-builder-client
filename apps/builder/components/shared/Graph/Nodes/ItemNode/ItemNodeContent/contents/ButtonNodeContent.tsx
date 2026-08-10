@@ -4,7 +4,7 @@ import {
   Editable,
   Flex,
 } from '@chakra-ui/react'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotActions } from 'contexts/TypebotContext'
 import { ButtonItem, ItemIndices, ItemType } from 'models'
 import React, { useEffect, useRef, useState } from 'react'
 
@@ -17,7 +17,7 @@ type Props = {
 export const ButtonNodeContent = ({ item, indices, onUpdateItem }: Props) => {
   const defaultPlaceholder = 'Insira o texto desta resposta...' 
 
-  const { deleteItem, updateItem, createItem } = useTypebot()
+  const { deleteItem, updateItem, createItem } = useTypebotActions()
   const [initialContent] = useState(item.content ?? '')
   const [itemValue, setItemValue] = useState(
     item.content ?? defaultPlaceholder

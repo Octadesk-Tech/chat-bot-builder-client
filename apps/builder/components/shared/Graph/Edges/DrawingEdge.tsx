@@ -1,6 +1,11 @@
 import { useEventListener } from '@chakra-ui/react'
 import assert from 'assert'
-import { useGraph, ConnectingIds } from 'contexts/GraphContext'
+import {
+  useGraph,
+  useBlockCoordinates,
+  useGraphPosition,
+  ConnectingIds,
+} from 'contexts/GraphContext'
 import { useTypebot } from 'contexts/TypebotContext/TypebotContext'
 import { colors } from 'libs/theme'
 import React, { useMemo, useState } from 'react'
@@ -12,20 +17,21 @@ import {
 
 export const DrawingEdge = () => {
   const {
-    graphPosition,
     setConnectingIds,
     connectingIds,
     sourceEndpoints,
     targetEndpoints,
-    blocksCoordinates,
   } = useGraph()
+  const { graphPosition } = useGraphPosition()
   const { createEdge } = useTypebot()
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
 
-  const sourceBlockCoordinates =
-    blocksCoordinates && blocksCoordinates[connectingIds?.source.blockId ?? '']
-  const targetBlockCoordinates =
-    blocksCoordinates && blocksCoordinates[connectingIds?.target?.blockId ?? '']
+  const sourceBlockCoordinates = useBlockCoordinates(
+    connectingIds?.source.blockId
+  )
+  const targetBlockCoordinates = useBlockCoordinates(
+    connectingIds?.target?.blockId
+  )
 
   const sourceTop = useMemo(() => {
     if (!connectingIds) return 0

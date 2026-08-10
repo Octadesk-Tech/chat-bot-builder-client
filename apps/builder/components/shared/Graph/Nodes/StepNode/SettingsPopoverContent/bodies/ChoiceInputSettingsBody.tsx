@@ -168,7 +168,7 @@ export const ChoiceInputSettingsBody = ({
                 {isCollapsed ? <SlArrowDown /> : <SlArrowUp />}
               </Button>
             </Flex>
-            <Collapse in={isCollapsed}>
+            <Collapse in={isCollapsed} unmountOnExit>
               <Flex direction={'column'} gap={4}>
                 {options?.fallbackMessages.map((message, index) =>
                   fallbackMessageComponent(message, index)

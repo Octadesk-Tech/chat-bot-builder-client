@@ -10,7 +10,7 @@ import { ItemNodesList } from 'components/shared/Graph/Nodes/ItemNode'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
 import { WithVariableContent } from '../../WithVariableContent'
 import { TextHtmlContent } from '../../TextHtmlContent'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebotActions } from 'contexts/TypebotContext'
 import cuid from 'cuid'
 
 type Props = {
@@ -19,7 +19,7 @@ type Props = {
 }
 
 const WhatsApButtonsContent = ({ step, indices }: Props) => {
-  const { updateStep } = useTypebot()
+  const { updateStep } = useTypebotActions()
 
   if (!step.options) step.options = defaultWhatsAppButtonsListOptions
 

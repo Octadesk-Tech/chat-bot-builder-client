@@ -106,12 +106,11 @@ const OctaSelect = (props: OctaSelectProps) => {
     ) as HTMLElement
     if (!settingsModal) return
 
-    if (isComponentVisible) {
-      settingsModal.style.overflow = 'hidden'
+    settingsModal.style.overflow = isComponentVisible ? 'hidden' : 'auto'
 
-      return
+    return () => {
+      settingsModal.style.overflow = 'auto'
     }
-    settingsModal.style.overflow = 'auto'
   }, [dialogRef, isComponentVisible])
 
   useEffect(() => {

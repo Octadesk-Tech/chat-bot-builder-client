@@ -1,10 +1,10 @@
 import { useCallback, useRef } from 'react'
-import { useGraph } from 'contexts/GraphContext'
+import { useGraphPosition } from 'contexts/GraphContext'
 import { Step } from 'models'
 import { stepHasItems } from 'utils'
 
 export const useRefreshGraphConnections = () => {
-  const { setGraphPosition } = useGraph()
+  const { setGraphPosition } = useGraphPosition()
   const timeoutRefs = useRef<Array<ReturnType<typeof setTimeout>>>([])
 
   const refreshConnections = useCallback((step: Step) => {
