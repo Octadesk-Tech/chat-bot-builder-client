@@ -186,7 +186,7 @@ export const StepNodesList = ({
     <Stack
       spacing={1}
       transition="none"
-      pointerEvents={isReadOnly || isStartBlock ? 'none' : 'auto'}
+      pointerEvents={isReadOnly ? 'none' : 'auto'}
     >
       <Flex
         ref={handlePushElementRef(0)}
