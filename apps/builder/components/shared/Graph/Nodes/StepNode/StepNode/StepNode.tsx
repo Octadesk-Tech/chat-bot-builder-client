@@ -123,6 +123,8 @@ const StepNodeBase = ({
 
   const isPreviewing = isConnecting || previewingEdge?.to.stepId === step.id
 
+  const isStartStep = step.type === 'start'
+
   const onDrag = (position: NodePosition) => {
     if (step.type === 'start' || !onMouseDown) return
     onMouseDown(position, step)
@@ -130,7 +132,7 @@ const StepNodeBase = ({
   useDragDistance({
     ref: stepRef,
     onDrag,
-    isDisabled: !onMouseDown || step.type === 'start',
+    isDisabled: !onMouseDown || isStartStep,
   })
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -294,6 +296,7 @@ const StepNodeBase = ({
                 data-testid={`step`}
                 w="full"
                 direction="column"
+                pointerEvents={isStartStep ? 'none' : 'auto'}
               >
                 <Stack spacing={2}>
                   <BlockStack

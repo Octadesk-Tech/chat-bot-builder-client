@@ -111,10 +111,11 @@ const MyComponent = memo(
 
         {renderedItems.map((block) => {
           const blockIndex = blockIndexById.get(block.id)
+          if (blockIndex === undefined) return null
           return (
             <BlockNode
               block={block}
-              blockIndex={blockIndex ?? 0}
+              blockIndex={blockIndex}
               simplified={renderedSimplified}
               key={block.id}
             />
