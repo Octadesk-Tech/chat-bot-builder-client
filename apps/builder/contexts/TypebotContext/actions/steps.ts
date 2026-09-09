@@ -51,7 +51,9 @@ const stepsAction = (
   ) =>
     setTypebot((typebot) =>
       produce(typebot, (typebot) => {
-        const step = typebot.blocks[blockIndex].steps[stepIndex]
+        const step = typebot.blocks[blockIndex]?.steps[stepIndex]
+        if (!step) return
+
         const removedReferenceUpdates = JSON.parse(
           JSON.stringify({ ...step, ...updates })
         )
