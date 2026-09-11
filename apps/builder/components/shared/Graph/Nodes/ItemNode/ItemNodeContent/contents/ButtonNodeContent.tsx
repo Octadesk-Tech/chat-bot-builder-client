@@ -23,14 +23,22 @@ export const ButtonNodeContent = ({ item, indices, onUpdateItem }: Props) => {
     item.content ?? defaultPlaceholder
   )
   const editableRef = useRef<HTMLDivElement | null>(null)
+  const isEditingRef = useRef(false)
+  const itemValueRef = useRef(itemValue)
+  const itemContentRef = useRef(item.content)
+  const commitPendingEditRef = useRef<(() => void) | null>(null)
+
+  itemValueRef.current = itemValue
+  itemContentRef.current = item.content
 
   useEffect(() => {
-    if (itemValue !== item.content)
-      setItemValue(item.content ?? defaultPlaceholder)
+    if (isEditingRef.current) return
+    setItemValue(item.content ?? defaultPlaceholder)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item])
+  }, [item.content])
 
   const handleInputSubmit = () => {
+    isEditingRef.current = false
     if (itemValue === '') deleteItem(indices)
     else {
       const newValue = itemValue === '' ? undefined : itemValue
@@ -39,6 +47,31 @@ export const ButtonNodeContent = ({ item, indices, onUpdateItem }: Props) => {
         onUpdateItem(newValue || '')
       }
     }
+  }
+
+  const commitPendingEdit = () => {
+    const pendingValue = itemValueRef.current
+    if (!isEditingRef.current) return
+    if (pendingValue === '' || pendingValue === defaultPlaceholder) return
+    if (pendingValue === itemContentRef.current) return
+    updateItem(indices, { content: pendingValue })
+    if (onUpdateItem) onUpdateItem(pendingValue)
+  }
+
+  commitPendingEditRef.current = commitPendingEdit
+
+  useEffect(
+    () => () => commitPendingEditRef.current?.(),
+    []
+  )
+
+  const handleEditStart = () => {
+    isEditingRef.current = true
+  }
+
+  const handleEditCancel = () => {
+    isEditingRef.current = false
+    setItemValue(item.content ?? defaultPlaceholder)
   }
 
   const hasMoreThanOneItem = () => indices.itemsCount && indices.itemsCount > 1
@@ -73,6 +106,8 @@ export const ButtonNodeContent = ({ item, indices, onUpdateItem }: Props) => {
         startWithEditView={false}
         value={itemValue}
         onChange={setItemValue}
+        onEdit={handleEditStart}
+        onCancel={handleEditCancel}
         onSubmit={handleInputSubmit}
         onKeyDownCapture={handleKeyPress}
         flex={2}

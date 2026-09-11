@@ -200,8 +200,6 @@ const StepNodeBase = ({
   const handleModalClose = () => {
     if (beforeCloseRef.current?.()) return
 
-    updateStep(indices, { ...step })
-
     refreshConnections(step)
 
     onModalClose()
@@ -211,8 +209,7 @@ const StepNodeBase = ({
   }
 
   const handleKeyUp = (content: TextBubbleContent) => {
-    const updatedStep = { ...step, content } as Step
-    updateStep(indices, updatedStep)
+    updateStep(indices, { content } as Partial<Step>)
   }
 
   const handleCloseEditor = () => {
@@ -237,7 +234,7 @@ const StepNodeBase = ({
   }
 
   const handleStepUpdate = (updates: Partial<Step>): void => {
-    updateStep(indices, { ...step, ...updates })
+    updateStep(indices, updates)
   }
 
   const hasErrorMessage = () => {
