@@ -54,10 +54,10 @@ const stepsAction = (
         const step = typebot.blocks[blockIndex]?.steps[stepIndex]
         if (!step) return
 
-        const removedReferenceUpdates = JSON.parse(
-          JSON.stringify({ ...step, ...updates })
-        )
-        typebot.blocks[blockIndex].steps[stepIndex] = removedReferenceUpdates
+        typebot.blocks[blockIndex].steps[stepIndex] = {
+          ...step,
+          ...removeReferences(updates),
+        } as Step
       })
     ),
   duplicateStep: ({ blockIndex, stepIndex }: StepIndices) =>
@@ -83,6 +83,14 @@ const stepsAction = (
       })
     ),
 })
+
+const removeReferences = (updates: Partial<Omit<Step, 'id' | 'type'>>) =>
+  Object.entries(updates).reduce((clonedUpdates, [key, value]) => {
+    clonedUpdates[key] =
+      value === undefined ? undefined : JSON.parse(JSON.stringify(value))
+    return clonedUpdates
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }, {} as Record<string, any>)
 
 const removeStepFromBlock =
   ({ blockIndex, stepIndex }: StepIndices) =>
