@@ -48,8 +48,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
   const handleStepUpdate = (options: StepOptions): void => {
     const stepWithOptions = step as StepWithOptions
     if (stepWithOptions.options) {
-      stepWithOptions.options = { ...stepWithOptions.options, ...options }
-      updateStep(indices, { ...stepWithOptions })
+      updateStep(indices, {
+        options: { ...stepWithOptions.options, ...options },
+      } as Partial<Step>)
     }
   }
 
