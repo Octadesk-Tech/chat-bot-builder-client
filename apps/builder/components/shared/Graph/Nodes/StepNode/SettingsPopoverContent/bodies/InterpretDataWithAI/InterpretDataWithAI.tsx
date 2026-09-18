@@ -12,6 +12,10 @@ import {
   Spinner,
   HStack,
   Divider,
+  Input,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import {
   IntegrationStepType,
@@ -40,6 +44,7 @@ type Props = {
 }
 
 const INSTRUCTIONS_DEBOUNCE_MS = 500
+const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 type InstructionsTextareaProps = {
   initialValue: string
@@ -144,6 +149,23 @@ export const InterpretDataWithAI = ({
   const { typebot } = useTypebot()
   const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const [isTesting, setIsTesting] = useState(false)
+  const [outputVariableName, setOutputVariableName] = useState(
+    step?.content?.outputVariableName ?? ''
+  )
+
+  const isOutputVariableNameInvalid =
+    outputVariableName.length > 0 && !SLUG_REGEX.test(outputVariableName)
+
+  const debouncedOutputVariableNameChange = useDebouncedCallback(
+    (value: string) =>
+      onContentChange({ ...step.content, outputVariableName: value }),
+    isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? INSTRUCTIONS_DEBOUNCE_MS : 0
+  )
+
+  const handleOutputVariableNameChange = (value: string) => {
+    setOutputVariableName(value)
+    debouncedOutputVariableNameChange(value)
+  }
 
   const [resultOfInterpretWithAi, setResultOfInterpretWithAi] =
     useState<string>('')
@@ -370,6 +392,22 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             findable
           />
         )}
+        {!isAutomatedTasksBot && (
+          <FormControl isInvalid={isOutputVariableNameInvalid}>
+            <FormLabel fontWeight="bold">Nome da variável de saída</FormLabel>
+            <Input
+              placeholder="ex: variavel-teste"
+              value={outputVariableName}
+              onChange={(e) => handleOutputVariableNameChange(e.target.value)}
+              onBlur={() => debouncedOutputVariableNameChange.flush()}
+            />
+            {isOutputVariableNameInvalid && (
+              <FormErrorMessage>
+                Use apenas letras minúsculas, números e hífens (ex: variavel-teste)
+              </FormErrorMessage>
+            )}
+          </FormControl>
+        )}
         <Stack direction="row" justifyContent="space-between" w="full">
           <Stack direction="row" alignItems="center" gap={2}>
             <Text fontWeight="bold">Instrução de formatação</Text>
@@ -455,6 +493,8 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
     isNonGetMethod,
     isTesting,
     step,
+    outputVariableName,
+    isOutputVariableNameInvalid,
   ])
 
   return (
