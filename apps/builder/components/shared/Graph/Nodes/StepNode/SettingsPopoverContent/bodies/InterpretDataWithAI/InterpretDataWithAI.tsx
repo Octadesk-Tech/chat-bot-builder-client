@@ -159,6 +159,15 @@ export const InterpretDataWithAI = ({
   const isOutputVariableNameInvalid =
     outputVariableName.length > 0 && !SLUG_REGEX.test(outputVariableName)
 
+  const isOutputVariableNameDuplicate = useMemo(() => {
+    if (!outputVariableName || isOutputVariableNameInvalid) return false
+    return (
+      variables?.some(
+        (v) => v.token === outputVariableName && v.fieldId !== step.id
+      ) ?? false
+    )
+  }, [outputVariableName, isOutputVariableNameInvalid, variables, step.id])
+
   const syncOutputVariable = useCallback(
     (name: string) => {
       onContentChange({ ...step.content, outputVariableName: name })
@@ -196,7 +205,11 @@ export const InterpretDataWithAI = ({
 
   const handleOutputVariableNameChange = (value: string) => {
     setOutputVariableName(value)
-    if (!value || SLUG_REGEX.test(value)) debouncedOutputVariableNameChange(value)
+    const isFormatValid = !value || SLUG_REGEX.test(value)
+    const isDuplicate = value
+      ? (variables?.some((v) => v.token === value && v.fieldId !== step.id) ?? false)
+      : false
+    if (isFormatValid && !isDuplicate) debouncedOutputVariableNameChange(value)
   }
 
   const [resultOfInterpretWithAi, setResultOfInterpretWithAi] =
@@ -425,7 +438,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
           />
         )}
         {!isAutomatedTasksBot && (
-          <FormControl isInvalid={isOutputVariableNameInvalid}>
+          <FormControl isInvalid={isOutputVariableNameInvalid || isOutputVariableNameDuplicate}>
             <FormLabel fontWeight="bold">Nome da variável de saída</FormLabel>
             <Input
               placeholder="ex: variavel-teste"
@@ -436,6 +449,11 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             {isOutputVariableNameInvalid && (
               <FormErrorMessage>
                 Use apenas letras minúsculas, números e hífens (ex: variavel-teste)
+              </FormErrorMessage>
+            )}
+            {!isOutputVariableNameInvalid && isOutputVariableNameDuplicate && (
+              <FormErrorMessage>
+                Este nome já está em uso por outra variável do fluxo
               </FormErrorMessage>
             )}
           </FormControl>
@@ -527,6 +545,7 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
     step,
     outputVariableName,
     isOutputVariableNameInvalid,
+    isOutputVariableNameDuplicate,
   ])
 
   return (
