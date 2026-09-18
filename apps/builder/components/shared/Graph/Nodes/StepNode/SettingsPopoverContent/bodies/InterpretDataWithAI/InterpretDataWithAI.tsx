@@ -24,7 +24,8 @@ import {
   WOZInterpretDataWithAIOptions,
   WOZInterpretDataWithAIResponseFormat,
 } from 'models'
-import { useMemo, useState, useRef, useEffect } from 'react'
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
+import cuid from 'cuid'
 import { useDebouncedCallback } from 'use-debounce'
 import { isEmpty } from 'utils'
 import { useInterpretDataWithAI } from 'hooks/InterpretDataWithAI/useInterpretDataWithAI'
@@ -32,7 +33,7 @@ import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
 import { WOZInterpretDataWithAI } from 'models'
 import { getDeepKeys } from 'services/integrations'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebot, useTypebotActions, useTypebotVariables } from 'contexts/TypebotContext'
 import OctaSelect from 'components/octaComponents/OctaSelect/OctaSelect'
 import ConditionalEdges from './ConditionalEdges/ConditionalEdges'
 
@@ -147,6 +148,8 @@ export const InterpretDataWithAI = ({
   } = useInterpretDataWithAI({ step })
 
   const { typebot } = useTypebot()
+  const { createVariable, updateVariable, deleteVariable } = useTypebotActions()
+  const variables = useTypebotVariables()
   const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const [isTesting, setIsTesting] = useState(false)
   const [outputVariableName, setOutputVariableName] = useState(
@@ -156,15 +159,44 @@ export const InterpretDataWithAI = ({
   const isOutputVariableNameInvalid =
     outputVariableName.length > 0 && !SLUG_REGEX.test(outputVariableName)
 
+  const syncOutputVariable = useCallback(
+    (name: string) => {
+      onContentChange({ ...step.content, outputVariableName: name })
+
+      const existing = variables?.find((v) => v.fieldId === step.id)
+
+      if (!name) {
+        if (existing) deleteVariable(existing.id)
+        return
+      }
+
+      if (existing) {
+        updateVariable(existing.id, { name, token: name })
+      } else {
+        createVariable({
+          id: cuid(),
+          variableId: undefined,
+          domain: 'CHAT',
+          name,
+          token: name,
+          type: undefined,
+          fieldId: step.id,
+          example: undefined,
+          fixed: false,
+        })
+      }
+    },
+    [step, variables, onContentChange, createVariable, updateVariable, deleteVariable]
+  )
+
   const debouncedOutputVariableNameChange = useDebouncedCallback(
-    (value: string) =>
-      onContentChange({ ...step.content, outputVariableName: value }),
+    syncOutputVariable,
     isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? INSTRUCTIONS_DEBOUNCE_MS : 0
   )
 
   const handleOutputVariableNameChange = (value: string) => {
     setOutputVariableName(value)
-    debouncedOutputVariableNameChange(value)
+    if (!value || SLUG_REGEX.test(value)) debouncedOutputVariableNameChange(value)
   }
 
   const [resultOfInterpretWithAi, setResultOfInterpretWithAi] =
