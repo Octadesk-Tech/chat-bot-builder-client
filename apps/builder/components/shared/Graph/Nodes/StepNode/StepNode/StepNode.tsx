@@ -277,6 +277,7 @@ const StepNodeBase = ({
     <StepNodeContext.Provider value={{ setIsPopoverOpened, setIsModalOpen: handleSetIsModalOpen, registerBeforeClose }}>
       <ContextMenu<HTMLDivElement>
         renderMenu={() => <StepNodeContextMenu indices={indices} />}
+        isDisabled={isStartStep}
       >
         {(ref, isOpened) => (
           <Popover
