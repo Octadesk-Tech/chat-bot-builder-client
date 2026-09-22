@@ -89,9 +89,9 @@ export const TextBox = ({
   }
 
   const saveCarretBeforeBlur = () => {
-    if (textBoxRef.current?.selectionStart != null) {
-      setCarretPosition(textBoxRef.current.selectionStart)
-    }
+    if (document.activeElement !== textBoxRef.current) return
+    const pos = textBoxRef.current?.selectionStart ?? -1
+    if (pos >= 0) setCarretPosition(pos)
   }
 
   const adapterValueOnChange = (event: any) => {
