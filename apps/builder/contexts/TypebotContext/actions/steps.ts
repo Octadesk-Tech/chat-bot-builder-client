@@ -64,16 +64,24 @@ const stepsAction = (
   duplicateStep: ({ blockIndex, stepIndex }: StepIndices) =>
     setTypebot((typebot) =>
       produce(typebot, (typebot) => {
+        if (isStartStepAt(typebot, { blockIndex, stepIndex })) return
         const step = { ...typebot.blocks[blockIndex].steps[stepIndex] }
         const newStep = duplicateStepDraft(step.blockId)(step)
         typebot.blocks[blockIndex].steps.splice(stepIndex + 1, 0, newStep)
       })
     ),
   detachStepFromBlock: (indices: StepIndices) =>
-    setTypebot((typebot) => produce(typebot, removeStepFromBlock(indices))),
+    setTypebot((typebot) =>
+      produce(typebot, (typebot) => {
+        if (isStartStepAt(typebot, indices)) return
+        removeStepFromBlock(indices)(typebot)
+      })
+    ),
   deleteStep: ({ blockIndex, stepIndex }: StepIndices) =>
     setTypebot((typebot) =>
       produce(typebot, (typebot) => {
+        if (isStartStepAt(typebot, { blockIndex, stepIndex })) return
+
         const stepId = typebot.blocks[blockIndex].steps[stepIndex].id
         setEmptyFields([stepId], ActionsTypeEmptyFields.REMOVE)
 
@@ -87,6 +95,12 @@ const stepsAction = (
       })
     ),
 })
+
+// A etapa de inicio do bot nunca pode ser removida ou duplicada
+const isStartStepAt = (
+  typebot: WritableDraft<Typebot>,
+  { blockIndex, stepIndex }: StepIndices
+) => typebot.blocks[blockIndex]?.steps[stepIndex]?.type === 'start'
 
 const removeReferences = (updates: Partial<Omit<Step, 'id' | 'type'>>) =>
   Object.entries(updates).reduce((clonedUpdates, [key, value]) => {
