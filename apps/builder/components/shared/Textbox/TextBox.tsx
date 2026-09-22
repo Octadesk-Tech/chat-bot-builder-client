@@ -84,6 +84,13 @@ export const TextBox = ({
     setCarretPosition(textBoxRef.current.selectionStart)
   }
 
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement & HTMLTextAreaElement>) => {
+    if (textBoxRef.current?.selectionStart != null) {
+      setCarretPosition(textBoxRef.current.selectionStart)
+    }
+    props.onBlur?.(e)
+  }
+
   const adapterValueOnChange = (event: any) => {
     if (typeof event === 'string') {
       return event
@@ -110,7 +117,7 @@ export const TextBox = ({
     <HStack spacing={0} align={'flex-end'} w="full" gap={2}>
       <TextBox
         {...props}
-        onBlur={props.onBlur}
+        onBlur={handleBlur}
         ref={textBoxRef}
         onKeyUp={handleKeyUp}
         onClick={handleKeyUp}
