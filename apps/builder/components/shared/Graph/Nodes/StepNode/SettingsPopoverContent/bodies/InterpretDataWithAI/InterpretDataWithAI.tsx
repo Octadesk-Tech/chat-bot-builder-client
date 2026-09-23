@@ -46,6 +46,7 @@ type Props = {
 
 const INSTRUCTIONS_DEBOUNCE_MS = 500
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const isValidSlug = (value: string) => SLUG_REGEX.test(value)
 
 type InstructionsTextareaProps = {
   initialValue: string
@@ -157,7 +158,7 @@ export const InterpretDataWithAI = ({
   )
 
   const isOutputVariableNameInvalid =
-    outputVariableName.length > 0 && !SLUG_REGEX.test(outputVariableName)
+    outputVariableName.length > 0 && !isValidSlug(outputVariableName)
 
   const isOutputVariableNameDuplicate = useMemo(() => {
     if (!outputVariableName || isOutputVariableNameInvalid) return false
@@ -166,11 +167,11 @@ export const InterpretDataWithAI = ({
         (v) => v.token === outputVariableName && v.fieldId !== step.id
       ) ?? false
     )
-  }, [outputVariableName, isOutputVariableNameInvalid, variables, step.id])
+  }, [outputVariableName, variables, step.id])
 
   const syncOutputVariable = useCallback(
     (name: string) => {
-      onContentChange({ ...step.content, outputVariableName: name })
+      onContentChange({ ...(step.content ?? {}), outputVariableName: name })
 
       const existing = variables?.find((v) => v.fieldId === step.id)
 
@@ -205,7 +206,7 @@ export const InterpretDataWithAI = ({
 
   const handleOutputVariableNameChange = (value: string) => {
     setOutputVariableName(value)
-    const isFormatValid = !value || SLUG_REGEX.test(value)
+    const isFormatValid = !value || isValidSlug(value)
     const isDuplicate = value
       ? (variables?.some((v) => v.token === value && v.fieldId !== step.id) ?? false)
       : false
