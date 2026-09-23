@@ -46,9 +46,9 @@ export const KeyValueInputs = ({
   const handleValueChange = (value: string) => {
     if (value === item.value) return
     const name = value.replace('{{', '').replace('}}', '')
-    const variable =
-      typebot?.variables.filter((item) => item.token === name) || []
-    onItemChange({ ...item, value, properties: variable[0] })
+    const baseName = name.split('.')[0].trim()
+    const variable = typebot?.variables.find((item) => item.token === baseName)
+    onItemChange({ ...item, value, properties: variable })
   }
 
   const onDeleteClick = () => {

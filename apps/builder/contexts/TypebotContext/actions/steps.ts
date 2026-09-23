@@ -10,6 +10,7 @@ import { WritableDraft } from 'immer/dist/types/types-external'
 import { SetEmptyFields, SetTypebot } from '../TypebotContext'
 import produce from 'immer'
 import { cleanUpEdgeDraft, deleteEdgeDraft } from './edges'
+import { deleteVariableDraft } from './variables'
 import cuid from 'cuid'
 import { byId, isWebhookStep, stepHasItems } from 'utils'
 import { duplicateItemDraft } from './items'
@@ -88,6 +89,9 @@ const stepsAction = (
         removeStepFromBlock({ blockIndex, stepIndex })(typebot)
         cleanUpEdgeDraft(typebot, removingStep.id)
         removeEmptyBlocks(typebot)
+
+        const stepVariable = typebot.variables.find((v) => v.fieldId === removingStep.id)
+        if (stepVariable) deleteVariableDraft(typebot, stepVariable.id)
       })
     ),
 })
