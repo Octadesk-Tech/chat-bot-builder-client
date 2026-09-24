@@ -39,6 +39,7 @@ import {
 import { v4 as uuid } from 'uuid'
 
 import { OctaProperty } from 'models'
+import { Channels } from 'enums/channels'
 
 export type WorkspaceWithMembers = Workspace & { members: MemberInWorkspace[] }
 
@@ -706,7 +707,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const fluxChannel = document.referrer.split('/')
 
-    const channel = query?.channel ?? (fluxChannel[5] || 'web')
+    const channel = query?.channel ?? (fluxChannel[5] || Channels.WEB)
 
     setCurrentWorkspace((current): any => ({ ...current, channel } as any))
   }, [])
