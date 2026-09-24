@@ -205,7 +205,7 @@ export const VariableSearchInput = ({
           return
         }
         onSelectVariable(event)
-        debounced(event.token)
+        debounced.cancel()
         onClose()
 
         if (isCloseModal) {

@@ -84,6 +84,12 @@ export const TextBox = ({
     setCarretPosition(textBoxRef.current.selectionStart)
   }
 
+  const saveCarretBeforeBlur = () => {
+    if (document.activeElement !== textBoxRef.current) return
+    const pos = textBoxRef.current?.selectionStart ?? -1
+    if (pos >= 0) setCarretPosition(pos)
+  }
+
   const adapterValueOnChange = (event: any) => {
     if (typeof event === 'string') {
       return event
@@ -107,7 +113,7 @@ export const TextBox = ({
     )
   }
   return (
-    <HStack spacing={0} align={'flex-end'} w="full" gap={2}>
+    <HStack spacing={0} align={'flex-end'} w="full" gap={2} onMouseDown={saveCarretBeforeBlur}>
       <TextBox
         {...props}
         onBlur={props.onBlur}

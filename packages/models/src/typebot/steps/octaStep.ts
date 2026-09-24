@@ -291,6 +291,7 @@ export enum WOZInterpretDataWithAIResponseFormat {
 export type WOZInterpretDataWithAIOptions = {
   systemMessage: string
   responseFormat?: WOZInterpretDataWithAIResponseFormat
+  outputVariableName?: string
 }
 
 export type CallOtherBotOptions = BaseOctaOptions & {

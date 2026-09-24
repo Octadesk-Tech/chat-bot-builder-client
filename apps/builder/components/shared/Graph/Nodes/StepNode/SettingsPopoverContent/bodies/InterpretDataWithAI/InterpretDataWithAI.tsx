@@ -12,6 +12,10 @@ import {
   Spinner,
   HStack,
   Divider,
+  Input,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
 } from '@chakra-ui/react'
 import {
   IntegrationStepType,
@@ -20,7 +24,8 @@ import {
   WOZInterpretDataWithAIOptions,
   WOZInterpretDataWithAIResponseFormat,
 } from 'models'
-import { useMemo, useState, useRef, useEffect } from 'react'
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react'
+import cuid from 'cuid'
 import { useDebouncedCallback } from 'use-debounce'
 import { isEmpty } from 'utils'
 import { useInterpretDataWithAI } from 'hooks/InterpretDataWithAI/useInterpretDataWithAI'
@@ -28,7 +33,7 @@ import { VariablesMenu } from './VariablesMenu'
 import { MdInfoOutline } from 'react-icons/md'
 import { WOZInterpretDataWithAI } from 'models'
 import { getDeepKeys } from 'services/integrations'
-import { useTypebot } from 'contexts/TypebotContext'
+import { useTypebot, useTypebotActions, useTypebotVariables } from 'contexts/TypebotContext'
 import OctaSelect from 'components/octaComponents/OctaSelect/OctaSelect'
 import ConditionalEdges from './ConditionalEdges/ConditionalEdges'
 
@@ -40,6 +45,8 @@ type Props = {
 }
 
 const INSTRUCTIONS_DEBOUNCE_MS = 500
+const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const isValidSlug = (value: string) => SLUG_REGEX.test(value)
 
 type InstructionsTextareaProps = {
   initialValue: string
@@ -142,8 +149,69 @@ export const InterpretDataWithAI = ({
   } = useInterpretDataWithAI({ step })
 
   const { typebot } = useTypebot()
+  const { createVariable, updateVariable, deleteVariable } = useTypebotActions()
+  const variables = useTypebotVariables()
   const isAutomatedTasksBot = typebot?.availableFor.includes('automated-tasks')
   const [isTesting, setIsTesting] = useState(false)
+  const [outputVariableName, setOutputVariableName] = useState(
+    step?.content?.outputVariableName ?? ''
+  )
+
+  const isOutputVariableNameInvalid =
+    outputVariableName.length > 0 && !isValidSlug(outputVariableName)
+
+  const isOutputVariableNameDuplicate = useMemo(() => {
+    if (!outputVariableName || isOutputVariableNameInvalid) return false
+    return (
+      variables?.some(
+        (v) => v.token === outputVariableName && v.fieldId !== step.id
+      ) ?? false
+    )
+  }, [outputVariableName, variables, step.id])
+
+  const syncOutputVariable = useCallback(
+    (name: string) => {
+      onContentChange({ ...(step.content ?? {}), outputVariableName: name })
+
+      const existing = variables?.find((v) => v.fieldId === step.id)
+
+      if (!name) {
+        if (existing) deleteVariable(existing.id)
+        return
+      }
+
+      if (existing) {
+        updateVariable(existing.id, { name, token: name })
+      } else {
+        createVariable({
+          id: cuid(),
+          variableId: undefined,
+          domain: 'CHAT',
+          name,
+          token: name,
+          type: undefined,
+          fieldId: step.id,
+          example: undefined,
+          fixed: false,
+        })
+      }
+    },
+    [step, variables, onContentChange, createVariable, updateVariable, deleteVariable]
+  )
+
+  const debouncedOutputVariableNameChange = useDebouncedCallback(
+    syncOutputVariable,
+    isEmpty(process.env.NEXT_PUBLIC_E2E_TEST) ? INSTRUCTIONS_DEBOUNCE_MS : 0
+  )
+
+  const handleOutputVariableNameChange = (value: string) => {
+    setOutputVariableName(value)
+    const isFormatValid = !value || isValidSlug(value)
+    const isDuplicate = value
+      ? (variables?.some((v) => v.token === value && v.fieldId !== step.id) ?? false)
+      : false
+    if (isFormatValid && !isDuplicate) debouncedOutputVariableNameChange(value)
+  }
 
   const [resultOfInterpretWithAi, setResultOfInterpretWithAi] =
     useState<string>('')
@@ -370,6 +438,27 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
             findable
           />
         )}
+        {!isAutomatedTasksBot && (
+          <FormControl isInvalid={isOutputVariableNameInvalid || isOutputVariableNameDuplicate}>
+            <FormLabel fontWeight="bold">Nome da variável de saída</FormLabel>
+            <Input
+              placeholder="ex: variavel-teste"
+              value={outputVariableName}
+              onChange={(e) => handleOutputVariableNameChange(e.target.value)}
+              onBlur={() => debouncedOutputVariableNameChange.flush()}
+            />
+            {isOutputVariableNameInvalid && (
+              <FormErrorMessage>
+                Use apenas letras minúsculas, números e hífens (ex: variavel-teste)
+              </FormErrorMessage>
+            )}
+            {!isOutputVariableNameInvalid && isOutputVariableNameDuplicate && (
+              <FormErrorMessage>
+                Este nome já está em uso por outra variável do fluxo
+              </FormErrorMessage>
+            )}
+          </FormControl>
+        )}
         <Stack direction="row" justifyContent="space-between" w="full">
           <Stack direction="row" alignItems="center" gap={2}>
             <Text fontWeight="bold">Instrução de formatação</Text>
@@ -455,6 +544,9 @@ Use as variáveis: {{ numero-ticket }}, {{ status-ticket }},
     isNonGetMethod,
     isTesting,
     step,
+    outputVariableName,
+    isOutputVariableNameInvalid,
+    isOutputVariableNameDuplicate,
   ])
 
   return (
