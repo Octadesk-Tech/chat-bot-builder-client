@@ -33,6 +33,7 @@ import { EditIcon } from '@chakra-ui/icons'
 import { useRouter } from 'next/router'
 
 import { config } from 'config/octadesk.config'
+import { Channels } from 'enums/channels'
 
 interface IFlux {
   botId: string
@@ -57,7 +58,10 @@ const DashboardPage = () => {
     }
 
     const fetchBots = async (): Promise<void> => {
-      const { fluxes } = (await BotsService().getBots('whatsapp', 2)) as {
+      const { fluxes } = (await BotsService().getBots(
+        Channels.WHATSAPP,
+        2
+      )) as {
         fluxes: IFlux[]
       }
 
