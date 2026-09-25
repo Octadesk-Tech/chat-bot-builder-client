@@ -1,6 +1,9 @@
 import { Box, Checkbox, HStack, Stack, Text } from '@chakra-ui/react'
 import { ChangeEvent, RefObject, useState } from 'react'
 import { Step, WOZAssignStep } from 'models'
+import { useWorkspace } from 'contexts/WorkspaceContext'
+import CostReductionBadge from './CostReductionBadge'
+import { Channels } from 'enums/channels'
 
 const DisableContextConfirmationBox = ({
   onStepChange,
@@ -9,6 +12,7 @@ const DisableContextConfirmationBox = ({
   onStepChange: (step: Partial<Step>) => void
   stepRef: RefObject<WOZAssignStep>
 }) => {
+  const { workspace } = useWorkspace()
   const [isSeeMoreActive, setIsSeeMoreActive] = useState(false)
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,32 +48,31 @@ const DisableContextConfirmationBox = ({
         </HStack>
         {seeMoreComponent()}
       </HStack>
+      {workspace?.channel === Channels.WHATSAPP && (
+        <Box mt={2}>
+          <CostReductionBadge />
+        </Box>
+      )}
       {isSeeMoreActive && (
-        <Stack spacing={5} mt={3} pl={6} maxW="100%">
-          <Box>
-            <Text fontWeight="bold" fontSize="sm" color="blueGray.400" mb={1.5}>
-              Experiência menos inteligente e personalizada
+        <Stack spacing={5} mt={3} maxW="100%">
+          <Text fontSize="sm" color="blueGray.400" lineHeight="tall">
+            Quando ativado, o WOZ{' '}
+            <Text as="span" fontWeight="bold">
+              não confirmará o próximo passo
             </Text>
-            <Text fontSize="sm" color="blueGray.400" lineHeight="tall">
-              O WOZ não confirmará o assunto, baseado no que for definido em{' '}
-              <Text as="span" fontWeight="bold" color="blueGray.400">
-                Redirecionamento baseado no assunto da conversa
-              </Text>
-              , antes de seguir para a próxima etapa, não garantindo que o
-              contato esteja no caminho certo e tenha clareza sobre as opções
-              disponíveis.
+            , baseado no que for definido em{' '}
+            <Text as="span" fontWeight="bold">
+              Redirecionamento baseado no assunto da conversa
             </Text>
-          </Box>
-          <Box>
-            <Text fontWeight="bold" fontSize="sm" color="blueGray.400" mb={1.5}>
-              Menos erros, mais assertividade
+            . Apenas seguirá o caminho configurado de acordo com o contexto.
+          </Text>
+          <Text fontSize="sm" color="blueGray.400" lineHeight="tall">
+            Quando desativado, o WOZ confirma a intenção e evita que o contato{' '}
+            <Text as="span" fontWeight="bold">
+              siga para um fluxo incorreto sem querer
             </Text>
-            <Text fontSize="sm" color="blueGray.400" lineHeight="tall">
-              Essa confirmação evita que o contato siga para um fluxo incorreto
-              sem querer, tornando a interação mais precisa e reduzindo
-              retrabalho.
-            </Text>
-          </Box>
+            , tornando a interação mais precisa e reduzindo retrabalho.
+          </Text>
         </Stack>
       )}
     </Box>

@@ -34,6 +34,7 @@ import {
 import React, { useMemo, useState } from 'react'
 import { StepCard, StepCardOverlay } from './StepCard'
 import LearnAutomatedTasks from './LearnAutomatedTasks'
+import { Channels } from 'enums/channels'
 
 export const StepsSideBar = () => {
   const { setDraggedStepType, draggedStepType } = useStepDnd()
@@ -188,7 +189,7 @@ export const StepsSideBar = () => {
 
   const shouldDisableComponent = (type: StepType) => {
     return (
-      workspace?.channel === 'whatsapp' &&
+      workspace?.channel === Channels.WHATSAPP &&
       ((type === OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
         !verifyFeatureToggle('whatsapp-api')) ||
         (type === OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
@@ -224,7 +225,7 @@ export const StepsSideBar = () => {
   const wabaMessageSteps = wabaMessageComponent().filter(
     (step) =>
       shouldShowComponent(step) &&
-      workspace?.channel === 'whatsapp' &&
+      workspace?.channel === Channels.WHATSAPP &&
       verifyFeatureToggle('commerce-enabled')
   )
 
@@ -485,7 +486,7 @@ export const StepsSideBar = () => {
                     isDisabled={shouldDisableComponent(type)}
                   />
                 ))}
-                {workspace?.channel === 'whatsapp' &&
+                {workspace?.channel === Channels.WHATSAPP &&
                   octaWabaSteps.map((type) => (
                     <StepCard
                       key={type as string}

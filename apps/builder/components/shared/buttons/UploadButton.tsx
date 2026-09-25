@@ -30,6 +30,7 @@ import {
   MoreDetailsButton,
 } from './UploadButton.style'
 import { CheckCircleOutlineIcon, BlockIcon } from 'assets/icons'
+import { Channels } from 'enums/channels'
 
 type UploadButtonProps = {
   filePath: string
@@ -141,11 +142,11 @@ export const UploadButton = ({
 
   const channelTranslations = {
     resources: 'Recursos',
-    whatsapp: 'WhatsApp',
+    [Channels.WHATSAPP]: 'WhatsApp',
     WABA: 'WhatsApp Oficial',
-    instagram: 'Instagram',
-    'facebook-messenger': 'Messenger',
-    web: 'Widget',
+    [Channels.INSTAGRAM]: 'Instagram',
+    [Channels.FACEBOOK_MESSENGER]: 'Messenger',
+    [Channels.WEB]: 'Widget',
   }
 
   const channelsWidth = (100 - 30) / botChannelsSpecifications.length
@@ -245,7 +246,7 @@ export const UploadButton = ({
           ? 'Áudios, imagens e vídeos'
           : 'Áudios, imagens, vídeos e documentos'
       case 'attachmentMaxSize':
-        if (channel === 'instagram') {
+        if (channel === Channels.INSTAGRAM) {
           return 'Imagens até 8mB / outros até 25mB'
         }
         return `Até ${convertToMb((item as any)[channel].value)}mB`
@@ -275,7 +276,7 @@ export const UploadButton = ({
       '.jpg, .jpeg, .png, image/*, audio/*, video/*, .xlsx, .xls, image/*, .doc, .docx, .ppt, .pptx, .txt, .pdf'
 
     const options: { [key: string]: string } = {
-      [`instagram`]: '.jpg, .jpeg, .png, image/*, audio/*, video/*',
+      [Channels.INSTAGRAM]: '.jpg, .jpeg, .png, image/*, audio/*, video/*',
     }
 
     if (!workspace?.channel) return allExtensions
@@ -287,7 +288,7 @@ export const UploadButton = ({
   }, [workspace?.channel])
 
   const infosUpload = () => {
-    if (workspace?.channel === 'instagram') {
+    if (workspace?.channel === Channels.INSTAGRAM) {
       return `Use arquivos com extensão de áudios, imagens e vídeos`
     }
     return `Use arquivos com extensão de áudios, imagens, vídeos e documentos`
