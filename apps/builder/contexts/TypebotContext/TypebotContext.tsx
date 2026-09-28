@@ -64,6 +64,7 @@ import useCustomVariables from 'hooks/CustomVariables/useCustomVariables'
 import { ICustomVariable } from 'hooks/CustomVariables/interface'
 import { WOZService } from 'services/octadesk/woz/woz.service'
 import useWozProfiles from 'hooks/WozProfiles/useWozProfiles'
+import { Channels } from 'enums/channels'
 
 type UpdateTypebotPayload = Partial<{
   theme: Theme
@@ -606,7 +607,7 @@ export const TypebotContext = ({
   const [botFluxesList, setBotFluxesList] = useState<Array<any>>([])
   useEffect(() => {
     const fluxChannel = document.referrer.split('/')
-    const channel = fluxChannel[5] || 'web'
+    const channel = fluxChannel[5] || Channels.WEB
     const fetchBots = async (): Promise<void> => {
       const v1V2BotsList: Array<any> = []
       Promise.all([

@@ -20,6 +20,7 @@ import {
 import 'emoji-mart/css/emoji-mart.css'
 import { Picker } from 'emoji-mart'
 import { useWorkspace } from 'contexts/WorkspaceContext'
+import { Channels } from 'enums/channels'
 
 type Props = {
   editor: PlateEditor<Value>
@@ -136,7 +137,7 @@ export const ToolBar = ({
           </span>
         </>
       )}
-      {workspace?.channel === 'web' && (
+      {workspace?.channel === Channels.WEB && (
         <>
           <span data-testid="underline-button">
             <MarkToolbarButton
