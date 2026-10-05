@@ -47,6 +47,7 @@ type Props = {
 const INSTRUCTIONS_DEBOUNCE_MS = 500
 const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 const isValidSlug = (value: string) => SLUG_REGEX.test(value)
+const toVariableToken = (name: string) => `#${name}`
 
 type InstructionsTextareaProps = {
   initialValue: string
@@ -160,14 +161,18 @@ export const InterpretDataWithAI = ({
   const isOutputVariableNameInvalid =
     outputVariableName.length > 0 && !isValidSlug(outputVariableName)
 
+  const isNameTakenByOtherVariable = useCallback(
+    (name: string) =>
+      variables?.some(
+        (v) => v.token === toVariableToken(name) && v.fieldId !== step.id
+      ) ?? false,
+    [variables, step.id]
+  )
+
   const isOutputVariableNameDuplicate = useMemo(() => {
     if (!outputVariableName || isOutputVariableNameInvalid) return false
-    return (
-      variables?.some(
-        (v) => v.token === outputVariableName && v.fieldId !== step.id
-      ) ?? false
-    )
-  }, [outputVariableName, variables, step.id])
+    return isNameTakenByOtherVariable(outputVariableName)
+  }, [outputVariableName, isOutputVariableNameInvalid, isNameTakenByOtherVariable])
 
   const syncOutputVariable = useCallback(
     (name: string) => {
@@ -181,14 +186,14 @@ export const InterpretDataWithAI = ({
       }
 
       if (existing) {
-        updateVariable(existing.id, { name, token: name })
+        updateVariable(existing.id, { name, token: toVariableToken(name) })
       } else {
         createVariable({
           id: cuid(),
           variableId: undefined,
           domain: 'CHAT',
           name,
-          token: name,
+          token: toVariableToken(name),
           type: undefined,
           fieldId: step.id,
           example: undefined,
@@ -207,9 +212,7 @@ export const InterpretDataWithAI = ({
   const handleOutputVariableNameChange = (value: string) => {
     setOutputVariableName(value)
     const isFormatValid = !value || isValidSlug(value)
-    const isDuplicate = value
-      ? (variables?.some((v) => v.token === value && v.fieldId !== step.id) ?? false)
-      : false
+    const isDuplicate = value ? isNameTakenByOtherVariable(value) : false
     if (isFormatValid && !isDuplicate) debouncedOutputVariableNameChange(value)
   }
 
