@@ -142,7 +142,7 @@ export const StepsSideBar = () => {
 
   const isValidToCurrentDomain = (type: StepType) => {
     if (LIMITED_DOMAINS.includes(typebot?.domain || 'chat')) {
-      return type === IntegrationStepType.WEBHOOK
+      return EVENT_AVAILABLE_STEPS.includes(type)
     }
 
     if (type === IntegrationStepType.EXTERNAL_EVENT) {
