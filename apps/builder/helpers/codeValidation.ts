@@ -36,3 +36,29 @@ const LOOP_WARNINGS: Array<{ pattern: RegExp; label: string }> = [
 
 export const detectSuspiciousLoops = (code: string): string[] =>
   LOOP_WARNINGS.filter((f) => f.pattern.test(code)).map((f) => f.label)
+
+const PREDICATE_METHODS =
+  /\.(find|filter|some|every|findIndex|findLast)\s*\(\s*\(?\s*([A-Za-z_$][\w$]*)\s*\)?\s*=>/g
+
+// `find(i => i.id = 'x')` assigns instead of comparing, so the predicate is always truthy and
+// `find` returns the first element — a frequent silent bug in user code. `===`, `==`, `!==`,
+// `<=` and `>=` don't match (the `=` is either preceded by an operator or followed by `=`).
+export const detectPredicateAssignments = (code: string): string[] => {
+  const warnings: string[] = []
+
+  PREDICATE_METHODS.lastIndex = 0
+  let match: RegExpExecArray | null
+  while ((match = PREDICATE_METHODS.exec(code)) !== null) {
+    const [, method, param] = match
+    const body = code.slice(
+      PREDICATE_METHODS.lastIndex,
+      PREDICATE_METHODS.lastIndex + 200
+    )
+    const assignment = new RegExp(
+      `\\b${param}\\s*(?:\\.\\w+|\\[[^\\]]*\\])\\s*=(?!=)`
+    )
+    if (assignment.test(body)) warnings.push(`${method}(${param} => ...)`)
+  }
+
+  return warnings
+}
