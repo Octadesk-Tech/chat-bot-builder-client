@@ -42,6 +42,7 @@ import {
 } from './bodies'
 import { ChoiceInputSettingsBody } from './bodies/ChoiceInputSettingsBody'
 import { CodeSettings } from './bodies/CodeSettings'
+import { SetVariableSettings } from './bodies/SetVariableSettings'
 import { ConditionSettingsBody } from './bodies/ConditionSettingsBody'
 import { ExternalEvent } from './bodies/ExternalEvent/ExternalEvent'
 import { InputMediaSettingBody } from './bodies/InputMediaSettingsBody'
@@ -230,6 +231,14 @@ export const StepSettings = ({
     case LogicStepType.CHAT_RETURN: {
       return (
         <ChatReturnBody step={step} onOptionsChange={handleOptionsChange} />
+      )
+    }
+    case LogicStepType.SET_VARIABLE: {
+      return (
+        <SetVariableSettings
+          options={step.options}
+          onOptionsChange={handleOptionsChange}
+        />
       )
     }
     case LogicStepType.REDIRECT: {
