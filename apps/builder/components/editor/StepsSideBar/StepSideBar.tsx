@@ -132,6 +132,7 @@ export const StepsSideBar = () => {
   const EVENT_AVAILABLE_STEPS: StepType[] = [
     IntegrationStepType.WEBHOOK,
     WOZStepType.INTERPRET_DATA_WITH_AI,
+    LogicStepType.SET_VARIABLE,
   ]
   const AUTOMATED_TASKS_AVAILABLE_STEPS: StepType[] = [
     WOZStepType.MESSAGE,
