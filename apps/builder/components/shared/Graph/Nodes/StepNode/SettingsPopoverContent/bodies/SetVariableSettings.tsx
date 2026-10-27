@@ -10,7 +10,11 @@ import {
 import { CodeEditor } from 'components/shared/CodeEditor'
 import { Textarea } from 'components/shared/Textbox'
 import { VariableSearchInput } from 'components/shared/VariableSearchInput/VariableSearchInput'
-import { detectSuspiciousLoops, validateCode } from 'helpers/codeValidation'
+import {
+  detectPredicateAssignments,
+  detectSuspiciousLoops,
+  validateCode,
+} from 'helpers/codeValidation'
 import { SetVariableOptions, Variable } from 'models'
 import React, { useMemo } from 'react'
 
@@ -47,6 +51,7 @@ export const SetVariableSettings = ({ options, onOptionsChange }: Props) => {
     return {
       validation: validateCode(options.expressionToEvaluate),
       loops: detectSuspiciousLoops(options.expressionToEvaluate),
+      assignments: detectPredicateAssignments(options.expressionToEvaluate),
     }
   }, [options.isCode, options.expressionToEvaluate])
 
@@ -104,6 +109,15 @@ export const SetVariableSettings = ({ options, onOptionsChange }: Props) => {
                 <AlertIcon />
                 Possível loop infinito ({codeIssues.loops.join(', ')}). A
                 execução é interrompida após 3 segundos.
+              </Alert>
+            )}
+            {codeIssues && codeIssues.assignments.length > 0 && (
+              <Alert status="warning" borderRadius="md" fontSize="sm">
+                <AlertIcon />
+                Possível atribuição em vez de comparação em{' '}
+                {codeIssues.assignments.join(', ')} — use <code>===</code> para
+                comparar (um <code>=</code> sozinho atribui o valor e o filtro
+                retorna sempre o primeiro item).
               </Alert>
             )}
           </>
