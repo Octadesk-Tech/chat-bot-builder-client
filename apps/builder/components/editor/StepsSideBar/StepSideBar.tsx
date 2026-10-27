@@ -121,7 +121,6 @@ export const StepsSideBar = () => {
       type !== BubbleStepType.IMAGE &&
       type !== InputStepType.URL &&
       type !== InputStepType.PAYMENT &&
-      type !== LogicStepType.SET_VARIABLE &&
       type !== LogicStepType.REDIRECT &&
       type !== LogicStepType.CODE &&
       type !== LogicStepType.TYPEBOT_LINK &&
