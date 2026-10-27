@@ -82,8 +82,11 @@ export const SetVariableSettings = ({ options, onOptionsChange }: Props) => {
           <>
             <Text fontSize="xs" color="gray.500">
               Escreva JavaScript. Leia as variáveis da conversa com{' '}
-              <code>variables[&apos;nome&apos;]</code> e finalize com{' '}
-              <code>return</code> — o valor retornado é salvo na variável.
+              <code>variables[&apos;nome&apos;]</code>, os dados da sala com{' '}
+              <code>room[&apos;campo&apos;]</code> e as mensagens com{' '}
+              <code>messages[0][&apos;campo&apos;]</code> (mais recente
+              primeiro). Finalize com <code>return</code> — o valor retornado é
+              salvo na variável.
             </Text>
             <CodeEditor
               value={options.expressionToEvaluate ?? ''}
