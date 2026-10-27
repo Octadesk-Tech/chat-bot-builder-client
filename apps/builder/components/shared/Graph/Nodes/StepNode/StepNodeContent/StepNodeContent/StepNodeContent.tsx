@@ -21,6 +21,7 @@ import {
 } from '../contents'
 import { AssignToTeamContent } from '../contents/AssignToTeam/AssignToTeamContent'
 import { CallOtherBotContent } from '../contents/CallOtherBot/CallOtherBotContent'
+import { ContinueOnSiteContent } from '../contents/ContinueOnSite/ContinueOnSiteContent'
 // import { WhatsAppOptionsContent } from '../contents/WhatsAppOptions/'
 // import { ConfigureContent } from './contents/ConfigureContent'
 import { OctaCommerceContent } from '../contents/OctaCommerceContent'
@@ -176,6 +177,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     }
     case OctaWabaStepType.COMMERCE: {
       return <OctaCommerceContent options={step.options} />
+    }
+    case OctaWabaStepType.CONTINUE_ON_SITE: {
+      return <ContinueOnSiteContent options={step.options} />
     }
     case OctaWabaStepType.WHATSAPP_BUTTONS_LIST: {
       return <WhatsAppButtonsContent step={step} indices={indices} />

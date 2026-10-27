@@ -12,7 +12,10 @@ export type OctaStep =
 
 // Waba steps
 
-export type OctaWabaStep = WhatsAppOptionsListStep | WhatsAppButtonsListStep
+export type OctaWabaStep =
+  | WhatsAppOptionsListStep
+  | WhatsAppButtonsListStep
+  | ContinueOnSiteStep
 
 export type WOZStep = WOZSuggestionStep | WOZAssignStep | WOZInterpretDataWithAI
 
@@ -32,6 +35,7 @@ export type OctaWabaStepOptions =
   | WhatsAppOptionsListOptions
   | WhatsAppButtonsListOptions
   | CommerceOptions
+  | ContinueOnSiteOptions
 
 // Steps that has variables on the popup modal
 export type OctaStepWithOptions =
@@ -66,6 +70,7 @@ export enum OctaWabaStepType {
   WHATSAPP_OPTIONS_LIST = 'whatsapp options list',
   WHATSAPP_BUTTONS_LIST = 'whatsapp buttons list',
   COMMERCE = 'commerce',
+  CONTINUE_ON_SITE = 'continue on site',
 }
 
 // Regular steps types that have options
@@ -118,6 +123,11 @@ export type CommerceStep = StepBase & {
 export type CallOtherBotStep = StepBase & {
   type: OctaStepType.CALL_OTHER_BOT
   options: CallOtherBotOptions
+}
+
+export type ContinueOnSiteStep = StepBase & {
+  type: OctaWabaStepType.CONTINUE_ON_SITE
+  options: ContinueOnSiteOptions
 }
 
 export type WhatsAppOptionsListStep = StepBase & {
@@ -299,6 +309,19 @@ export type CallOtherBotOptions = BaseOctaOptions & {
   botToCall: string
 }
 
+// "Continuar no site": mensagem interativa cta_url do WhatsApp.
+// title -> header.text (60, opcional), description -> body.text (1024),
+// footer -> footer.text (60, opcional),
+// buttonText -> action.parameters.display_text (20),
+// widgetFluxId -> id do bot web usado pelo backend para montar a URL.
+export type ContinueOnSiteOptions = {
+  title?: string
+  description: string
+  footer?: string
+  buttonText: string
+  widgetFluxId: string
+}
+
 export type Assign = {
   id: string
   variableId?: string
@@ -478,6 +501,14 @@ export const defaultCallOtherBotOptions: CallOtherBotOptions = {
   botToCall: '',
   name: '',
   subject: '',
+}
+
+export const defaultContinueOnSiteOptions: ContinueOnSiteOptions = {
+  title: '',
+  description: '',
+  footer: '',
+  buttonText: '',
+  widgetFluxId: '',
 }
 
 const seeYa = 'Até mais!'

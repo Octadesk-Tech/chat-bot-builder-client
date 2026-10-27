@@ -153,6 +153,10 @@ export const StepsSideBar = () => {
       return verifyFeatureToggle('customer-recontact')
     }
 
+    if (type === OctaWabaStepType.CONTINUE_ON_SITE) {
+      return verifyFeatureToggle('allow-to-continue-chatting-on-website')
+    }
+
     return true
   }
 
@@ -195,12 +199,23 @@ export const StepsSideBar = () => {
         (type === OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
           !verifyFeatureToggle('whatsapp-api')) ||
         (type === OctaWabaStepType.COMMERCE &&
+          !verifyFeatureToggle('whatsapp-api')) ||
+        (type === OctaWabaStepType.CONTINUE_ON_SITE &&
           !verifyFeatureToggle('whatsapp-api')))
     )
   }
 
   const wabaMessageComponent = () => {
-    return [OctaWabaStepType.COMMERCE]
+    return [OctaWabaStepType.COMMERCE, OctaWabaStepType.CONTINUE_ON_SITE]
+  }
+
+  const wabaMessageExtraFlag: Partial<Record<OctaWabaStepType, string>> = {
+    [OctaWabaStepType.COMMERCE]: 'commerce-enabled',
+  }
+
+  const isWabaMessageEnabled = (type: OctaWabaStepType) => {
+    const flag = wabaMessageExtraFlag[type]
+    return flag ? verifyFeatureToggle(flag) : true
   }
 
   const getBaseUrl = () => {
@@ -226,7 +241,7 @@ export const StepsSideBar = () => {
     (step) =>
       shouldShowComponent(step) &&
       workspace?.channel === Channels.WHATSAPP &&
-      verifyFeatureToggle('commerce-enabled')
+      isWabaMessageEnabled(step)
   )
 
   const wozAssign = Object.values(WOZStepType).filter(
