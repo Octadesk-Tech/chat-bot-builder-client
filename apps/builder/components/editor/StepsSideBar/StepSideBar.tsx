@@ -140,6 +140,18 @@ export const StepsSideBar = () => {
   ]
   const LIMITED_DOMAINS = ['person', 'ticket']
 
+  const INTERACTIVE_MESSAGE_STEPS: StepType[] = [
+    OctaWabaStepType.WHATSAPP_CAROUSEL,
+    OctaWabaStepType.WHATSAPP_LOCATION_REQUEST,
+  ]
+
+  const WHATSAPP_API_STEPS: StepType[] = [
+    OctaWabaStepType.WHATSAPP_BUTTONS_LIST,
+    OctaWabaStepType.WHATSAPP_OPTIONS_LIST,
+    OctaWabaStepType.COMMERCE,
+    ...INTERACTIVE_MESSAGE_STEPS,
+  ]
+
   const isValidToCurrentDomain = (type: StepType) => {
     if (LIMITED_DOMAINS.includes(typebot?.domain || 'chat')) {
       return EVENT_AVAILABLE_STEPS.includes(type)
@@ -151,6 +163,10 @@ export const StepsSideBar = () => {
 
     if (type === LogicStepType.CHAT_RETURN) {
       return verifyFeatureToggle('customer-recontact')
+    }
+
+    if (INTERACTIVE_MESSAGE_STEPS.includes(type)) {
+      return verifyFeatureToggle('interactive-message-templates')
     }
 
     return true
@@ -190,17 +206,13 @@ export const StepsSideBar = () => {
   const shouldDisableComponent = (type: StepType) => {
     return (
       workspace?.channel === Channels.WHATSAPP &&
-      ((type === OctaWabaStepType.WHATSAPP_BUTTONS_LIST &&
-        !verifyFeatureToggle('whatsapp-api')) ||
-        (type === OctaWabaStepType.WHATSAPP_OPTIONS_LIST &&
-          !verifyFeatureToggle('whatsapp-api')) ||
-        (type === OctaWabaStepType.COMMERCE &&
-          !verifyFeatureToggle('whatsapp-api')))
+      WHATSAPP_API_STEPS.includes(type) &&
+      !verifyFeatureToggle('whatsapp-api')
     )
   }
 
   const wabaMessageComponent = () => {
-    return [OctaWabaStepType.COMMERCE]
+    return [OctaWabaStepType.COMMERCE, OctaWabaStepType.WHATSAPP_CAROUSEL]
   }
 
   const getBaseUrl = () => {
@@ -226,7 +238,8 @@ export const StepsSideBar = () => {
     (step) =>
       shouldShowComponent(step) &&
       workspace?.channel === Channels.WHATSAPP &&
-      verifyFeatureToggle('commerce-enabled')
+      (step !== OctaWabaStepType.COMMERCE ||
+        verifyFeatureToggle('commerce-enabled'))
   )
 
   const wozAssign = Object.values(WOZStepType).filter(

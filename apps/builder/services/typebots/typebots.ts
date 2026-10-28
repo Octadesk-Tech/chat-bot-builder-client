@@ -61,6 +61,8 @@ import {
   defaultWOZSuggestionOptions,
   defaultWebhookOptions,
   defaultWhatsAppButtonsListOptions,
+  defaultWhatsAppCarouselOptions,
+  defaultWhatsAppLocationRequestOptions,
   defaultWhatsAppOptionsListContent,
   defaultWhatsAppOptionsListOptions,
   ReturnType,
@@ -559,6 +561,10 @@ const parseOctaStepOptions = (
       return defaultWhatsAppOptionsListOptions
     case OctaWabaStepType.WHATSAPP_BUTTONS_LIST:
       return defaultWhatsAppButtonsListOptions
+    case OctaWabaStepType.WHATSAPP_CAROUSEL:
+      return defaultWhatsAppCarouselOptions
+    case OctaWabaStepType.WHATSAPP_LOCATION_REQUEST:
+      return defaultWhatsAppLocationRequestOptions
     default:
       return null
   }

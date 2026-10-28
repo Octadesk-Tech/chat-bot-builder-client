@@ -8,6 +8,7 @@ import {
   Step,
   IntegrationStepType,
   Edge,
+  WhatsAppCarouselOptions,
 } from 'models'
 import { isBubbleStepType, isInputStep, stepHasItems } from 'utils'
 import { z } from 'zod'
@@ -58,6 +59,31 @@ const hasConditionSameTargetBlock = (step: Step, edges: Edge[]): boolean => {
   }
 
   return false
+}
+
+const MIN_CAROUSEL_CARDS = 2
+const CAROUSEL_URL_REGEX = /^https?:\/\/\S+$/i
+
+const getCarouselValidationMessage = (
+  options?: WhatsAppCarouselOptions
+): string | undefined => {
+  const cards = options?.cards ?? []
+
+  if (cards.length < MIN_CAROUSEL_CARDS)
+    return `O carrossel precisa de pelo menos ${MIN_CAROUSEL_CARDS} cards`
+
+  if (
+    cards.some(
+      (card) => !card.media?.url || !card.buttonText?.trim() || !card.url
+    )
+  )
+    return 'Preencha a mídia, o texto e o link do botão de todos os cards'
+
+  if (cards.some((card) => !CAROUSEL_URL_REGEX.test(card.url)))
+    return 'Informe links que comecem com http:// ou https://'
+
+  if (new Set(cards.map((card) => card.media?.type)).size > 1)
+    return 'Todos os cards precisam ter o mesmo tipo de mídia'
 }
 
 const inpuStepsWithFallbackMessages = [
@@ -144,6 +170,29 @@ export const getValidationMessages = (
         data.push({
           message: step?.options?.listTitle?.content?.plainText,
         })
+      }
+    }
+
+    if (
+      OctaWabaStepType.WHATSAPP_CAROUSEL === step.type ||
+      OctaWabaStepType.WHATSAPP_LOCATION_REQUEST === step.type
+    ) {
+      data.push({
+        message: step?.options?.body?.content?.plainText,
+        max: { value: 1024 },
+      })
+    }
+
+    if (OctaWabaStepType.WHATSAPP_CAROUSEL === step.type) {
+      const carouselMessage = getCarouselValidationMessage(step.options)
+
+      if (carouselMessage) {
+        return [
+          {
+            type: VALIDATION_MESSAGE_TYPE.WARNING,
+            message: [carouselMessage],
+          },
+        ]
       }
     }
 

@@ -12,7 +12,11 @@ export type OctaStep =
 
 // Waba steps
 
-export type OctaWabaStep = WhatsAppOptionsListStep | WhatsAppButtonsListStep
+export type OctaWabaStep =
+  | WhatsAppOptionsListStep
+  | WhatsAppButtonsListStep
+  | WhatsAppCarouselStep
+  | WhatsAppLocationRequestStep
 
 export type WOZStep = WOZSuggestionStep | WOZAssignStep | WOZInterpretDataWithAI
 
@@ -31,6 +35,8 @@ export type OctaStepOptions =
 export type OctaWabaStepOptions =
   | WhatsAppOptionsListOptions
   | WhatsAppButtonsListOptions
+  | WhatsAppCarouselOptions
+  | WhatsAppLocationRequestOptions
   | CommerceOptions
 
 // Steps that has variables on the popup modal
@@ -66,6 +72,8 @@ export enum OctaWabaStepType {
   WHATSAPP_OPTIONS_LIST = 'whatsapp options list',
   WHATSAPP_BUTTONS_LIST = 'whatsapp buttons list',
   COMMERCE = 'commerce',
+  WHATSAPP_CAROUSEL = 'whatsapp carousel',
+  WHATSAPP_LOCATION_REQUEST = 'whatsapp location request',
 }
 
 // Regular steps types that have options
@@ -130,6 +138,16 @@ export type WhatsAppButtonsListStep = StepBase & {
   type: OctaWabaStepType.WHATSAPP_BUTTONS_LIST
   options: WhatsAppButtonsListOptions
   items: [WhatsAppButtonsItem]
+}
+
+export type WhatsAppCarouselStep = StepBase & {
+  type: OctaWabaStepType.WHATSAPP_CAROUSEL
+  options: WhatsAppCarouselOptions
+}
+
+export type WhatsAppLocationRequestStep = StepBase & {
+  type: OctaWabaStepType.WHATSAPP_LOCATION_REQUEST
+  options: WhatsAppLocationRequestOptions
 }
 
 export type WhatsAppOptionsItem = ItemBase & {
@@ -366,6 +384,38 @@ export type WhatsAppButtonsListOptions = BaseOctaOptions & {
   fallbackMessages: Array<TextBubbleContent>
   property: OctaProperty
   variableId: string
+}
+
+export type WhatsAppCarouselMediaType = 'image' | 'video'
+
+export type WhatsAppCarouselCard = {
+  id: string
+  media?: {
+    url: string
+    type: WhatsAppCarouselMediaType
+    name?: string
+    size?: number
+  }
+  text?: {
+    content?: TextBubbleContent
+  }
+  buttonText: string
+  url: string
+}
+
+export type WhatsAppCarouselOptions = BaseOctaOptions & {
+  body: {
+    content?: TextBubbleContent
+  }
+  cards: Array<WhatsAppCarouselCard>
+}
+
+export type WhatsAppLocationRequestOptions = BaseOctaOptions & {
+  body: {
+    content?: TextBubbleContent
+  }
+  property?: OctaProperty
+  variableId?: string
 }
 
 export const defaultOfficeHoursOptions: OfficeHoursOptions = {
@@ -614,3 +664,23 @@ export const defaultWhatsAppButtonsListOptions: WhatsAppButtonsListOptions = {
   ),
   variableId: '',
 }
+
+export const defaultWhatsAppCarouselOptions: WhatsAppCarouselOptions = {
+  name: '',
+  subject: '',
+  body: {
+    content: undefined,
+  },
+  cards: [],
+}
+
+export const defaultWhatsAppLocationRequestOptions: WhatsAppLocationRequestOptions =
+  {
+    name: '',
+    subject: '',
+    body: {
+      content: undefined,
+    },
+    property: undefined,
+    variableId: undefined,
+  }

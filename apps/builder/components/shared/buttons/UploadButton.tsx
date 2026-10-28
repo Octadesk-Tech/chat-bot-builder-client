@@ -20,7 +20,7 @@ import {
   chakra,
 } from '@chakra-ui/react'
 import { BotSpecificationOption, useWorkspace } from 'contexts/WorkspaceContext'
-import React, { ChangeEvent, useEffect, useState, useMemo } from 'react'
+import React, { ChangeEvent, useEffect, useId, useState, useMemo } from 'react'
 import fileUploader from 'services/octadesk/fileUploader/fileUploader'
 import {
   ChannelSection,
@@ -33,8 +33,9 @@ import { CheckCircleOutlineIcon, BlockIcon } from 'assets/icons'
 import { Channels } from 'enums/channels'
 
 type UploadButtonProps = {
-  filePath: string
+  filePath?: string
   includeFileName?: boolean
+  accept?: string
   onFileUploaded: (
     url: string,
     type: string,
@@ -45,9 +46,11 @@ type UploadButtonProps = {
 export const UploadButton = ({
   filePath,
   includeFileName,
+  accept,
   onFileUploaded,
   ...props
 }: UploadButtonProps) => {
+  const inputId = `file-input-${useId()}`
   const [isUploading, setIsUploading] = useState(false)
   const {
     workspace,
@@ -300,15 +303,15 @@ export const UploadButton = ({
         <chakra.input
           data-testid="file-upload-input"
           type="file"
-          id="file-input"
+          id={inputId}
           display="none"
           onChange={handleInputChange}
-          accept={accepedExtensions}
+          accept={accept ?? accepedExtensions}
         />
         <Button
           as="label"
           size="md"
-          htmlFor="file-input"
+          htmlFor={inputId}
           cursor="pointer"
           isLoading={isUploading}
           {...props}

@@ -4,6 +4,7 @@ import {
   AssignToIcon,
   CalendarIcon,
   CallBotIcon,
+  CarouselIcon,
   CodeIcon,
   CommerceIcon,
   ContactCardIcon,
@@ -18,6 +19,7 @@ import {
   FlagIcon,
   LayoutIcon,
   ListIcon,
+  LocationIcon,
   PhoneIcon,
   PreReserveIcon,
   QuestionIcon,
@@ -119,6 +121,10 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
       return <ListIcon color="#256F42" {...props} />
     case OctaWabaStepType.WHATSAPP_BUTTONS_LIST:
       return <CodeIcon color="#256F42" {...props} />
+    case OctaWabaStepType.WHATSAPP_CAROUSEL:
+      return <CarouselIcon color="#256F42" {...props} />
+    case OctaWabaStepType.WHATSAPP_LOCATION_REQUEST:
+      return <LocationIcon color="#256F42" {...props} />
     case OctaStepType.OFFICE_HOURS:
       return <CalendarIcon color="#373A86" />
     case OctaWabaStepType.COMMERCE:

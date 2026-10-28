@@ -25,6 +25,8 @@ import { CallOtherBotContent } from '../contents/CallOtherBot/CallOtherBotConten
 // import { ConfigureContent } from './contents/ConfigureContent'
 import { OctaCommerceContent } from '../contents/OctaCommerceContent'
 import { WhatsAppButtonsContent } from '../contents/WhatsApp/WhatsAppButtons'
+import { WhatsAppCarouselContent } from '../contents/WhatsApp/WhatsAppCarousel'
+import { WhatsAppLocationRequestContent } from '../contents/WhatsApp/WhatsAppLocationRequest'
 import { WhatsAppOptionsContent } from '../contents/WhatsApp/WhatsAppOptions'
 // import { PaymentInputContent } from './contents/PaymentInputContent'
 // import { SendEmailContent } from './contents/SendEmailContent'
@@ -179,6 +181,12 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     }
     case OctaWabaStepType.WHATSAPP_BUTTONS_LIST: {
       return <WhatsAppButtonsContent step={step} indices={indices} />
+    }
+    case OctaWabaStepType.WHATSAPP_CAROUSEL: {
+      return <WhatsAppCarouselContent step={step} />
+    }
+    case OctaWabaStepType.WHATSAPP_LOCATION_REQUEST: {
+      return <WhatsAppLocationRequestContent step={step} />
     }
     case OctaStepType.PRE_RESERVE: {
       return <PreReserveContent step={step} />

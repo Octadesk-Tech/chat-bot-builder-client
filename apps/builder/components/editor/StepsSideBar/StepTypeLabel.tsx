@@ -101,6 +101,10 @@ export const StepTypeLabel = ({ type }: Props) => {
       return <Text>Pergunta com lista de opções</Text>
     case OctaWabaStepType.WHATSAPP_BUTTONS_LIST:
       return <Text>Pergunta com lista de botões</Text>
+    case OctaWabaStepType.WHATSAPP_CAROUSEL:
+      return <Text>Carrossel</Text>
+    case OctaWabaStepType.WHATSAPP_LOCATION_REQUEST:
+      return <Text>Pergunta de localização</Text>
     case OctaWabaStepType.COMMERCE:
       return <Text>Enviar um catálogo</Text>
     case OctaStepType.PRE_RESERVE:

@@ -134,7 +134,12 @@ export const isOctaBubbleStepType = (
 
 export const isOctaStepType = (type: StepType): type is OctaStepType => {
   const octaType = Object.values(OctaStepType) as string[]
-  return [...octaType, OctaWabaStepType.COMMERCE].includes(type)
+  return [
+    ...octaType,
+    OctaWabaStepType.COMMERCE,
+    OctaWabaStepType.WHATSAPP_CAROUSEL,
+    OctaWabaStepType.WHATSAPP_LOCATION_REQUEST,
+  ].includes(type)
 }
 
 export const isWOZStepType = (type: StepType): type is WOZStepType => {

@@ -36,6 +36,8 @@ import {
   PreReserveSettingsBody,
   UrlInputSettingsBody,
   WhatsAppButtonsListSettingsBody,
+  WhatsAppCarouselSettingsBody,
+  WhatsAppLocationRequestSettingsBody,
   WhatsAppOptionsListSettingsBody,
   WOZAssignSettingBody,
   WOZSuggestionSettingBody,
@@ -77,6 +79,8 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
     switch (step.type) {
       case OctaWabaStepType.WHATSAPP_BUTTONS_LIST:
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
+      case OctaWabaStepType.WHATSAPP_CAROUSEL:
+      case OctaWabaStepType.WHATSAPP_LOCATION_REQUEST:
       case OctaStepType.OFFICE_HOURS:
       case OctaWabaStepType.COMMERCE:
       case WOZStepType.ASSIGN:
@@ -110,6 +114,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
         break
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
       case OctaWabaStepType.WHATSAPP_BUTTONS_LIST:
+      case OctaWabaStepType.WHATSAPP_CAROUSEL:
         height = 800
         break
       default:
@@ -354,6 +359,22 @@ export const StepSettings = ({
           onOptionsChange={handleOptionsChange}
           step={step}
           indices={indices}
+        />
+      )
+    }
+    case OctaWabaStepType.WHATSAPP_CAROUSEL: {
+      return (
+        <WhatsAppCarouselSettingsBody
+          options={step.options}
+          onOptionsChange={handleOptionsChange}
+        />
+      )
+    }
+    case OctaWabaStepType.WHATSAPP_LOCATION_REQUEST: {
+      return (
+        <WhatsAppLocationRequestSettingsBody
+          options={step.options}
+          onOptionsChange={handleOptionsChange}
         />
       )
     }

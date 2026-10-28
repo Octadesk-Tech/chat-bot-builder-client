@@ -629,6 +629,34 @@ export const ListIcon = (props: any) => (
   </IconContext.Provider>
 )
 
+export const CarouselIcon = (props: any) => (
+  <IconContext.Provider
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
+  >
+    <div>
+      <MaterialDesign.MdViewCarousel />
+    </div>
+  </IconContext.Provider>
+)
+
+export const LocationIcon = (props: any) => (
+  <IconContext.Provider
+    value={{
+      color: props.color,
+      className: 'global-class-name',
+      size: props.fontSize,
+    }}
+  >
+    <div>
+      <MaterialDesign.MdLocationOn />
+    </div>
+  </IconContext.Provider>
+)
+
 export const RadioIcon = (props: any) => (
   <IconContext.Provider
     value={{ color: props.color, className: 'global-class-name' }}
