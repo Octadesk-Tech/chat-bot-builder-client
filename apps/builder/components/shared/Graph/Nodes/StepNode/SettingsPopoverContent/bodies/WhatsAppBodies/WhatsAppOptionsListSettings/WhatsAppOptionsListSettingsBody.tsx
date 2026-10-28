@@ -30,7 +30,7 @@ import { StepIndices } from 'models'
 
 type WhatsAppOptionsListSettingsBodyProps = {
   options: WhatsAppOptionsListOptions
-  onOptionsChange: (options: WhatsAppOptionsListOptions) => void
+  onOptionsChange: (options: Partial<WhatsAppOptionsListOptions>) => void
   step?: WhatsAppOptionsListStep
   indices: StepIndices
 }
@@ -76,7 +76,6 @@ export const WhatsAppOptionsListSettingsBody = ({
   const handleVariableChange = (variable?: Variable) => {
     if (!variable || (!variable.id && !variable.variableId)) {
       onOptionsChange({
-        ...options,
         property: undefined,
         variableId: undefined,
       })
@@ -86,7 +85,6 @@ export const WhatsAppOptionsListSettingsBody = ({
     const varId = variable.variableId || variable.id
 
     onOptionsChange({
-      ...options,
       property: {
         domain: variable.domain,
         name: variable.name,
@@ -103,12 +101,7 @@ export const WhatsAppOptionsListSettingsBody = ({
       ...value,
       ...updateHeaderText,
     }))
-    onOptionsChange({
-      ...options,
-      header: {
-        content,
-      },
-    })
+    onOptionsChange({ header: { content } })
   }
 
   const handleBodyText = (content: any) => {
@@ -117,12 +110,7 @@ export const WhatsAppOptionsListSettingsBody = ({
       ...value,
       ...updateBodyText,
     }))
-    onOptionsChange({
-      ...options,
-      body: {
-        content,
-      },
-    })
+    onOptionsChange({ body: { content } })
   }
 
   const handleFooterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,10 +126,7 @@ export const WhatsAppOptionsListSettingsBody = ({
       plainText: newValue,
     }
 
-    onOptionsChange({
-      ...options,
-      footer: { content },
-    })
+    onOptionsChange({ footer: { content } })
   }
   const handleListTitle = (content: any) => {
     const updateListTitleText = { listTitle: content.plainText }
@@ -149,25 +134,14 @@ export const WhatsAppOptionsListSettingsBody = ({
       ...value,
       ...updateListTitleText,
     }))
-    onOptionsChange({
-      ...options,
-      listTitle: {
-        content,
-      },
-    })
+    onOptionsChange({ listTitle: { content } })
   }
 
   const handleFallBackMessage = (content: TextBubbleContent, index: number) => {
-    if (!options) return
-    if (!options?.fallbackMessages) options.fallbackMessages = []
+    const fallbackMessages = [...(options.fallbackMessages ?? [])]
+    fallbackMessages[index] = content
 
-    if (options.fallbackMessages.length > index)
-      options.fallbackMessages[index] = content
-    else options.fallbackMessages.push(content)
-
-    onOptionsChange({
-      ...options,
-    })
+    onOptionsChange({ fallbackMessages })
   }
 
   const fallbackMessageComponent = (
@@ -195,10 +169,7 @@ export const WhatsAppOptionsListSettingsBody = ({
   }
 
   const onAssign = (v: any) => {
-    onOptionsChange({
-      ...options,
-      ...v,
-    })
+    onOptionsChange(v)
   }
 
   const handleAddOption = () => {
@@ -215,7 +186,7 @@ export const WhatsAppOptionsListSettingsBody = ({
 
     const updatedItems = [...localListItems, newOption]
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, listItems: updatedItems })
+    onOptionsChange({ listItems: updatedItems })
   }
 
   const handleUpdateOption = (index: number, value: string) => {
@@ -227,7 +198,7 @@ export const WhatsAppOptionsListSettingsBody = ({
     }
 
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, listItems: updatedItems })
+    onOptionsChange({ listItems: updatedItems })
   }
 
   const handleRemoveOption = (index: number) => {
@@ -238,7 +209,7 @@ export const WhatsAppOptionsListSettingsBody = ({
     )
 
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, listItems: updatedItems })
+    onOptionsChange({ listItems: updatedItems })
   }
 
   const handleReorderOption = (oldIndex: number, newIndex: number) => {
@@ -247,7 +218,7 @@ export const WhatsAppOptionsListSettingsBody = ({
     updatedItems.splice(newIndex, 0, movedItem)
 
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, listItems: updatedItems })
+    onOptionsChange({ listItems: updatedItems })
   }
 
   return (

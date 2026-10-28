@@ -29,6 +29,7 @@ import {
   WOZInterpretDataWithAIOptions,
 } from 'models'
 import { useRef } from 'react'
+import { useTypebot } from 'contexts/TypebotContext'
 import {
   AssignToTeamSettingsBody,
   CallOtherBotSettingsBody,
@@ -166,6 +167,8 @@ export const StepSettings = ({
   webhook?: Webhook
   onStepChange: (step: Partial<Step>) => void
 }) => {
+  const { updateStepOptions } = useTypebot()
+
   const handleContentChange = (
     content:
       | MediaBubbleContent
@@ -176,6 +179,9 @@ export const StepSettings = ({
   }
   const handleOptionsChange = (options: StepOptions) => {
     onStepChange({ options } as Partial<Step>)
+  }
+  const handlePartialOptionsChange = (partialOptions: Partial<StepOptions>) => {
+    updateStepOptions(indices, partialOptions)
   }
   const handleItemChange = (updates: Partial<any>) => {
     onStepChange({
@@ -361,7 +367,7 @@ export const StepSettings = ({
       return (
         <WhatsAppOptionsListSettingsBody
           options={step.options || {}}
-          onOptionsChange={handleOptionsChange}
+          onOptionsChange={handlePartialOptionsChange}
           step={step}
           indices={indices}
         />
@@ -371,7 +377,7 @@ export const StepSettings = ({
       return (
         <WhatsAppButtonsListSettingsBody
           options={step.options || {}}
-          onOptionsChange={handleOptionsChange}
+          onOptionsChange={handlePartialOptionsChange}
           step={step}
           indices={indices}
         />

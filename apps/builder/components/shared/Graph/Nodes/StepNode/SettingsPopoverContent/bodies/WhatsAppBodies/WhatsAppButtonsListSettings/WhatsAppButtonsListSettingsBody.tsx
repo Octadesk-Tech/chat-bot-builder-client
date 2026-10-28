@@ -30,7 +30,7 @@ import { ItemDraggableList } from 'components/shared/Graph/Nodes/ItemNode/ItemDr
 
 type WhatsAppButtonsListSettingsBodyProps = {
   options: WhatsAppButtonsListOptions
-  onOptionsChange: (options: WhatsAppButtonsListOptions) => void
+  onOptionsChange: (options: Partial<WhatsAppButtonsListOptions>) => void
   step?: WhatsAppButtonsListStep
   indices: StepIndices
 }
@@ -71,7 +71,6 @@ export const WhatsAppButtonsListSettingsBody = ({
   const handleVariableChange = (variable?: Variable) => {
     if (!variable || (!variable.id && !variable.variableId)) {
       onOptionsChange({
-        ...options,
         property: undefined,
         variableId: undefined,
       })
@@ -81,7 +80,6 @@ export const WhatsAppButtonsListSettingsBody = ({
     const varId = variable.variableId || variable.id
 
     onOptionsChange({
-      ...options,
       property: {
         domain: variable.domain,
         name: variable.name,
@@ -99,12 +97,7 @@ export const WhatsAppButtonsListSettingsBody = ({
       ...prev,
       header: plainText,
     }))
-    onOptionsChange({
-      ...options,
-      header: {
-        content,
-      },
-    })
+    onOptionsChange({ header: { content } })
   }
 
   const handleBodyText = (content: any) => {
@@ -113,12 +106,7 @@ export const WhatsAppButtonsListSettingsBody = ({
       ...value,
       ...updateBodyText,
     }))
-    onOptionsChange({
-      ...options,
-      body: {
-        content,
-      },
-    })
+    onOptionsChange({ body: { content } })
   }
 
   const handleFooterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -134,23 +122,14 @@ export const WhatsAppButtonsListSettingsBody = ({
       plainText: newValue,
     }
 
-    onOptionsChange({
-      ...options,
-      footer: { content },
-    })
+    onOptionsChange({ footer: { content } })
   }
 
   const handleFallBackMessage = (content: TextBubbleContent, index: number) => {
-    if (!options) return
-    if (!options?.fallbackMessages) options.fallbackMessages = []
+    const fallbackMessages = [...(options.fallbackMessages ?? [])]
+    fallbackMessages[index] = content
 
-    if (options.fallbackMessages.length > index)
-      options.fallbackMessages[index] = content
-    else options.fallbackMessages.push(content)
-
-    onOptionsChange({
-      ...options,
-    })
+    onOptionsChange({ fallbackMessages })
   }
 
   const fallbackMessageComponent = (
@@ -178,10 +157,7 @@ export const WhatsAppButtonsListSettingsBody = ({
   }
 
   const onAssign = (v: any) => {
-    onOptionsChange({
-      ...options,
-      ...v,
-    })
+    onOptionsChange(v)
   }
 
   const handleAddButton = () => {
@@ -195,7 +171,7 @@ export const WhatsAppButtonsListSettingsBody = ({
 
     const updatedItems = [...localListItems, newButton]
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, buttonItems: updatedItems })
+    onOptionsChange({ buttonItems: updatedItems })
   }
 
   const handleUpdateButton = (index: number, value: string) => {
@@ -206,7 +182,7 @@ export const WhatsAppButtonsListSettingsBody = ({
     }
 
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, buttonItems: updatedItems })
+    onOptionsChange({ buttonItems: updatedItems })
   }
 
   const handleRemoveButton = (index: number) => {
@@ -217,7 +193,7 @@ export const WhatsAppButtonsListSettingsBody = ({
     )
 
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, buttonItems: updatedItems })
+    onOptionsChange({ buttonItems: updatedItems })
   }
 
   const handleReorderButton = (oldIndex: number, newIndex: number) => {
@@ -226,7 +202,7 @@ export const WhatsAppButtonsListSettingsBody = ({
     updatedItems.splice(newIndex, 0, movedItem)
 
     setLocalListItems(updatedItems)
-    onOptionsChange({ ...options, buttonItems: updatedItems })
+    onOptionsChange({ buttonItems: updatedItems })
   }
 
   return (

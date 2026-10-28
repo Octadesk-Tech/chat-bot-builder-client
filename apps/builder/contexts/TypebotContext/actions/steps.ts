@@ -4,6 +4,8 @@ import {
   DraggableStep,
   DraggableStepType,
   StepIndices,
+  StepOptions,
+  StepWithOptions,
 } from 'models'
 import { removeEmptyBlocks } from './blocks'
 import { WritableDraft } from 'immer/dist/types/types-external'
@@ -26,6 +28,10 @@ export type StepsActions = {
   updateStep: (
     indices: StepIndices,
     updates: Partial<Omit<Step, 'id' | 'type'>>
+  ) => void
+  updateStepOptions: (
+    indices: StepIndices,
+    partialOptions: Partial<StepOptions>
   ) => void
   duplicateStep: (indices: StepIndices) => void
   detachStepFromBlock: (indices: StepIndices) => void
@@ -59,6 +65,23 @@ const stepsAction = (
           ...step,
           ...removeReferences(updates),
         } as Step
+      })
+    ),
+  updateStepOptions: (
+    { blockIndex, stepIndex }: StepIndices,
+    partialOptions: Partial<StepOptions>
+  ) =>
+    setTypebot((typebot) =>
+      produce(typebot, (typebot) => {
+        const step = typebot.blocks[blockIndex]?.steps[stepIndex] as
+          | WritableDraft<StepWithOptions>
+          | undefined
+        if (!step) return
+
+        step.options = {
+          ...step.options,
+          ...removeReferences(partialOptions),
+        } as StepOptions
       })
     ),
   duplicateStep: ({ blockIndex, stepIndex }: StepIndices) =>
@@ -102,7 +125,7 @@ const isStartStepAt = (
   { blockIndex, stepIndex }: StepIndices
 ) => typebot.blocks[blockIndex]?.steps[stepIndex]?.type === 'start'
 
-const removeReferences = (updates: Partial<Omit<Step, 'id' | 'type'>>) =>
+const removeReferences = (updates: object) =>
   Object.entries(updates).reduce((clonedUpdates, [key, value]) => {
     clonedUpdates[key] =
       value === undefined ? undefined : JSON.parse(JSON.stringify(value))
