@@ -133,6 +133,7 @@ export const StepsSideBar = () => {
     IntegrationStepType.WEBHOOK,
     WOZStepType.INTERPRET_DATA_WITH_AI,
     LogicStepType.SET_VARIABLE,
+    LogicStepType.CONDITION,
   ]
   const AUTOMATED_TASKS_AVAILABLE_STEPS: StepType[] = [
     WOZStepType.MESSAGE,
