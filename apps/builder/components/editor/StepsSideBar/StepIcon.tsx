@@ -121,6 +121,8 @@ export const StepIcon = ({ type, ...props }: StepIconProps) => {
       return <CodeIcon color="#256F42" {...props} />
     case OctaStepType.OFFICE_HOURS:
       return <CalendarIcon color="#373A86" />
+    case OctaWabaStepType.CONTINUE_ON_SITE:
+      return <ExternalLinkIcon color="#AA561C" {...props} />
     case OctaWabaStepType.COMMERCE:
       return <CommerceIcon color="#AA561C" {...props} />
     case OctaStepType.PRE_RESERVE:

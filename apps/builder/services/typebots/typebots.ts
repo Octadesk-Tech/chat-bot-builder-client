@@ -40,6 +40,7 @@ import {
   defaultCallOtherBotOptions,
   defaultChoiceInputOptions,
   defaultCommerceOptions,
+  defaultContinueOnSiteOptions,
   defaultConditionContent,
   defaultConversationTagOptions,
   defaultCpfInputOptions,
@@ -547,6 +548,8 @@ const parseOctaStepOptions = (
       return defaultOfficeHoursOptions
     case OctaWabaStepType.COMMERCE:
       return defaultCommerceOptions
+    case OctaWabaStepType.CONTINUE_ON_SITE:
+      return defaultContinueOnSiteOptions
     case OctaStepType.PRE_RESERVE:
       return defaultPreReserveOptions
     case OctaStepType.CONVERSATION_TAG:
