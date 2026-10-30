@@ -18,6 +18,7 @@ const FORBIDDEN_PATTERNS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /Proxy\s*\(/, label: 'Proxy' },
   { pattern: /Reflect\s*\./, label: 'Reflect' },
   { pattern: /\.env\b/, label: '.env' },
+  { pattern: /\bfetch\s*\(/, label: 'fetch()' },
 ]
 
 export const validateCode = (code: string): CodeValidationResult => {
