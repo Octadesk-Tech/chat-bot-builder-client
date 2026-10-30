@@ -114,6 +114,8 @@ export const StepsSideBar = () => {
     setIsExtended(false)
   }
 
+  const isCodeBlockEnabled = verifyFeatureToggle('bot-code-block')
+
   const isValidComponent = (type: StepType) => {
     return (
       type !== BubbleStepType.EMBED &&
@@ -121,7 +123,7 @@ export const StepsSideBar = () => {
       type !== BubbleStepType.IMAGE &&
       type !== InputStepType.URL &&
       type !== InputStepType.PAYMENT &&
-      type !== LogicStepType.SET_VARIABLE &&
+      (type !== LogicStepType.SET_VARIABLE || isCodeBlockEnabled) &&
       type !== LogicStepType.REDIRECT &&
       type !== LogicStepType.CODE &&
       type !== LogicStepType.TYPEBOT_LINK &&
@@ -133,6 +135,9 @@ export const StepsSideBar = () => {
   const EVENT_AVAILABLE_STEPS: StepType[] = [
     IntegrationStepType.WEBHOOK,
     WOZStepType.INTERPRET_DATA_WITH_AI,
+    ...(isCodeBlockEnabled
+      ? [LogicStepType.SET_VARIABLE, LogicStepType.CONDITION]
+      : []),
   ]
   const AUTOMATED_TASKS_AVAILABLE_STEPS: StepType[] = [
     WOZStepType.MESSAGE,
