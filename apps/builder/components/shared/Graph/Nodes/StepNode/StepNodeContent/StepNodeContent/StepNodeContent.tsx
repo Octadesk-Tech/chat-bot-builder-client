@@ -16,7 +16,7 @@ import {
 import { ItemNodesList } from '../../../ItemNode'
 
 import {
-  // SetVariableContent,
+  SetVariableContent,
   TextBubbleContent,
 } from '../contents'
 import { AssignToTeamContent } from '../contents/AssignToTeam/AssignToTeamContent'
@@ -86,9 +86,9 @@ export const StepNodeContent = ({ step, indices }: Props) => {
     //     // />
     //   )
     // }
-    // case LogicStepType.SET_VARIABLE: {
-    //   return <SetVariableContent step={step} />
-    // }
+    case LogicStepType.SET_VARIABLE: {
+      return <SetVariableContent step={step} />
+    }
     case LogicStepType.CONDITION: {
       return <ItemNodesList step={step} indices={indices} isReadOnly />
     }
