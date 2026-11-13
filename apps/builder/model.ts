@@ -346,6 +346,7 @@ export type FeatureFlags = {
   'use-new-bot-builder': FeatureFlagsProps
   'responsible-contact-enabled': FeatureFlagsProps
   'customer-recontact': FeatureFlagsProps
+  'allow-to-continue-chatting-on-website': FeatureFlagsProps
 }
 
 export type CollaborationType =

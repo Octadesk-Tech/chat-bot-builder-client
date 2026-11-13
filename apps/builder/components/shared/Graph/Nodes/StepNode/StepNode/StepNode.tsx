@@ -251,6 +251,7 @@ const StepNodeBase = ({
   const checkisConnectable = (step: Step): boolean => {
     return (
       !isEndConversationStep(step) &&
+      !isContinueOnSiteStep(step) &&
       !isAssignToTeamStep(step) &&
       hasDefaultConnector(step) &&
       !isOfficeHoursStep(step) &&
@@ -479,6 +480,10 @@ const isEndConversationStep = (
 ): step is Exclude<Step, BubbleStep> => {
   // hasStepRedirectNoneAvailable(step)
   return isOctaBubbleStep(step)
+}
+
+const isContinueOnSiteStep = (step: Step) => {
+  return step.type === OctaWabaStepType.CONTINUE_ON_SITE
 }
 
 const isAssignToTeamStep = (step: Step): step is AssignToTeamStep => {
