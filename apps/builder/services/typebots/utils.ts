@@ -3,7 +3,6 @@ import imageCompression from 'browser-image-compression'
 import { config } from 'config/octadesk.config'
 import { Parser } from 'htmlparser2'
 import { Step, Typebot } from 'models'
-import { sendRequest } from 'utils'
 
 export const fetcher = async (input: RequestInfo, init?: RequestInit) => {
   const url = input.toString().replace(config.basePath || '', '')
@@ -61,26 +60,6 @@ export const toKebabCase = (value: string) => {
   )
   if (!matched) return ''
   return matched.map((x) => x.toLowerCase()).join('-')
-}
-
-export const uploadFile = async (file: File, filePath: string) => {
-  const { data } = await sendRequest<{ presignedUrl: string }>(
-    `/api/storage/upload-url?filePath=${encodeURIComponent(filePath)}`
-  )
-
-  if (!data?.presignedUrl)
-    return {
-      url: null,
-    }
-
-  await fetch(data.presignedUrl, {
-    method: 'PUT',
-    body: file,
-  })
-
-  return {
-    url: data.presignedUrl.split('?')[0],
-  }
 }
 
 export const compressFile = async (file: File) => {
