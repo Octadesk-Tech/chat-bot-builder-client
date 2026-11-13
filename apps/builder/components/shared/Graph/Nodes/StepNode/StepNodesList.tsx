@@ -121,6 +121,7 @@ export const StepNodesList = ({
   const isRoutingStep = (type: StepType) =>
     [
       OctaBubbleStepType.END_CONVERSATION,
+      OctaWabaStepType.CONTINUE_ON_SITE,
       OctaStepType.ASSIGN_TO_TEAM,
       OctaStepType.CALL_OTHER_BOT,
       WOZStepType.ASSIGN,
