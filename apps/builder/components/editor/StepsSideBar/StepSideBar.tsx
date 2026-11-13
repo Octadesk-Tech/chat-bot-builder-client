@@ -220,7 +220,11 @@ export const StepsSideBar = () => {
   }
 
   const wabaMessageComponent = () => {
-    return [OctaWabaStepType.COMMERCE, OctaWabaStepType.CONTINUE_ON_SITE]
+    return [OctaWabaStepType.COMMERCE]
+  }
+
+  const wabaRoutingComponent = () => {
+    return [OctaWabaStepType.CONTINUE_ON_SITE]
   }
 
   const wabaMessageExtraFlag: Partial<Record<OctaWabaStepType, string>> = {
@@ -246,12 +250,22 @@ export const StepsSideBar = () => {
     shouldShowComponent(step)
   )
   const octaWabaSteps = Object.values(OctaWabaStepType).filter(
-    (s) => !wabaMessageComponent().includes(s) && shouldShowComponent(s)
+    (s) =>
+      !wabaMessageComponent().includes(s) &&
+      !wabaRoutingComponent().includes(s) &&
+      shouldShowComponent(s)
   )
   const bubbleSteps = Object.values(BubbleStepType).filter((step) =>
     shouldShowComponent(step)
   )
   const wabaMessageSteps = wabaMessageComponent().filter(
+    (step) =>
+      shouldShowComponent(step) &&
+      workspace?.channel === Channels.WHATSAPP &&
+      isWabaMessageEnabled(step)
+  )
+
+  const wabaRoutingSteps = wabaRoutingComponent().filter(
     (step) =>
       shouldShowComponent(step) &&
       workspace?.channel === Channels.WHATSAPP &&
@@ -528,7 +542,9 @@ export const StepsSideBar = () => {
               </SimpleGrid>
             </Stack>
           )}
-          {(octaSteps.length || octaBubbleSteps.length) && (
+          {(octaSteps.length ||
+            octaBubbleSteps.length ||
+            wabaRoutingSteps.length) && (
             <Stack>
               <Text fontSize="sm" fontWeight="semibold" color="gray.600">
                 Direcionamentos
@@ -552,6 +568,19 @@ export const StepsSideBar = () => {
                       key={type as string}
                       type={type}
                       onMouseDown={handleMouseDown}
+                    />
+                  ))}
+                </SimpleGrid>
+              )}
+              {wabaRoutingSteps.length > 0 && (
+                <SimpleGrid columns={1} spacing="3">
+                  {wabaRoutingSteps.map((type) => (
+                    <StepCard
+                      key={type as string}
+                      type={type}
+                      onMouseDown={handleMouseDown}
+                      badge={'WAB'}
+                      isDisabled={shouldDisableComponent(type)}
                     />
                   ))}
                 </SimpleGrid>
