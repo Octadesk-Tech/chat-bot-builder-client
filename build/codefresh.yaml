@@ -199,6 +199,7 @@ steps:
     image: alpine/git
     working_directory: "${{CF_VOLUME_PATH}}/${{GIT_IAC_REPOSITORY}}/"
     commands:
+      - git remote set-url origin "https://x-access-token:${{GIT_TOKEN}}@github.com/Octadesk-Tech/${{GIT_IAC_REPOSITORY}}.git"
       - git checkout ${{MAIN_BRANCH}}
       - git branch --set-upstream-to=origin/${{MAIN_BRANCH}} ${{MAIN_BRANCH}}
       - git config user.email "${{GIT_CONFIG_EMAIL}}"
