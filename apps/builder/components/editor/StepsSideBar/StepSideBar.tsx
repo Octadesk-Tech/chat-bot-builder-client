@@ -144,8 +144,17 @@ export const StepsSideBar = () => {
     WOZStepType.INTERPRET_DATA_WITH_AI,
   ]
   const LIMITED_DOMAINS = ['person', 'ticket']
+  const MESSAGE_DOMAIN = 'message'
+
+  const isBlockedInMessageDomain = (type: StepType) =>
+    typebot?.domain === MESSAGE_DOMAIN &&
+    type === WOZStepType.INTERPRET_DATA_WITH_AI
 
   const isValidToCurrentDomain = (type: StepType) => {
+    if (isBlockedInMessageDomain(type)) {
+      return false
+    }
+
     if (LIMITED_DOMAINS.includes(typebot?.domain || 'chat')) {
       return EVENT_AVAILABLE_STEPS.includes(type)
     }
