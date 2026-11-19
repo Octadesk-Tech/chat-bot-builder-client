@@ -53,6 +53,7 @@ import {
   defaultOfficeHoursOptions,
   defaultPhoneInputOptions,
   defaultPreReserveOptions,
+  defaultSetVariablesOptions,
   defaultSettings,
   defaultTextBubbleContent,
   defaultTheme,
@@ -586,8 +587,8 @@ const parseDefaultStepOptions = (
     //   return defaultPaymentInputOptions
     case InputStepType.ASK_NAME:
       return defaultAskNameOptions
-    // case LogicStepType.SET_VARIABLE:
-    //   return defaultSetVariablesOptions
+    case LogicStepType.SET_VARIABLE:
+      return defaultSetVariablesOptions
     // case LogicStepType.REDIRECT:
     //   return defaultRedirectOptions
     // case LogicStepType.CODE:

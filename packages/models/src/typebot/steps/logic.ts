@@ -112,6 +112,12 @@ export type SetVariableOptions = {
   variableId?: string
   expressionToEvaluate?: string
   isCode?: boolean
+  property?: {
+    domain: string
+    name: string
+    token: string
+    type?: string
+  }
 }
 
 export type RedirectOptions = {
