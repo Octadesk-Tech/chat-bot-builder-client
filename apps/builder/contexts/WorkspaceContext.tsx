@@ -314,7 +314,7 @@ export const WorkspaceContext = ({ children }: { children: ReactNode }) => {
 
     const getMultiLevelProp = (obj: any, keys: any) => {
       return keys.split('.').reduce((cur: any, key: any) => {
-        return cur[key]
+        return cur?.[key]
       }, obj)
     }
 

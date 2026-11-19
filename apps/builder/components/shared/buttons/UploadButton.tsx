@@ -214,7 +214,7 @@ export const UploadButton = ({
       }
 
       uniqueBotChannelsSpecifications.forEach((elem) => {
-        const channel: any = (listSpecifications() as any)[elem].value
+        const channel: any = (listSpecifications() as any)?.[elem]?.value
 
         ;(list as any)[elem] = (channel && channel.includes(spec)) || false
       })
