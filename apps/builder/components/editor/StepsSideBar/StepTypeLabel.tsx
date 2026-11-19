@@ -103,6 +103,8 @@ export const StepTypeLabel = ({ type }: Props) => {
       return <Text>Pergunta com lista de botões</Text>
     case OctaWabaStepType.COMMERCE:
       return <Text>Enviar um catálogo</Text>
+    case OctaWabaStepType.CONTINUE_ON_SITE:
+      return <Text>Envie continuar no site</Text>
     case OctaStepType.PRE_RESERVE:
       return <Text>Reservar conversa para um grupo</Text>
     case OctaStepType.CONVERSATION_TAG:

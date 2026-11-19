@@ -15,6 +15,7 @@ import { stepHasItems } from 'utils'
 
 const finalSteps: string[] = [
   OctaBubbleStepType.END_CONVERSATION,
+  OctaWabaStepType.CONTINUE_ON_SITE,
   WOZStepType.MESSAGE,
 ]
 

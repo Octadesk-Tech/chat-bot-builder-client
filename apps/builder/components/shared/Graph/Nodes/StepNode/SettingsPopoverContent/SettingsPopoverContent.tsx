@@ -9,6 +9,7 @@ import {
 import { ExpandIcon } from 'assets/icons'
 import {
   BubbleStepType,
+  defaultContinueOnSiteOptions,
   EndConversationStep,
   InputStepType,
   IntegrationStepType,
@@ -32,6 +33,7 @@ import { useTypebot } from 'contexts/TypebotContext'
 import {
   AssignToTeamSettingsBody,
   CallOtherBotSettingsBody,
+  ContinueOnSiteSettingsBody,
   ConversationTagBody,
   EndConversationSettingsBody,
   PreReserveSettingsBody,
@@ -80,6 +82,7 @@ export const SettingsPopoverContent = ({ onExpandClick, ...props }: Props) => {
       case OctaWabaStepType.WHATSAPP_OPTIONS_LIST:
       case OctaStepType.OFFICE_HOURS:
       case OctaWabaStepType.COMMERCE:
+      case OctaWabaStepType.CONTINUE_ON_SITE:
       case WOZStepType.ASSIGN:
         width = 450
         break
@@ -331,6 +334,14 @@ export const StepSettings = ({
       return (
         <OctaCommerceBody
           options={step.options}
+          onOptionsChange={handleOptionsChange}
+        />
+      )
+    }
+    case OctaWabaStepType.CONTINUE_ON_SITE: {
+      return (
+        <ContinueOnSiteSettingsBody
+          options={step.options || defaultContinueOnSiteOptions}
           onOptionsChange={handleOptionsChange}
         />
       )
