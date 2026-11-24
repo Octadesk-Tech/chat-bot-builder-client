@@ -8,6 +8,10 @@ import {
   useEventListener,
 } from '@chakra-ui/react'
 import { PlusIcon } from 'assets/icons'
+import {
+  BlockErrorFallback,
+  ErrorBoundary,
+} from 'components/shared/ErrorBoundary'
 import { Coordinates, useGraph } from 'contexts/GraphContext'
 import {
   computeNearestPlaceholderIndex,
@@ -213,14 +217,16 @@ export const StepNodesList = ({
       {hasTypebot &&
         steps.map((step, idx) => (
           <Fragment key={step.id}>
-            <StepNode
-              step={step}
-              indices={stableIndices[idx]}
-              isConnectable={steps.length - 1 === idx}
-              onMouseDown={stableOnMouseDown[idx]}
-              isStartBlock={isStartBlock}
-              unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
-            />
+            <ErrorBoundary fallback={<BlockErrorFallback />} resetKey={step}>
+              <StepNode
+                step={step}
+                indices={stableIndices[idx]}
+                isConnectable={steps.length - 1 === idx}
+                onMouseDown={stableOnMouseDown[idx]}
+                isStartBlock={isStartBlock}
+                unreachableNode={blockEndedIndex >= 0 && blockEndedIndex < idx}
+              />
+            </ErrorBoundary>
             {!isRoutingStep(step.type) && (
               <Flex
                 ref={handlePushElementRef(idx + 1)}
