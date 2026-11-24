@@ -1,8 +1,37 @@
 import NextErrorComponent from 'next/error'
 
+import { Button, Heading, Text, VStack } from '@chakra-ui/react'
 import * as Sentry from '@sentry/nextjs'
 import { NextPageContext } from 'next'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+
+const isInsideIframe = () => globalThis.self !== globalThis.top
+
+const notifyParentOfBuilderError = () => {
+  globalThis.parent.postMessage({ name: 'builderError' }, '*')
+}
+
+const redirectToAutomationStudio = () => {
+  globalThis.location.replace(
+    `${globalThis.location.origin}/automation-studio`
+  )
+}
+
+const reloadEditor = () => {
+  globalThis.location.reload()
+}
+
+const EmbeddedErrorPage = () => (
+  <VStack h="100vh" justify="center" spacing="4" px="6" textAlign="center">
+    <Heading size="md">Algo deu errado no editor</Heading>
+    <Text color="gray.600">
+      Recarregue o editor para voltar ao último estado salvo.
+    </Text>
+    <Button colorScheme="blue" onClick={reloadEditor}>
+      Recarregar editor
+    </Button>
+  </VStack>
+)
 
 const MyError = ({
   statusCode,
@@ -13,15 +42,27 @@ const MyError = ({
   hasGetInitialPropsRun: boolean
   err: Error
 }) => {
+  const [isEmbedded, setIsEmbedded] = useState<boolean>()
+
   if (!hasGetInitialPropsRun && err) {
     Sentry.captureException(err)
   }
 
   useEffect(() => {
-    globalThis.location.replace(
-      `${globalThis.location.origin}/automation-studio`
-    )
+    const embedded = isInsideIframe()
+    setIsEmbedded(embedded)
+
+    if (!embedded) {
+      redirectToAutomationStudio()
+      return
+    }
+
+    notifyParentOfBuilderError()
   }, [])
+
+  if (isEmbedded === undefined) return null
+
+  if (isEmbedded) return <EmbeddedErrorPage />
 
   return <NextErrorComponent statusCode={statusCode} />
 }
