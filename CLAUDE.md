@@ -24,7 +24,6 @@ Packages of interest:
 
 ```bash
 yarn install
-yarn docker:up            # starts local infra (DB, etc.)
 yarn dev:prepare          # builds bot-engine and typebot-js first
 yarn dev                  # starts all apps in parallel
 # Windows:
