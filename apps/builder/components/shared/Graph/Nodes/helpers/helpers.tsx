@@ -147,6 +147,32 @@ export const getValidationMessages = (
       }
     }
 
+    if (OctaWabaStepType.CONTINUE_ON_SITE === step.type) {
+      data.push(
+        {
+          message: step?.options?.title,
+          min: { value: -1 },
+          max: { value: 60, message: 'Máximo de 60 caracteres' },
+        },
+        {
+          message: step?.options?.description,
+          max: { value: 1024, message: 'Máximo de 1024 caracteres' },
+        },
+        {
+          message: step?.options?.footer,
+          min: { value: -1 },
+          max: { value: 60, message: 'Máximo de 60 caracteres' },
+        },
+        {
+          message: step?.options?.buttonText,
+          max: { value: 20, message: 'Máximo de 20 caracteres' },
+        },
+        {
+          message: step?.options?.widgetFluxId,
+        }
+      )
+    }
+
     if (OctaStepType.ASSIGN_TO_TEAM === step.type) {
       data.push(
         {
