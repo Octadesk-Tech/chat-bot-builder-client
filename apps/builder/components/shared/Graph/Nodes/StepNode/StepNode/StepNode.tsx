@@ -14,6 +14,10 @@ import { StepTypeLabel } from 'components/editor/StepsSideBar/StepTypeLabel'
 import { OctaDivider } from 'components/octaComponents/OctaDivider/OctaDivider'
 import OctaTooltip from 'components/octaComponents/OctaTooltip/OctaTooltip'
 import { ContextMenu } from 'components/shared/ContextMenu'
+import {
+  BlockErrorFallback,
+  ErrorBoundary,
+} from 'components/shared/ErrorBoundary'
 import { useGraph } from 'contexts/GraphContext'
 import { NodePosition, useDragDistance } from 'contexts/GraphDndContext'
 import {
@@ -364,7 +368,12 @@ const StepNodeBase = ({
                       {step.type !== 'start' && (
                         <span>
                           <OctaDivider />
-                          <StepNodeContent step={step} indices={indices} />
+                          <ErrorBoundary
+                            fallback={<BlockErrorFallback />}
+                            resetKey={step}
+                          >
+                            <StepNodeContent step={step} indices={indices} />
+                          </ErrorBoundary>
                         </span>
                       )}
                       <TargetEndpoint
@@ -450,11 +459,13 @@ const StepNodeBase = ({
                 onCloseComplete={() => setModalMounted(false)}
                 stepType={step.type}
               >
-                <StepSettings
-                  step={step}
-                  indices={indices}
-                  onStepChange={handleStepUpdate}
-                />
+                <ErrorBoundary fallback={<BlockErrorFallback />}>
+                  <StepSettings
+                    step={step}
+                    indices={indices}
+                    onStepChange={handleStepUpdate}
+                  />
+                </ErrorBoundary>
               </SettingsModal>
             )}
           </Popover>
